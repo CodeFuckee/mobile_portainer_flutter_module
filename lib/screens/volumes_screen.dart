@@ -1,0 +1,497 @@
+import 'package:flutter/material.dart';
+import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
+import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
+import '../services/docker_service.dart';
+import '../models/docker_volume.dart';
+import 'volume_details_screen.dart';
+import '../utils/notify_utils.dart';
+
+enum VolumeFilter { all, inUse, unused }
+
+class VolumesScreen extends StatefulWidget {
+  const VolumesScreen({super.key});
+
+  @override
+  State<VolumesScreen> createState() => VolumesScreenState();
+}
+
+class VolumesScreenState extends State<VolumesScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  List<DockerVolume> _allVolumes = [];
+  List<DockerVolume> _filteredVolumes = [];
+  bool _isLoading = false;
+  bool _isCompactMode = false;
+  VolumeFilter _currentFilter = VolumeFilter.all;
+  String? _error;
+  String _currentApiUrl = '';
+  String _currentApiKey = '';
+  bool _currentIgnoreSsl = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettingsAndFetch();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadSettingsAndFetch() async {
+    final prefs = await PreferencesService.getInstance();
+    final url = prefs.getString('docker_api_url') ?? 'http://10.0.2.2:2375';
+    final apiKey = prefs.getString('docker_api_key') ?? '';
+    final ignoreSsl = prefs.getString('docker_ignore_ssl') == 'true';
+    setState(() {
+      _currentApiUrl = url;
+      _currentApiKey = apiKey;
+      _currentIgnoreSsl = ignoreSsl;
+    });
+    _fetchVolumes();
+  }
+
+  void refreshAfterSettings() {
+    _loadSettingsAndFetch();
+  }
+
+  bool get isLoading => _isLoading;
+  Future<void> manualRefresh() => _fetchVolumes();
+
+  Future<void> _fetchVolumes() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    final service = DockerService(baseUrl: _currentApiUrl, apiKey: _currentApiKey, ignoreSsl: _currentIgnoreSsl);
+    try {
+      final volumes = await service.getVolumes();
+      setState(() {
+        _allVolumes = volumes;
+        _filterVolumes();
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+        _allVolumes = [];
+        _filteredVolumes = [];
+      });
+    }
+  }
+
+  void _filterVolumes() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredVolumes = _allVolumes.where((volume) {
+        final matchesQuery = query.isEmpty || volume.name.toLowerCase().contains(query);
+        final matchesFilter = switch (_currentFilter) {
+          VolumeFilter.all => true,
+          VolumeFilter.inUse => volume.inUse,
+          VolumeFilter.unused => !volume.inUse,
+        };
+        return matchesQuery && matchesFilter;
+      }).toList();
+    });
+  }
+
+  void _onSearchChanged(String query) {
+    setState(() {
+      _filterVolumes();
+    });
+  }
+
+  Future<void> _deleteVolume(DockerVolume volume) async {
+    final t = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(t.titleConfirmDelete),
+        content: Text(t.msgConfirmDeleteVolume),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(t.actionCancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: Text(t.actionDelete),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final service = DockerService(baseUrl: _currentApiUrl, apiKey: _currentApiKey, ignoreSsl: _currentIgnoreSsl);
+      try {
+        await service.deleteVolume(volume.name);
+        if (mounted) {
+          NotifyUtils.showNotify(context, t.msgVolumeDeleted);
+          _fetchVolumes();
+        }
+      } catch (e) {
+        if (mounted) {
+          NotifyUtils.showNotify(context, t.msgDeleteVolumeFailed(e.toString()));
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+    
+    if (_error != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(t.msgCurrentApi(_currentApiUrl), style: const TextStyle(color: Colors.grey)),
+            const SizedBox(height: 10),
+            Text(_error!, style: const TextStyle(color: Colors.red), textAlign: TextAlign.center),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _loadSettingsAndFetch,
+              child: Text(t.msgRetry),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: t.hintSearchVolumes,
+                    prefixIcon: const Icon(Icons.search),
+                    filled: true,
+                    fillColor: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[800]
+                        : Colors.grey[200],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: const BorderSide(color: Colors.blue, width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 14,
+                    ),
+                  ),
+                  onChanged: _onSearchChanged,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Material(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[800]
+                    : Colors.grey[200],
+                borderRadius: BorderRadius.circular(16.0),
+                child: PopupMenuButton<VolumeFilter>(
+                  tooltip: t.filterAll,
+                  onSelected: (VolumeFilter item) {
+                    setState(() {
+                      _currentFilter = item;
+                      _filterVolumes();
+                    });
+                  },
+                  itemBuilder: (BuildContext context) => <PopupMenuEntry<VolumeFilter>>[
+                    PopupMenuItem<VolumeFilter>(
+                      value: VolumeFilter.all,
+                      child: Text(t.filterAll),
+                    ),
+                    PopupMenuItem<VolumeFilter>(
+                      value: VolumeFilter.inUse,
+                      child: Text(t.filterInUse),
+                    ),
+                    PopupMenuItem<VolumeFilter>(
+                      value: VolumeFilter.unused,
+                      child: Text(t.filterUnused),
+                    ),
+                  ],
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    alignment: Alignment.center,
+                    child: Icon(
+                      Icons.filter_list,
+                      color: _currentFilter != VolumeFilter.all 
+                          ? Colors.blue 
+                          : Theme.of(context).iconTheme.color,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Material(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[800]
+                    : Colors.grey[200],
+                borderRadius: BorderRadius.circular(16.0),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16.0),
+                  onTap: () {
+                    setState(() {
+                      _isCompactMode = !_isCompactMode;
+                    });
+                  },
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    alignment: Alignment.center,
+                    child: Icon(
+                      _isCompactMode
+                          ? Icons.view_agenda_outlined
+                          : Icons.view_list,
+                      color: Theme.of(context).iconTheme.color,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: _fetchVolumes,
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _filteredVolumes.isEmpty
+                  ? Center(child: Text(t.msgNoContainers.replaceAll('containers', 'volumes').replaceAll('容器', '存储卷')))
+                  : ListView.builder(
+                    itemCount: _filteredVolumes.length,
+                    itemBuilder: (context, index) {
+                      final volume = _filteredVolumes[index];
+                      if (_isCompactMode) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Theme.of(context).dividerColor,
+                                width: 0.5,
+                              ),
+                            ),
+                          ),
+                          child: ListTile(
+                            dense: true,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 0,
+                            ),
+                            onTap: () async {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => VolumeDetailsScreen(
+                                    volumeName: volume.name,
+                                    apiUrl: _currentApiUrl,
+                                    apiKey: _currentApiKey,
+                                    ignoreSsl: _currentIgnoreSsl,
+                                  ),
+                                ),
+                              );
+                              if (result == true) {
+                                _fetchVolumes();
+                              }
+                            },
+                            title: Text(
+                              volume.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (volume.inUse)
+                                  Container(
+                                    margin: const EdgeInsets.only(right: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green.withOpacity(0.1),
+                                      border: Border.all(color: Colors.green),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      t.labelInUse,
+                                      style: const TextStyle(
+                                        color: Colors.green,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                      volume.driver,
+                                      style: const TextStyle(
+                                        color: Colors.blue,
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete, size: 20, color: Colors.grey),
+                                    onPressed: () => _deleteVolume(volume),
+                                    tooltip: t.actionDelete,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+                      return Card(
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () async {
+                            final result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => VolumeDetailsScreen(
+                                  volumeName: volume.name,
+                                  apiUrl: _currentApiUrl,
+                                  apiKey: _currentApiKey,
+                                  ignoreSsl: _currentIgnoreSsl,
+                                ),
+                              ),
+                            );
+                            if (result == true) {
+                              _fetchVolumes();
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  volume.name,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                              ),
+                                              if (volume.inUse)
+                                                Container(
+                                                  margin: const EdgeInsets.only(left: 8),
+                                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.green.withOpacity(0.1),
+                                                    border: Border.all(color: Colors.green),
+                                                    borderRadius: BorderRadius.circular(4),
+                                                  ),
+                                                  child: Text(
+                                                    t.labelInUse,
+                                                    style: const TextStyle(
+                                                      color: Colors.green,
+                                                      fontSize: 10,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              IconButton(
+                                                icon: const Icon(Icons.delete, size: 20, color: Colors.grey),
+                                                onPressed: () => _deleteVolume(volume),
+                                                tooltip: t.actionDelete,
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            '${t.labelDriver}: ${volume.driver}',
+                                            style: TextStyle(
+                                              color: Colors.grey[600],
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                          if (volume.mountpoint.isNotEmpty) ...[
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              volume.mountpoint,
+                                              style: TextStyle(
+                                                color: Colors.grey[600],
+                                                fontSize: 12,
+                                                fontFamily: 'Monospace'
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                            ),
+                                          ],
+                                          if (volume.created.isNotEmpty) ...[
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              volume.created,
+                                              style: TextStyle(
+                                                color: Colors.grey[600],
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
+}

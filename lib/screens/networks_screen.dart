@@ -1,0 +1,335 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
+import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
+import '../models/docker_network.dart';
+import '../services/docker_service.dart';
+import 'network_details_screen.dart';
+
+class NetworksScreen extends StatefulWidget {
+  const NetworksScreen({super.key});
+
+  @override
+  State<NetworksScreen> createState() => NetworksScreenState();
+}
+
+class NetworksScreenState extends State<NetworksScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  List<DockerNetwork> _allNetworks = [];
+  List<DockerNetwork> _filteredNetworks = [];
+  bool _isLoading = false;
+  bool _isCompactMode = false;
+  String? _error;
+  String _currentApiUrl = '';
+  String _currentApiKey = '';
+  bool _currentIgnoreSsl = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettingsAndFetch();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadSettingsAndFetch() async {
+    final prefs = await PreferencesService.getInstance();
+    final url = prefs.getString('docker_api_url') ?? 'http://10.0.2.2:2375';
+    final apiKey = prefs.getString('docker_api_key') ?? '';
+    final ignoreSsl = prefs.getString('docker_ignore_ssl') == 'true';
+    setState(() {
+      _currentApiUrl = url;
+      _currentApiKey = apiKey;
+      _currentIgnoreSsl = ignoreSsl;
+    });
+    _fetchNetworks();
+  }
+
+  void refreshAfterSettings() {
+    _loadSettingsAndFetch();
+  }
+
+  bool get isLoading => _isLoading;
+  Future<void> manualRefresh() => _fetchNetworks();
+
+  Future<void> _fetchNetworks() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    final service = DockerService(baseUrl: _currentApiUrl, apiKey: _currentApiKey, ignoreSsl: _currentIgnoreSsl);
+    try {
+      final networks = await service.getNetworks();
+      setState(() {
+        _allNetworks = networks;
+        _filterNetworks();
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+        _allNetworks = [];
+        _filteredNetworks = [];
+      });
+    }
+  }
+
+  void _filterNetworks() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredNetworks = _allNetworks.where((network) {
+        final name = network.name.toLowerCase();
+        final id = network.id.toLowerCase();
+        final driver = network.driver.toLowerCase();
+        return query.isEmpty || 
+               name.contains(query) || 
+               id.contains(query) ||
+               driver.contains(query);
+      }).toList();
+    });
+  }
+
+  void _onSearchChanged(String query) {
+    setState(() {
+      _filterNetworks();
+    });
+  }
+
+  String _formatDate(String dateStr) {
+    if (dateStr.isEmpty) return '';
+    try {
+      final date = DateTime.parse(dateStr).toLocal();
+      return DateFormat('yyyy-MM-dd HH:mm').format(date);
+    } catch (_) {
+      return dateStr;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+    
+    if (_error != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(t.msgCurrentApi(_currentApiUrl), style: const TextStyle(color: Colors.grey)),
+            const SizedBox(height: 10),
+            Text(_error!, style: const TextStyle(color: Colors.red), textAlign: TextAlign.center),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _loadSettingsAndFetch,
+              child: Text(t.msgRetry),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: t.hintSearchNetworks,
+                    prefixIcon: const Icon(Icons.search),
+                    filled: true,
+                    fillColor: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[800]
+                        : Colors.grey[200],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      borderSide:
+                          const BorderSide(color: Colors.blue, width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 14,
+                    ),
+                  ),
+                  onChanged: _onSearchChanged,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Material(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[800]
+                    : Colors.grey[200],
+                borderRadius: BorderRadius.circular(16.0),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16.0),
+                  onTap: () {
+                    setState(() {
+                      _isCompactMode = !_isCompactMode;
+                    });
+                  },
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    alignment: Alignment.center,
+                    child: Icon(
+                      _isCompactMode
+                          ? Icons.view_agenda_outlined
+                          : Icons.view_list,
+                      color: Theme.of(context).iconTheme.color,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: _fetchNetworks,
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : ListView.builder(
+                    itemCount: _filteredNetworks.length,
+                    itemBuilder: (context, index) {
+                      final network = _filteredNetworks[index];
+                      if (_isCompactMode) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Theme.of(context).dividerColor,
+                                width: 0.5,
+                              ),
+                            ),
+                          ),
+                          child: ListTile(
+                            dense: true,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 0,
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => NetworkDetailsScreen(
+                                    networkId: network.id,
+                                    networkName: network.name,
+                                    apiUrl: _currentApiUrl,
+                                    apiKey: _currentApiKey,
+                                    ignoreSsl: _currentIgnoreSsl,
+                                  ),
+                                ),
+                              );
+                            },
+                            title: Text(
+                              network.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        );
+                      }
+                      return Card(
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => NetworkDetailsScreen(
+                                  networkId: network.id,
+                                  networkName: network.name,
+                                  apiUrl: _currentApiUrl,
+                                  apiKey: _currentApiKey,
+                                  ignoreSsl: _currentIgnoreSsl,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            network.name,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'ID: ${network.shortId}',
+                                            style: TextStyle(
+                                              color: Theme.of(context).textTheme.bodySmall?.color,
+                                              fontFamily: 'monospace',
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Divider(height: 24),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    _buildInfoItem(Icons.settings_ethernet, network.driver),
+                                    _buildInfoItem(Icons.access_time, _formatDate(network.created)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoItem(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: Colors.grey),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: const TextStyle(color: Colors.grey),
+        ),
+      ],
+    );
+  }
+}
