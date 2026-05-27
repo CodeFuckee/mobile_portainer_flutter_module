@@ -102,128 +102,246 @@ class _MainTabScreenState extends State<MainTabScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
-    
-    // Calculate effective layout mode for UI display
-    // final screenWidth = MediaQuery.of(context).size.width;
-    // final isWide = screenWidth >= 600;
-    
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isWide = screenWidth >= 600;
+
     String currentEffectiveMode = 'list';
     if (_selectedIndex == 1) {
       currentEffectiveMode = _containerLayoutMode;
     }
 
+    final body = IndexedStack(
+      index: _selectedIndex,
+      children: [
+        DashboardScreen(
+          key: _dashboardKey,
+          onSwitchToContainers: () {
+            _containersKey.currentState?.refreshAfterSettings();
+            _settingsKey.currentState?.refresh();
+            _onItemTapped(1);
+          },
+          onSwitchToImages: () {
+            _settingsKey.currentState?.refresh();
+            _onItemTapped(2);
+          },
+        ),
+        HomeScreen(
+          key: _containersKey,
+          layoutMode: _containerLayoutMode,
+        ),
+        const ResourcesScreen(),
+        SettingsScreen(
+          key: _settingsKey,
+          onSaved: () {
+            _settingsChanged = true;
+            _onItemTapped(0);
+            NotifyUtils.showNotify(context, t.msgSettingsSaved);
+          },
+        ),
+      ],
+    );
+
+    if (isWide) {
+      return Scaffold(
+        body: _buildWideLayout(body, t, currentEffectiveMode),
+      );
+    }
+
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: colorScheme.surface,
+        elevation: 0,
+        scrolledUnderElevation: 0,
         title: Text(_getTitle(t)),
-        actions: [
-          if (_selectedIndex == 1) // Layout toggle for Containers
-            IconButton(
-              icon: Icon(currentEffectiveMode == 'grid' 
-                  ? Icons.view_list 
-                  : Icons.grid_view),
-              onPressed: _toggleLayoutMode,
-              tooltip: 'Switch Layout',
-            ),
-          if (_selectedIndex < 2) // Only Dashboard (0) and Containers (1) need refresh here
-            IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: () {
-                if (_selectedIndex == 0) {
-                  _dashboardKey.currentState?.refresh();
-                } else if (_selectedIndex == 1) {
-                  if (_containersKey.currentState?.isLoading != true) {
-                    _containersKey.currentState?.manualRefresh();
-                  }
-                }
-              },
-            ),
-          const SizedBox(width: 4),
-          Tooltip(
-            message: (_containersKey.currentState?.isWsConnected ?? false)
-                ? t.msgWsConnected
-                : t.msgWsDisconnected,
-            child: Icon(
-              (_containersKey.currentState?.isWsConnected ?? false)
-                  ? Icons.cloud_done
-                  : Icons.cloud_off,
-              color: (_containersKey.currentState?.isWsConnected ?? false)
-                  ? Colors.green
-                  : Colors.grey,
-            ),
+        actions: _buildActions(t, currentEffectiveMode),
+      ),
+      body: body,
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            height: 0.5,
+            color: colorScheme.outlineVariant,
           ),
-          const SizedBox(width: 8),
+          NavigationBar(
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: _onItemTapped,
+            animationDuration: const Duration(milliseconds: 400),
+            backgroundColor: colorScheme.surface,
+            surfaceTintColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            destinations: _buildDestinations(t),
+          ),
         ],
       ),
-      floatingActionButton: _selectedIndex == 1
-          ? FloatingActionButton(
+      floatingActionButton: _selectedIndex != 1
+          ? null
+          : FloatingActionButton(
               onPressed: () {
                 _containersKey.currentState?.showRunContainerDialog();
               },
               child: const Icon(Icons.add),
-            )
-          : null,
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: [
-          DashboardScreen(
-            key: _dashboardKey,
-            onSwitchToContainers: () {
-              // Refresh containers because server might have changed
-              _containersKey.currentState?.refreshAfterSettings();
-              _settingsKey.currentState?.refresh();
-              _onItemTapped(1);
-            },
-            onSwitchToImages: () {
-              // Switch to Resources tab (index 2) then open Images
-              // This navigation is more complex now as Images is inside Resources
-              // For now, let's just switch to Resources tab
-              _settingsKey.currentState?.refresh();
-              _onItemTapped(2);
-            },
-          ),
-          HomeScreen(
-            key: _containersKey,
-            layoutMode: _containerLayoutMode,
-          ),
-          const ResourcesScreen(),
-          SettingsScreen(
-            key: _settingsKey,
-            onSaved: () {
-              _settingsChanged = true;
-              // Go back to Dashboard and refresh
-              _onItemTapped(0);
-              NotifyUtils.showNotify(context, t.msgSettingsSaved);
-            },
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType
-            .fixed, // Ensure all items are shown properly with 4 items
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: [
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.dashboard),
-            label: t.titleDashboard,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.dns),
-            label: t.titleContainers,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.category),
-            label: t.titleResources,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.settings),
-            label: t.titleSettings,
-          ),
-        ],
-      ),
+            ),
     );
   }
 
-  // Pull image dialog removed from main screen as Images screen is now nested.
-  // It should be implemented inside ImagesScreen or ResourcesScreen if needed.
+  List<Widget> _buildActions(AppLocalizations t, String currentEffectiveMode) {
+    return [
+      if (_selectedIndex == 1)
+        IconButton(
+          icon: Icon(currentEffectiveMode == 'grid'
+              ? Icons.view_list
+              : Icons.grid_view),
+          onPressed: _toggleLayoutMode,
+          tooltip: 'Switch Layout',
+        ),
+      if (_selectedIndex < 2)
+        IconButton(
+          icon: const Icon(Icons.refresh),
+          onPressed: () {
+            if (_selectedIndex == 0) {
+              _dashboardKey.currentState?.refresh();
+            } else if (_selectedIndex == 1) {
+              if (_containersKey.currentState?.isLoading != true) {
+                _containersKey.currentState?.manualRefresh();
+              }
+            }
+          },
+        ),
+      const SizedBox(width: 4),
+      Tooltip(
+        message: (_containersKey.currentState?.isWsConnected ?? false)
+            ? t.msgWsConnected
+            : t.msgWsDisconnected,
+        child: Icon(
+          (_containersKey.currentState?.isWsConnected ?? false)
+              ? Icons.cloud_done
+              : Icons.cloud_off,
+          color: (_containersKey.currentState?.isWsConnected ?? false)
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+      ),
+      const SizedBox(width: 8),
+    ];
+  }
+
+  Widget _buildWideLayout(Widget body, AppLocalizations t, String currentEffectiveMode) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Row(
+      children: [
+        Container(
+          color: colorScheme.surface,
+          child: NavigationRail(
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: _onItemTapped,
+            labelType: NavigationRailLabelType.all,
+            backgroundColor: Colors.transparent,
+            destinations: [
+              NavigationRailDestination(
+                icon: const Icon(Icons.dashboard_outlined),
+                selectedIcon: const Icon(Icons.dashboard),
+                label: Text(t.titleDashboard),
+              ),
+              NavigationRailDestination(
+                icon: const Icon(Icons.dns_outlined),
+                selectedIcon: const Icon(Icons.dns),
+                label: Text(t.titleContainers),
+              ),
+              NavigationRailDestination(
+                icon: const Icon(Icons.category_outlined),
+                selectedIcon: const Icon(Icons.category),
+                label: Text(t.titleResources),
+              ),
+              NavigationRailDestination(
+                icon: const Icon(Icons.settings_outlined),
+                selectedIcon: const Icon(Icons.settings),
+                label: Text(t.titleSettings),
+              ),
+            ],
+          ),
+        ),
+        VerticalDivider(width: 1, color: colorScheme.outlineVariant),
+        Expanded(
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 60),
+                child: Column(
+                  children: [
+                    Divider(height: 1, color: colorScheme.outlineVariant),
+                    Expanded(child: body),
+                  ],
+                ),
+              ),
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 60,
+                child: Container(
+                  color: colorScheme.surface,
+                  padding: const EdgeInsets.fromLTRB(24, 18, 24, 0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _getTitle(t),
+                          style: textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
+                      ..._buildActions(t, currentEffectiveMode),
+                    ],
+                  ),
+                ),
+              ),
+              if (_selectedIndex == 1)
+                Positioned(
+                  right: 16,
+                  bottom: 16,
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      _containersKey.currentState?.showRunContainerDialog();
+                    },
+                    child: const Icon(Icons.add),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  List<NavigationDestination> _buildDestinations(AppLocalizations t) {
+    return [
+      NavigationDestination(
+        icon: const Icon(Icons.dashboard_outlined),
+        selectedIcon: const Icon(Icons.dashboard),
+        label: t.titleDashboard,
+      ),
+      NavigationDestination(
+        icon: const Icon(Icons.dns_outlined),
+        selectedIcon: const Icon(Icons.dns),
+        label: t.titleContainers,
+      ),
+      NavigationDestination(
+        icon: const Icon(Icons.category_outlined),
+        selectedIcon: const Icon(Icons.category),
+        label: t.titleResources,
+      ),
+      NavigationDestination(
+        icon: const Icon(Icons.settings_outlined),
+        selectedIcon: const Icon(Icons.settings),
+        label: t.titleSettings,
+      ),
+    ];
+  }
 }

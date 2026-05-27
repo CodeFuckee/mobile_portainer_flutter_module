@@ -4,6 +4,11 @@ import 'package:mobile_portainer_flutter_module/services/platform/preferences_se
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import '../models/docker_network.dart';
 import '../services/docker_service.dart';
+import '../widgets/app_search_bar.dart';
+import '../widgets/error_view.dart';
+import '../widgets/empty_view.dart';
+import '../widgets/loading_view.dart';
+import '../widgets/layout_toggle.dart';
 import 'network_details_screen.dart';
 
 class NetworksScreen extends StatefulWidget {
@@ -116,95 +121,33 @@ class NetworksScreenState extends State<NetworksScreen> {
     final t = AppLocalizations.of(context)!;
     
     if (_error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(t.msgCurrentApi(_currentApiUrl), style: const TextStyle(color: Colors.grey)),
-            const SizedBox(height: 10),
-            Text(_error!, style: const TextStyle(color: Colors.red), textAlign: TextAlign.center),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _loadSettingsAndFetch,
-              child: Text(t.msgRetry),
-            ),
-          ],
-        ),
+      return ErrorView(
+        message: _error!,
+        subtitle: t.msgCurrentApi(_currentApiUrl),
+        onRetry: _loadSettingsAndFetch,
+        retryLabel: t.msgRetry,
       );
     }
 
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: t.hintSearchNetworks,
-                    prefixIcon: const Icon(Icons.search),
-                    filled: true,
-                    fillColor: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey[800]
-                        : Colors.grey[200],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                      borderSide:
-                          const BorderSide(color: Colors.blue, width: 2),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 14,
-                    ),
-                  ),
-                  onChanged: _onSearchChanged,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Material(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey[800]
-                    : Colors.grey[200],
-                borderRadius: BorderRadius.circular(16.0),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(16.0),
-                  onTap: () {
-                    setState(() {
-                      _isCompactMode = !_isCompactMode;
-                    });
-                  },
-                  child: Container(
-                    width: 50,
-                    height: 50,
-                    alignment: Alignment.center,
-                    child: Icon(
-                      _isCompactMode
-                          ? Icons.view_agenda_outlined
-                          : Icons.view_list,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+        AppSearchBar(
+          controller: _searchController,
+          hintText: t.hintSearchNetworks,
+          onChanged: _onSearchChanged,
+          trailing: LayoutToggle(
+            isCompactMode: _isCompactMode,
+            onToggle: () => setState(() => _isCompactMode = !_isCompactMode),
           ),
         ),
         Expanded(
           child: RefreshIndicator(
             onRefresh: _fetchNetworks,
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : ListView.builder(
+                ? const LoadingView(type: LoadingType.list)
+                : _filteredNetworks.isEmpty
+                  ? const EmptyView(icon: Icons.hub_outlined, message: '')
+                  : ListView.builder(
                     itemCount: _filteredNetworks.length,
                     itemBuilder: (context, index) {
                       final network = _filteredNetworks[index];

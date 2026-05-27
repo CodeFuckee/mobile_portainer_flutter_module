@@ -5,6 +5,13 @@ import 'package:mobile_portainer_flutter_module/services/platform/preferences_se
 import '../services/docker_service.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
+import '../theme/theme_extensions.dart';
+import '../widgets/section_title.dart';
+import '../widgets/info_card.dart';
+import '../widgets/info_row.dart';
+import '../widgets/error_view.dart';
+import '../widgets/loading_view.dart';
+import '../widgets/action_sheet.dart';
 import 'container_logs_screen.dart';
 import 'volume_details_screen.dart';
 import 'container_files_screen.dart';
@@ -457,28 +464,11 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
   }
 
   Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 8),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.blue,
-        ),
-      ),
-    );
+    return SectionTitle(title: title);
   }
 
   Widget _buildInfoCard(List<Widget> children) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(children: children),
-      ),
-    );
+    return InfoCard(children: children);
   }
 
   Widget _buildInfoRow(
@@ -489,53 +479,13 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
     bool showCopyButton = false,
     String? copyValue,
   }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          Expanded(
-            child: GestureDetector(
-              onLongPress: () {
-                Clipboard.setData(ClipboardData(text: copyValue ?? value));
-                NotifyUtils.showNotify(context, '$label copied');
-              },
-              onTap: onTap,
-              child: Text(
-                value,
-                style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  color: onTap != null
-                      ? Colors.blue
-                      : (isError ? Colors.red : null),
-                  decoration: onTap != null ? TextDecoration.underline : null,
-                ),
-              ),
-            ),
-          ),
-          if (showCopyButton)
-            InkWell(
-              onTap: () {
-                Clipboard.setData(ClipboardData(text: copyValue ?? value));
-                NotifyUtils.showNotify(context, '$label copied');
-              },
-              child: const Padding(
-                padding: EdgeInsets.only(left: 8.0),
-                child: Icon(Icons.copy, size: 16, color: Colors.grey),
-              ),
-            ),
-        ],
-      ),
+    return InfoRow(
+      label: label,
+      value: value,
+      isError: isError,
+      onTap: onTap,
+      showCopyButton: showCopyButton,
+      copyValue: copyValue,
     );
   }
 

@@ -10,8 +10,16 @@ import '../services/docker_service.dart';
 import 'container_logs_screen.dart';
 import 'container_details_screen.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
+import '../theme/theme_extensions.dart';
 
 import '../widgets/env_vars_selector.dart';
+import '../widgets/status_badge.dart';
+import '../widgets/app_search_bar.dart';
+import '../widgets/info_row.dart';
+import '../widgets/error_view.dart';
+import '../widgets/empty_view.dart';
+import '../widgets/loading_view.dart';
+import '../widgets/action_sheet.dart';
 
 class HomeScreen extends StatefulWidget {
   final String layoutMode;
@@ -144,13 +152,16 @@ class HomeScreenState extends State<HomeScreen> {
     _eventChannel?.sink.close();
     _reconnectTimer?.cancel();
 
+    debugPrint('Connecting to WebSocket...');
+    debugPrint('  API URL: $_currentApiUrl');
+    debugPrint('  Ignore SSL: $_currentIgnoreSsl');
+
     final service = DockerService(
       baseUrl: _currentApiUrl,
       apiKey: _currentApiKey,
       ignoreSsl: _currentIgnoreSsl,
     );
     try {
-      debugPrint('Connecting to WebSocket...');
       final channel = await service.connectToEvents();
       _eventChannel = channel;
 
@@ -372,17 +383,18 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Color _getStatusColor(String status) {
+    final dockerColors = Theme.of(context).extension<DockerColors>();
     switch (status.toLowerCase()) {
       case 'running':
-        return Colors.green;
+        return dockerColors?.statusRunning ?? Colors.green;
       case 'exited':
-        return Colors.red;
+        return dockerColors?.statusExited ?? Colors.red;
       case 'created':
-        return Colors.blue;
+        return dockerColors?.statusCreated ?? Colors.blue;
       case 'restarting':
-        return Colors.orange;
+        return dockerColors?.statusRestarting ?? Colors.orange;
       case 'paused':
-        return Colors.amber;
+        return dockerColors?.statusPaused ?? Colors.amber;
       default:
         return Colors.grey;
     }
@@ -651,108 +663,58 @@ class HomeScreenState extends State<HomeScreen> {
     final bool hasActiveFilters =
         _selectedStatus != 'all' || _selectedStack != 'all';
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: t.hintSearch,
-                    prefixIcon: const Icon(Icons.search),
-                    filled: true,
-                    fillColor: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey[800]
-                        : Colors.grey[200],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                      borderSide: const BorderSide(
-                        color: Colors.blue,
-                        width: 2,
-                      ),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 14,
-                    ),
-                  ),
-                  onChanged: _onSearchChanged,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Material(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey[800]
-                    : Colors.grey[200],
-                borderRadius: BorderRadius.circular(16.0),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(16.0),
-                  onTap: _showFilterDialog,
-                  child: Container(
-                    width: 50,
-                    height: 50,
-                    alignment: Alignment.center,
-                    decoration: hasActiveFilters
-                        ? BoxDecoration(
-                            border: Border.all(color: Colors.blue, width: 2),
-                            borderRadius: BorderRadius.circular(16.0),
-                          )
-                        : null,
-                    child: Icon(
-                      Icons.tune,
-                      color: hasActiveFilters
-                          ? Colors.blue
-                          : Theme.of(context).iconTheme.color,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        if (_isLoading)
-          const Expanded(child: Center(child: CircularProgressIndicator()))
-        else if (_error != null)
-          Expanded(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      _error!,
-                      style: const TextStyle(color: Colors.red),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      t.msgCurrentApi(_currentApiUrl),
-                      style: const TextStyle(color: Colors.grey),
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _fetchContainers,
-                      child: Text(t.msgRetry),
-                    ),
-                  ],
+        AppSearchBar(
+          controller: _searchController,
+          hintText: t.hintSearch,
+          onChanged: _onSearchChanged,
+          trailing: Material(
+            color: colorScheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(16),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: _showFilterDialog,
+              child: Container(
+                width: 50,
+                height: 50,
+                alignment: Alignment.center,
+                decoration: hasActiveFilters
+                    ? BoxDecoration(
+                        border: Border.all(color: colorScheme.primary, width: 2),
+                        borderRadius: BorderRadius.circular(16),
+                      )
+                    : null,
+                child: Icon(
+                  Icons.tune,
+                  color: hasActiveFilters
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant,
                 ),
               ),
             ),
+          ),
+        ),
+        if (_isLoading)
+          const Expanded(child: LoadingView(type: LoadingType.list))
+        else if (_error != null)
+          Expanded(
+            child: ErrorView(
+              message: _error!,
+              subtitle: t.msgCurrentApi(_currentApiUrl),
+              onRetry: _fetchContainers,
+              retryLabel: t.msgRetry,
+            ),
           )
         else if (_filteredContainers.isEmpty)
-          Expanded(child: Center(child: Text(t.msgNoContainers)))
+          Expanded(
+            child: EmptyView(
+              icon: Icons.inbox_outlined,
+              message: t.msgNoContainers,
+            ),
+          )
         else
           Expanded(
             child: LayoutBuilder(
@@ -815,51 +777,53 @@ class HomeScreenState extends State<HomeScreen> {
       return;
     }
 
+    final dockerColors = Theme.of(context).extension<DockerColors>();
+
     // Define actions
-    final actionStart = _ActionItem(
-      t.actionStart,
-      Icons.play_arrow,
-      Colors.green,
-      'start',
+    final actionStart = ActionItem(
+      label: t.actionStart,
+      icon: Icons.play_arrow,
+      color: dockerColors?.statusRunning ?? Colors.green,
+      actionCode: 'start',
     );
-    final actionStop = _ActionItem(
-      t.actionStop,
-      Icons.stop,
-      Colors.red,
-      'stop',
+    final actionStop = ActionItem(
+      label: t.actionStop,
+      icon: Icons.stop,
+      color: dockerColors?.statusExited ?? Colors.red,
+      actionCode: 'stop',
     );
-    final actionKill = _ActionItem(
-      t.actionKill,
-      Icons.dangerous,
-      Colors.redAccent,
-      'kill',
+    final actionKill = ActionItem(
+      label: t.actionKill,
+      icon: Icons.dangerous,
+      color: Colors.redAccent,
+      actionCode: 'kill',
     );
-    final actionRestart = _ActionItem(
-      t.actionRestart,
-      Icons.refresh,
-      Colors.blue,
-      'restart',
+    final actionRestart = ActionItem(
+      label: t.actionRestart,
+      icon: Icons.refresh,
+      color: dockerColors?.statusCreated ?? Colors.blue,
+      actionCode: 'restart',
     );
-    final actionPause = _ActionItem(
-      t.actionPause,
-      Icons.pause,
-      Colors.orange,
-      'pause',
+    final actionPause = ActionItem(
+      label: t.actionPause,
+      icon: Icons.pause,
+      color: dockerColors?.statusRestarting ?? Colors.orange,
+      actionCode: 'pause',
     );
-    final actionResume = _ActionItem(
-      t.actionResume,
-      Icons.play_circle_outline,
-      Colors.greenAccent,
-      'resume',
+    final actionResume = ActionItem(
+      label: t.actionResume,
+      icon: Icons.play_circle_outline,
+      color: Colors.greenAccent,
+      actionCode: 'resume',
     );
-    final actionRemove = _ActionItem(
-      t.actionRemove,
-      Icons.delete,
-      Colors.grey,
-      'remove',
+    final actionRemove = ActionItem(
+      label: t.actionRemove,
+      icon: Icons.delete,
+      color: Colors.grey,
+      actionCode: 'remove',
     );
 
-    List<_ActionItem> actions = [];
+    List<ActionItem> actions = [];
 
     // Filter actions based on status
     switch (container.status.toLowerCase()) {
@@ -1040,6 +1004,8 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildContainerTile(DockerContainer container, AppLocalizations t) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -1072,35 +1038,10 @@ class HomeScreenState extends State<HomeScreen> {
         },
         title: Text(
           container.name,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          ),
+          style: textTheme.titleMedium?.copyWith(fontSize: 14),
           overflow: TextOverflow.ellipsis,
         ),
-        trailing: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 8,
-            vertical: 2,
-          ),
-          decoration: BoxDecoration(
-            color: _getStatusColor(
-              container.status,
-            ).withAlpha(30),
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(
-              color: _getStatusColor(container.status),
-            ),
-          ),
-          child: Text(
-            container.status.toLowerCase(),
-            style: TextStyle(
-              color: _getStatusColor(container.status),
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
+        trailing: StatusBadge(status: container.status),
       ),
     );
   }
@@ -1110,12 +1051,10 @@ class HomeScreenState extends State<HomeScreen> {
     AppLocalizations t, {
     EdgeInsetsGeometry? margin,
   }) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Card(
-      margin: margin ??
-          const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 8,
-          ),
+      margin: margin ?? EdgeInsets.zero,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
@@ -1135,90 +1074,63 @@ class HomeScreenState extends State<HomeScreen> {
         },
         child: Padding(
           padding: const EdgeInsets.all(12.0),
-          child: SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            container.name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _getStatusColor(
-                                container.status,
-                              ).withAlpha(30),
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(
-                                color: _getStatusColor(container.status),
-                              ),
-                            ),
-                            child: Text(
-                              container.status.toLowerCase(),
-                              style: TextStyle(
-                                color: _getStatusColor(container.status),
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          container.name,
+                          style: textTheme.titleMedium,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        StatusBadge(status: container.status),
+                      ],
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.article_outlined),
-                      tooltip: 'Logs',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ContainerLogsScreen(
-                              containerId: container.id,
-                              containerName: container.name,
-                              apiUrl: _currentApiUrl,
-                              apiKey: _currentApiKey,
-                              ignoreSsl: _currentIgnoreSsl,
-                            ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.article_outlined),
+                    tooltip: 'Logs',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ContainerLogsScreen(
+                            containerId: container.id,
+                            containerName: container.name,
+                            apiUrl: _currentApiUrl,
+                            apiKey: _currentApiKey,
+                            ignoreSsl: _currentIgnoreSsl,
                           ),
-                        );
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.more_vert),
-                      onPressed: () => _showContainerActions(container),
-                    ),
-                  ],
-                ),
-                const Divider(height: 16),
-                if (container.stack.isNotEmpty) ...[
-                  _buildInfoRow(t.labelStack, container.stack),
-                  const SizedBox(height: 4),
+                        ),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.more_vert),
+                    onPressed: () => _showContainerActions(container),
+                  ),
                 ],
-                if (container.image.isNotEmpty) ...[
-                  _buildInfoRow(t.labelImage, container.image),
-                  const SizedBox(height: 4),
-                ],
-                if (container.ports.isNotEmpty) ...[
-                  _buildInfoRow(t.labelPorts, container.ports),
-                ],
+              ),
+              const Divider(height: 16),
+              if (container.stack.isNotEmpty) ...[
+                InfoRow(label: t.labelStack, value: container.stack, labelWidth: 60),
+                const SizedBox(height: 4),
               ],
-            ),
+              if (container.image.isNotEmpty) ...[
+                InfoRow(label: t.labelImage, value: container.image, labelWidth: 60),
+                const SizedBox(height: 4),
+              ],
+              if (container.ports.isNotEmpty) ...[
+                InfoRow(label: t.labelPorts, value: container.ports, labelWidth: 60),
+              ],
+            ],
           ),
         ),
       ),
@@ -1308,32 +1220,4 @@ class HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 60,
-          child: Text(
-            label,
-            style: const TextStyle(
-              color: Colors.grey,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-        Expanded(child: Text(value, style: const TextStyle(fontSize: 13))),
-      ],
-    );
-  }
-}
-
-class _ActionItem {
-  final String label;
-  final IconData icon;
-  final Color color;
-  final String actionCode;
-
-  _ActionItem(this.label, this.icon, this.color, this.actionCode);
 }

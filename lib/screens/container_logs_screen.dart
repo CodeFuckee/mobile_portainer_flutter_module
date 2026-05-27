@@ -4,6 +4,8 @@ import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
 import 'dart:async';
 import '../services/docker_service.dart';
+import '../widgets/error_view.dart';
+import '../widgets/loading_view.dart';
 
 class ContainerLogsScreen extends StatefulWidget {
   final String containerId;
@@ -336,27 +338,12 @@ class _ContainerLogsScreenState extends State<ContainerLogsScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const LoadingView(type: LoadingType.card)
           : _error != null
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          _error!,
-                          style: const TextStyle(color: Colors.red),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: _fetchLogs,
-                          child: const Text('Retry'),
-                        ),
-                      ],
-                    ),
-                  ),
+              ? ErrorView(
+                  message: _error!,
+                  onRetry: _fetchLogs,
+                  retryLabel: 'Retry',
                 )
               : Container(
                   color: const Color(0xFF1E1E1E), // VS Code like background
@@ -432,8 +419,8 @@ class _ContainerLogsScreenState extends State<ContainerLogsScreen> {
           FloatingActionButton(
             heroTag: "zoom_in",
             mini: true,
-            backgroundColor: Colors.grey[800],
-            child: const Icon(Icons.add, color: Colors.white),
+            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
+            child: Icon(Icons.add, color: Theme.of(context).colorScheme.onSurface),
             onPressed: () {
               setState(() {
                 if (_fontSize < 30) {
@@ -447,8 +434,8 @@ class _ContainerLogsScreenState extends State<ContainerLogsScreen> {
           FloatingActionButton(
             heroTag: "zoom_out",
             mini: true,
-            backgroundColor: Colors.grey[800],
-            child: const Icon(Icons.remove, color: Colors.white),
+            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
+            child: Icon(Icons.remove, color: Theme.of(context).colorScheme.onSurface),
             onPressed: () {
               setState(() {
                 if (_fontSize > 8) {

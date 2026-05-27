@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
+import 'loading_view.dart';
 
 class EnvVarsSelector extends StatefulWidget {
   const EnvVarsSelector({super.key});
@@ -88,7 +89,7 @@ class _EnvVarsSelectorState extends State<EnvVarsSelector> with SingleTickerProv
         ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const LoadingView(type: LoadingType.list)
           : TabBarView(
               controller: _tabController,
               children: [

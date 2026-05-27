@@ -3,6 +3,12 @@ import 'package:mobile_portainer_flutter_module/services/platform/preferences_se
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import '../services/docker_service.dart';
 import '../models/docker_volume.dart';
+import '../theme/theme_extensions.dart';
+import '../widgets/app_search_bar.dart';
+import '../widgets/error_view.dart';
+import '../widgets/empty_view.dart';
+import '../widgets/loading_view.dart';
+import '../widgets/layout_toggle.dart';
 import 'volume_details_screen.dart';
 import '../utils/notify_utils.dart';
 
@@ -152,66 +158,29 @@ class VolumesScreenState extends State<VolumesScreen> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
     
+    final colorScheme = Theme.of(context).colorScheme;
+
     if (_error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(t.msgCurrentApi(_currentApiUrl), style: const TextStyle(color: Colors.grey)),
-            const SizedBox(height: 10),
-            Text(_error!, style: const TextStyle(color: Colors.red), textAlign: TextAlign.center),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _loadSettingsAndFetch,
-              child: Text(t.msgRetry),
-            ),
-          ],
-        ),
+      return ErrorView(
+        message: _error!,
+        subtitle: t.msgCurrentApi(_currentApiUrl),
+        onRetry: _loadSettingsAndFetch,
+        retryLabel: t.msgRetry,
       );
     }
 
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
+        AppSearchBar(
+          controller: _searchController,
+          hintText: t.hintSearchVolumes,
+          onChanged: _onSearchChanged,
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Expanded(
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: t.hintSearchVolumes,
-                    prefixIcon: const Icon(Icons.search),
-                    filled: true,
-                    fillColor: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey[800]
-                        : Colors.grey[200],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                      borderSide: const BorderSide(color: Colors.blue, width: 2),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 14,
-                    ),
-                  ),
-                  onChanged: _onSearchChanged,
-                ),
-              ),
-              const SizedBox(width: 12),
               Material(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey[800]
-                    : Colors.grey[200],
-                borderRadius: BorderRadius.circular(16.0),
+                color: colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(16),
                 child: PopupMenuButton<VolumeFilter>(
                   tooltip: t.filterAll,
                   onSelected: (VolumeFilter item) {
@@ -240,38 +209,17 @@ class VolumesScreenState extends State<VolumesScreen> {
                     alignment: Alignment.center,
                     child: Icon(
                       Icons.filter_list,
-                      color: _currentFilter != VolumeFilter.all 
-                          ? Colors.blue 
-                          : Theme.of(context).iconTheme.color,
+                      color: _currentFilter != VolumeFilter.all
+                          ? colorScheme.primary
+                          : colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Material(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey[800]
-                    : Colors.grey[200],
-                borderRadius: BorderRadius.circular(16.0),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(16.0),
-                  onTap: () {
-                    setState(() {
-                      _isCompactMode = !_isCompactMode;
-                    });
-                  },
-                  child: Container(
-                    width: 50,
-                    height: 50,
-                    alignment: Alignment.center,
-                    child: Icon(
-                      _isCompactMode
-                          ? Icons.view_agenda_outlined
-                          : Icons.view_list,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
-                  ),
-                ),
+              const SizedBox(width: 8),
+              LayoutToggle(
+                isCompactMode: _isCompactMode,
+                onToggle: () => setState(() => _isCompactMode = !_isCompactMode),
               ),
             ],
           ),
@@ -280,9 +228,9 @@ class VolumesScreenState extends State<VolumesScreen> {
           child: RefreshIndicator(
             onRefresh: _fetchVolumes,
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const LoadingView(type: LoadingType.list)
                 : _filteredVolumes.isEmpty
-                  ? Center(child: Text(t.msgNoContainers.replaceAll('containers', 'volumes').replaceAll('容器', '存储卷')))
+                  ? EmptyView(icon: Icons.storage_outlined, message: t.msgNoContainers)
                   : ListView.builder(
                     itemCount: _filteredVolumes.length,
                     itemBuilder: (context, index) {

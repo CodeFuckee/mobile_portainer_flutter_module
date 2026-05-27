@@ -4,6 +4,11 @@ import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import '../services/docker_service.dart';
 import 'package:intl/intl.dart';
+import '../widgets/section_title.dart';
+import '../widgets/info_card.dart';
+import '../widgets/info_row.dart';
+import '../widgets/error_view.dart';
+import '../widgets/loading_view.dart';
 
 class ImageDetailsScreen extends StatefulWidget {
   final String imageId;
@@ -85,27 +90,12 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const LoadingView(type: LoadingType.card)
           : _error != null
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          _error!,
-                          style: const TextStyle(color: Colors.red),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: _fetchDetails,
-                          child: const Text('Retry'),
-                        ),
-                      ],
-                    ),
-                  ),
+              ? ErrorView(
+                  message: _error!,
+                  onRetry: _fetchDetails,
+                  retryLabel: 'Retry',
                 )
               : _buildDetailsList(),
     );
@@ -228,76 +218,19 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
   }
 
   Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 8),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.blue,
-        ),
-      ),
-    );
+    return SectionTitle(title: title);
   }
 
   Widget _buildInfoCard(List<Widget> children) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: children,
-        ),
-      ),
-    );
+    return InfoCard(children: children);
   }
 
   Widget _buildInfoRow(String label, String value, {bool showCopyButton = false}) {
     if (value.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          Expanded(
-            child: GestureDetector(
-              onLongPress: () {
-                Clipboard.setData(ClipboardData(text: value));
-                NotifyUtils.showNotify(context, '$label copied');
-              },
-              child: Text(
-                value,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ),
-          if (showCopyButton)
-            InkWell(
-              onTap: () {
-                Clipboard.setData(ClipboardData(text: value));
-                NotifyUtils.showNotify(context, '$label copied');
-              },
-              child: const Padding(
-                padding: EdgeInsets.only(left: 8.0),
-                child: Icon(Icons.copy, size: 16, color: Colors.grey),
-              ),
-            ),
-        ],
-      ),
+    return InfoRow(
+      label: label,
+      value: value,
+      showCopyButton: showCopyButton,
     );
   }
 

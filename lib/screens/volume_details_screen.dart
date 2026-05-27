@@ -3,6 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import '../services/docker_service.dart';
 import '../utils/notify_utils.dart';
+import '../widgets/section_title.dart';
+import '../widgets/info_row.dart';
+import '../widgets/error_view.dart';
+import '../widgets/loading_view.dart';
 
 import 'container_details_screen.dart';
 
@@ -125,24 +129,15 @@ class _VolumeDetailsScreenState extends State<VolumeDetailsScreen> {
 
   Widget _buildBody(AppLocalizations t) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const LoadingView(type: LoadingType.card);
     }
 
     if (_error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(t.msgCurrentApi(widget.apiUrl), style: const TextStyle(color: Colors.grey)),
-            const SizedBox(height: 10),
-            Text(_error!, style: const TextStyle(color: Colors.red), textAlign: TextAlign.center),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _fetchDetails,
-              child: Text(t.msgRetry),
-            ),
-          ],
-        ),
+      return ErrorView(
+        message: _error!,
+        subtitle: t.msgCurrentApi(widget.apiUrl),
+        onRetry: _fetchDetails,
+        retryLabel: t.msgRetry,
       );
     }
 

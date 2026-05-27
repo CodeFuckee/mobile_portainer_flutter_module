@@ -4,6 +4,13 @@ import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
 import '../models/docker_container.dart';
 import '../services/docker_service.dart';
+import '../theme/theme_extensions.dart';
+import '../widgets/status_badge.dart';
+import '../widgets/app_search_bar.dart';
+import '../widgets/error_view.dart';
+import '../widgets/empty_view.dart';
+import '../widgets/loading_view.dart';
+import '../widgets/layout_toggle.dart';
 import 'container_details_screen.dart';
 
 class StackContainersScreen extends StatefulWidget {
@@ -106,17 +113,18 @@ class StackContainersScreenState extends State<StackContainersScreen> {
   }
 
   Color _getStatusColor(String status) {
+    final dockerColors = Theme.of(context).extension<DockerColors>();
     switch (status.toLowerCase()) {
       case 'running':
-        return Colors.green;
+        return dockerColors?.statusRunning ?? Colors.green;
       case 'exited':
-        return Colors.red;
+        return dockerColors?.statusExited ?? Colors.red;
       case 'created':
-        return Colors.blue;
+        return dockerColors?.statusCreated ?? Colors.blue;
       case 'restarting':
-        return Colors.orange;
+        return dockerColors?.statusRestarting ?? Colors.orange;
       case 'paused':
-        return Colors.amber;
+        return dockerColors?.statusPaused ?? Colors.amber;
       default:
         return Colors.grey;
     }
@@ -190,7 +198,7 @@ class StackContainersScreenState extends State<StackContainersScreen> {
         title: Text(widget.stackName),
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete_sweep, color: Colors.redAccent),
+            icon: Icon(Icons.delete_sweep, color: Theme.of(context).colorScheme.error),
             onPressed: _allContainers.isEmpty ? null : _deleteAllContainers,
           ),
           IconButton(
@@ -211,67 +219,28 @@ class StackContainersScreenState extends State<StackContainersScreen> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: t.hintSearch,
-                prefixIcon: const Icon(Icons.search),
-                filled: true,
-                fillColor: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey[800]
-                    : Colors.grey[200],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                  borderSide: const BorderSide(
-                    color: Colors.blue,
-                    width: 2,
-                  ),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 14,
-                ),
-              ),
-              onChanged: _onSearchChanged,
-            ),
+          AppSearchBar(
+            controller: _searchController,
+            hintText: t.hintSearch,
+            onChanged: _onSearchChanged,
           ),
           if (_isLoading)
-            const Expanded(child: Center(child: CircularProgressIndicator()))
+            const Expanded(child: LoadingView(type: LoadingType.list))
           else if (_error != null)
             Expanded(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        _error!,
-                        style: const TextStyle(color: Colors.red),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _fetchContainers,
-                        child: Text(t.msgRetry),
-                      ),
-                    ],
-                  ),
-                ),
+              child: ErrorView(
+                message: _error!,
+                onRetry: _fetchContainers,
+                retryLabel: t.msgRetry,
               ),
             )
           else if (_filteredContainers.isEmpty)
-            Expanded(child: Center(child: Text(t.msgNoContainers)))
+            Expanded(
+              child: EmptyView(
+                icon: Icons.inbox_outlined,
+                message: t.msgNoContainers,
+              ),
+            )
           else
             Expanded(
               child: Scrollbar(

@@ -9,6 +9,7 @@ import 'env_vars_screen.dart';
 import 'ports_screen.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import '../services/docker_service.dart';
+import '../theme/theme_extensions.dart';
 
 class ResourcesScreen extends StatelessWidget {
   const ResourcesScreen({super.key});
@@ -21,38 +22,38 @@ class ResourcesScreen extends StatelessWidget {
       _ResourceItem(
         title: t.titleImages,
         icon: Icons.layers,
-        color: Colors.purple,
+        color: DockerResourceIconColor.images,
         screen: const ImagesScreen(),
         hasFab: true,
       ),
       _ResourceItem(
         title: t.titleNetworks,
         icon: Icons.hub,
-        color: Colors.orange,
+        color: DockerResourceIconColor.networks,
         screen: const NetworksScreen(),
       ),
       _ResourceItem(
         title: t.titleStacks,
         icon: Icons.apps,
-        color: Colors.teal,
+        color: DockerResourceIconColor.stacks,
         screen: const StacksScreen(),
       ),
       _ResourceItem(
         title: t.titleVolumes,
         icon: Icons.storage,
-        color: Colors.brown,
+        color: DockerResourceIconColor.volumes,
         screen: const VolumesScreen(),
       ),
       _ResourceItem(
         title: t.titleEnvVars,
         icon: Icons.settings_ethernet,
-        color: Colors.blueGrey,
+        color: DockerResourceIconColor.envVars,
         screen: const EnvVarsScreen(),
       ),
       _ResourceItem(
         title: t.titlePorts,
         icon: Icons.settings_input_component,
-        color: Colors.indigo,
+        color: DockerResourceIconColor.ports,
         screen: const PortsScreen(),
       ),
     ];

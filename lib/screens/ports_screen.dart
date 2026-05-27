@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import '../services/docker_service.dart';
+import '../widgets/error_view.dart';
+import '../widgets/loading_view.dart';
 
 class PortsScreen extends StatefulWidget {
   const PortsScreen({super.key});
@@ -75,22 +77,14 @@ class _PortsScreenState extends State<PortsScreen> {
     final t = AppLocalizations.of(context)!;
 
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: LoadingView(type: LoadingType.card));
     }
 
     if (_error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(_error!, style: const TextStyle(color: Colors.red)),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _fetchPorts,
-              child: Text(t.msgRetry),
-            ),
-          ],
-        ),
+      return ErrorView(
+        message: _error!,
+        onRetry: _fetchPorts,
+        retryLabel: t.msgRetry,
       );
     }
 

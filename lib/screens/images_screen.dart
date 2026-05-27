@@ -5,6 +5,13 @@ import '../models/docker_image.dart';
 import '../services/docker_service.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
+import '../theme/theme_extensions.dart';
+import '../widgets/status_badge.dart';
+import '../widgets/app_search_bar.dart';
+import '../widgets/error_view.dart';
+import '../widgets/empty_view.dart';
+import '../widgets/loading_view.dart';
+import '../widgets/layout_toggle.dart';
 import 'image_details_screen.dart';
 
 class ImagesScreen extends StatefulWidget {
@@ -194,96 +201,31 @@ class ImagesScreenState extends State<ImagesScreen> {
     final t = AppLocalizations.of(context)!;
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: t.hintSearch,
-                    prefixIcon: const Icon(Icons.search),
-                    filled: true,
-                    fillColor: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey[800]
-                        : Colors.grey[200],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                      borderSide: const BorderSide(color: Colors.blue, width: 2),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                  ),
-                  onChanged: _onSearchChanged,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Material(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey[800]
-                    : Colors.grey[200],
-                borderRadius: BorderRadius.circular(16.0),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(16.0),
-                  onTap: _toggleLayoutMode,
-                  child: Container(
-                    width: 50,
-                    height: 50,
-                    alignment: Alignment.center,
-                    child: Icon(
-                      !_isGridMode
-                          ? Icons.grid_view
-                          : Icons.view_list,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+        AppSearchBar(
+          controller: _searchController,
+          hintText: t.hintSearch,
+          onChanged: _onSearchChanged,
+          trailing: LayoutToggle(
+            isCompactMode: !_isGridMode,
+            onToggle: _toggleLayoutMode,
           ),
         ),
         if (_isLoading)
-          const Expanded(child: Center(child: CircularProgressIndicator()))
+          const Expanded(child: LoadingView(type: LoadingType.list))
         else if (_error != null)
           Expanded(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      _error!, 
-                      style: const TextStyle(color: Colors.red), 
-                      textAlign: TextAlign.center
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      t.msgCurrentApi(_currentApiUrl),
-                      style: const TextStyle(color: Colors.grey),
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _fetchImages,
-                      child: Text(t.msgRetry),
-                    ),
-                  ],
-                ),
-              ),
+            child: ErrorView(
+              message: _error!,
+              subtitle: t.msgCurrentApi(_currentApiUrl),
+              onRetry: _fetchImages,
+              retryLabel: t.msgRetry,
             ),
           )
         else if (_filteredImages.isEmpty)
            Expanded(
-            child: Center(
-              child: Text(t.msgNoContainers.replaceAll('containers', 'images').replaceAll('容器', '镜像')), // Quick fallback, ideally add msgNoImages
+            child: EmptyView(
+              icon: Icons.image_outlined,
+              message: t.msgNoContainers,
             ),
           )
         else

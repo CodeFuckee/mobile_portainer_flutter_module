@@ -13,6 +13,7 @@ import 'package:mobile_portainer_flutter_module/services/update_service.dart';
 import '../services/harmonyos_platform.dart';
 import '../services/harmonyos_shared_prefs.dart';
 import '../utils/platform_detector.dart';
+import '../widgets/loading_view.dart';
 
 class SettingsScreen extends StatefulWidget {
   final VoidCallback? onSaved;
@@ -463,7 +464,7 @@ class SettingsScreenState extends State<SettingsScreen> {
     
     return Scaffold(
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: LoadingView(type: LoadingType.list))
           : ListView(
               padding: const EdgeInsets.all(16.0),
               children: [

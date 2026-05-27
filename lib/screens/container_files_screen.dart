@@ -12,6 +12,8 @@ import '../services/docker_service.dart';
 import '../services/harmonyos_platform.dart';
 import '../models/container_file.dart';
 import '../utils/platform_detector.dart';
+import '../widgets/error_view.dart';
+import '../widgets/loading_view.dart';
 
 import 'file_content_screen.dart';
 
@@ -388,36 +390,15 @@ class _ContainerFilesScreenState extends State<ContainerFilesScreen> {
     }
 
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: LoadingView(type: LoadingType.list));
     }
 
     if (_error != null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, color: Colors.red, size: 48),
-              const SizedBox(height: 16),
-              Text(
-                t.msgErrorLoadingFiles,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                _error!,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.red),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _fetchFiles,
-                child: Text(t.msgRetry),
-              ),
-            ],
-          ),
-        ),
+      return ErrorView(
+        message: t.msgErrorLoadingFiles,
+        subtitle: _error!,
+        onRetry: _fetchFiles,
+        retryLabel: t.msgRetry,
       );
     }
 

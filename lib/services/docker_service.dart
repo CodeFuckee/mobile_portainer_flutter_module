@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -661,38 +662,78 @@ class DockerService {
   }
  
   Future<WebSocketChannel> connectToEvents() async {
-    final cleanBaseUrl = baseUrl.endsWith('/') 
-        ? baseUrl.substring(0, baseUrl.length - 1) 
+    final cleanBaseUrl = baseUrl.endsWith('/')
+        ? baseUrl.substring(0, baseUrl.length - 1)
         : baseUrl;
-        
-    String wsUrl = cleanBaseUrl.replaceFirst('http', 'ws');
+
+    // 使用 HTTP scheme（不是 ws/wss），因为走 HttpClient.openUrl 路径
+    String httpUrl;
     if (cleanBaseUrl.startsWith('https')) {
-       wsUrl = cleanBaseUrl.replaceFirst('https', 'wss');
-    } else if (!cleanBaseUrl.startsWith('http')) {
-       // Handle cases where scheme might be missing, default to ws
-       wsUrl = 'ws://$cleanBaseUrl';
+      httpUrl = '$cleanBaseUrl/ws/events';
+    } else if (cleanBaseUrl.startsWith('http')) {
+      httpUrl = '$cleanBaseUrl/ws/events';
     } else {
-       wsUrl = cleanBaseUrl.replaceFirst('http', 'ws');
+      httpUrl = 'http://$cleanBaseUrl/ws/events';
     }
-    
-    wsUrl = '$wsUrl/ws/events?api_key=$apiKey';
 
-    final headers = <String, dynamic>{};
     if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
+      httpUrl = '$httpUrl?api_key=${Uri.encodeComponent(apiKey!)}';
     }
 
+    final logUrl = apiKey != null && apiKey!.isNotEmpty
+        ? httpUrl.replaceFirst(apiKey!, '***')
+        : httpUrl;
+    print('WebSocket URL: $logUrl');
+
+    final uri = Uri.parse(httpUrl);
+
+    // 使用 HttpClient.openUrl 手动进行 WebSocket 升级
+    // 这避免了 WebSocket.connect 在 macOS 沙盒中直接调用 BSD socket 的问题
+    final client = HttpClient();
+    client.connectionTimeout = const Duration(seconds: 10);
     if (ignoreSsl) {
-      final client = HttpClient();
       client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
-      try {
-        final ws = await WebSocket.connect(wsUrl, headers: headers, customClient: client);
-        return IOWebSocketChannel(ws);
-      } catch (e) {
-        throw Exception('WebSocket connection failed: $e');
+    }
+
+    try {
+      print('Attempting WebSocket upgrade via HttpClient...');
+      final request = await client.openUrl('GET', uri);
+
+      // WebSocket 升级握手 headers
+      request.headers.set('Connection', 'Upgrade');
+      request.headers.set('Upgrade', 'websocket');
+      request.headers.set('Sec-WebSocket-Version', '13');
+      // 生成随机的 Sec-WebSocket-Key
+      final rng = Random();
+      final bytes = List<int>.generate(16, (_) => rng.nextInt(256));
+      final key = base64Encode(bytes);
+      request.headers.set('Sec-WebSocket-Key', key);
+
+      if (apiKey != null && apiKey!.isNotEmpty) {
+        request.headers.set('X-API-Key', apiKey!);
       }
-    } else {
-      return IOWebSocketChannel.connect(Uri.parse(wsUrl), headers: headers);
+
+      final response = await request.close();
+
+      if (response.statusCode == 101) {
+        print('WebSocket upgrade successful (101)');
+        final socket = await response.detachSocket();
+        final ws = WebSocket.fromUpgradedSocket(
+          socket,
+          serverSide: false,
+        );
+        return IOWebSocketChannel(ws);
+      } else {
+        final body = await response.transform(utf8.decoder).join();
+        print('WebSocket upgrade failed: HTTP ${response.statusCode}');
+        print('Response body: $body');
+        throw Exception(
+          'WebSocket upgrade failed: HTTP ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      print('WebSocket connection error: $e');
+      throw Exception('WebSocket connection failed: $e');
     }
   }
 
@@ -703,11 +744,11 @@ class DockerService {
 
     String wsUrl = cleanBaseUrl.replaceFirst('http', 'ws');
     if (cleanBaseUrl.startsWith('https')) {
-       wsUrl = cleanBaseUrl.replaceFirst('https', 'wss');
+      wsUrl = cleanBaseUrl.replaceFirst('https', 'wss');
     } else if (!cleanBaseUrl.startsWith('http')) {
-       wsUrl = 'ws://$cleanBaseUrl';
+      wsUrl = 'ws://$cleanBaseUrl';
     } else {
-       wsUrl = cleanBaseUrl.replaceFirst('http', 'ws');
+      wsUrl = cleanBaseUrl.replaceFirst('http', 'ws');
     }
     
     // Using /ws/images/pull endpoint
