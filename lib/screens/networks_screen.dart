@@ -70,12 +70,14 @@ class NetworksScreenState extends State<NetworksScreen> {
     final service = DockerService(baseUrl: _currentApiUrl, apiKey: _currentApiKey, ignoreSsl: _currentIgnoreSsl);
     try {
       final networks = await service.getNetworks();
+      if (!mounted) return;
       setState(() {
         _allNetworks = networks;
         _filterNetworks();
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _error = e.toString();
         _isLoading = false;

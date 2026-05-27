@@ -1,4 +1,8 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
 
 /// The translations for English (`en`).
 class AppLocalizationsEn extends AppLocalizations {
@@ -491,4 +495,76 @@ class AppLocalizationsEn extends AppLocalizations {
   String labelSelectedCount(Object count) {
     return '$count variables selected';
   }
+
+  @override
+  String get labelMore => 'more';
+
+  @override
+  String get titleLogin => 'Login';
+
+  @override
+  String get labelUsername => 'Username';
+
+  @override
+  String get labelPassword => 'Password';
+
+  @override
+  String get hintUsername => 'Enter username';
+
+  @override
+  String get hintPassword => 'Enter password';
+
+  @override
+  String get btnLogin => 'Login';
+
+  @override
+  String get msgLoginFailed => 'Login failed, please check your credentials';
+
+  @override
+  String get msgConnecting => 'Connecting...';
+
+  @override
+  String get btnLogout => 'Logout';
+
+  @override
+  String get titleApiKeys => 'API Keys';
+
+  @override
+  String get labelApiKeyName => 'Key Name';
+
+  @override
+  String get hintApiKeyName => 'Enter a name for this key';
+
+  @override
+  String get labelApiKeyValue => 'Key Value';
+
+  @override
+  String get hintApiKeyValue => 'Leave empty for auto-generated key';
+
+  @override
+  String get msgApiKeyCreated => 'API Key created';
+
+  @override
+  String get msgApiKeyDeleted => 'API Key deleted';
+
+  @override
+  String get msgApiKeyCopied => 'API Key copied to clipboard';
+
+  @override
+  String get msgNoApiKeys => 'No API keys found';
+
+  @override
+  String get actionCreateKey => 'Create Key';
+
+  @override
+  String get labelCreatedAt => 'Created';
+
+  @override
+  String get labelExpiresAt => 'Expires';
+
+  @override
+  String get labelNever => 'Never';
+
+  @override
+  String get msgConfirmDeleteApiKey => 'Are you sure you want to delete this API key?';
 }

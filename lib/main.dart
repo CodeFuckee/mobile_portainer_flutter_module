@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/main_tab_screen.dart';
+import 'screens/login_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'services/notification_service.dart';
+import 'services/auth_service.dart';
 import 'services/harmonyos_shared_prefs.dart';
 import 'utils/platform_detector.dart';
 import 'theme/app_theme.dart';
@@ -90,7 +92,48 @@ class _MyAppState extends State<MyApp> {
         Locale('en'),
         Locale('zh'),
       ],
-      home: const MainTabScreen(),
+      home: const AuthGate(),
     );
+  }
+}
+
+class AuthGate extends StatefulWidget {
+  const AuthGate({super.key});
+
+  @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  bool? _isLoggedIn;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuth();
+  }
+
+  Future<void> _checkAuth() async {
+    final loggedIn = await AuthService.isLoggedIn();
+    if (mounted) {
+      setState(() {
+        _isLoggedIn = loggedIn;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoggedIn == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_isLoggedIn!) {
+      return const MainTabScreen();
+    }
+
+    return const LoginScreen();
   }
 }

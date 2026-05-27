@@ -8,6 +8,8 @@ import 'package:intl/intl.dart' as intl;
 import 'app_localizations_en.dart';
 import 'app_localizations_zh.dart';
 
+// ignore_for_file: type=lint
+
 /// Callers can lookup localized strings with an instance of AppLocalizations
 /// returned by `AppLocalizations.of(context)`.
 ///
@@ -1028,6 +1030,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} variables selected'**
   String labelSelectedCount(Object count);
+
+  /// No description provided for @labelMore.
+  ///
+  /// In en, this message translates to:
+  /// **'more'**
+  String get labelMore;
+
+  /// No description provided for @titleLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get titleLogin;
+
+  /// No description provided for @labelUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get labelUsername;
+
+  /// No description provided for @labelPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get labelPassword;
+
+  /// No description provided for @hintUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter username'**
+  String get hintUsername;
+
+  /// No description provided for @hintPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter password'**
+  String get hintPassword;
+
+  /// No description provided for @btnLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get btnLogin;
+
+  /// No description provided for @msgLoginFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Login failed, please check your credentials'**
+  String get msgLoginFailed;
+
+  /// No description provided for @msgConnecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting...'**
+  String get msgConnecting;
+
+  /// No description provided for @btnLogout.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get btnLogout;
+
+  /// No description provided for @titleApiKeys.
+  ///
+  /// In en, this message translates to:
+  /// **'API Keys'**
+  String get titleApiKeys;
+
+  /// No description provided for @labelApiKeyName.
+  ///
+  /// In en, this message translates to:
+  /// **'Key Name'**
+  String get labelApiKeyName;
+
+  /// No description provided for @hintApiKeyName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a name for this key'**
+  String get hintApiKeyName;
+
+  /// No description provided for @labelApiKeyValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Key Value'**
+  String get labelApiKeyValue;
+
+  /// No description provided for @hintApiKeyValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty for auto-generated key'**
+  String get hintApiKeyValue;
+
+  /// No description provided for @msgApiKeyCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'API Key created'**
+  String get msgApiKeyCreated;
+
+  /// No description provided for @msgApiKeyDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'API Key deleted'**
+  String get msgApiKeyDeleted;
+
+  /// No description provided for @msgApiKeyCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'API Key copied to clipboard'**
+  String get msgApiKeyCopied;
+
+  /// No description provided for @msgNoApiKeys.
+  ///
+  /// In en, this message translates to:
+  /// **'No API keys found'**
+  String get msgNoApiKeys;
+
+  /// No description provided for @actionCreateKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Key'**
+  String get actionCreateKey;
+
+  /// No description provided for @labelCreatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get labelCreatedAt;
+
+  /// No description provided for @labelExpiresAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires'**
+  String get labelExpiresAt;
+
+  /// No description provided for @labelNever.
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get labelNever;
+
+  /// No description provided for @msgConfirmDeleteApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this API key?'**
+  String get msgConfirmDeleteApiKey;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -68,12 +68,14 @@ class StacksScreenState extends State<StacksScreen> {
     final service = DockerService(baseUrl: _currentApiUrl, apiKey: _currentApiKey, ignoreSsl: _currentIgnoreSsl);
     try {
       final stacks = await service.getStacks();
+      if (!mounted) return;
       setState(() {
         _allStacks = stacks;
         _filterStacks();
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _error = e.toString();
         _isLoading = false;

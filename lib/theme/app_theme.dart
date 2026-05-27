@@ -89,7 +89,7 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
 
-      scaffoldBackgroundColor: colorScheme.surface,
+      scaffoldBackgroundColor: colorScheme.surfaceContainer,
 
       textTheme: textTheme.copyWith(
         titleLarge: textTheme.titleLarge?.copyWith(

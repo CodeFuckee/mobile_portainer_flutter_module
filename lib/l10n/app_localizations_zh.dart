@@ -1,4 +1,8 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
 
 /// The translations for Chinese (`zh`).
 class AppLocalizationsZh extends AppLocalizations {
@@ -491,4 +495,76 @@ class AppLocalizationsZh extends AppLocalizations {
   String labelSelectedCount(Object count) {
     return '已选 $count 个变量';
   }
+
+  @override
+  String get labelMore => '更多';
+
+  @override
+  String get titleLogin => '登录';
+
+  @override
+  String get labelUsername => '用户名';
+
+  @override
+  String get labelPassword => '密码';
+
+  @override
+  String get hintUsername => '请输入用户名';
+
+  @override
+  String get hintPassword => '请输入密码';
+
+  @override
+  String get btnLogin => '登录';
+
+  @override
+  String get msgLoginFailed => '登录失败，请检查您的凭据';
+
+  @override
+  String get msgConnecting => '正在连接...';
+
+  @override
+  String get btnLogout => '退出登录';
+
+  @override
+  String get titleApiKeys => 'API 密钥管理';
+
+  @override
+  String get labelApiKeyName => '密钥名称';
+
+  @override
+  String get hintApiKeyName => '输入密钥名称';
+
+  @override
+  String get labelApiKeyValue => '密钥值';
+
+  @override
+  String get hintApiKeyValue => '留空则由后端自动生成';
+
+  @override
+  String get msgApiKeyCreated => 'API 密钥已创建';
+
+  @override
+  String get msgApiKeyDeleted => 'API 密钥已删除';
+
+  @override
+  String get msgApiKeyCopied => 'API 密钥已复制到剪贴板';
+
+  @override
+  String get msgNoApiKeys => '暂无 API 密钥';
+
+  @override
+  String get actionCreateKey => '创建密钥';
+
+  @override
+  String get labelCreatedAt => '创建时间';
+
+  @override
+  String get labelExpiresAt => '过期时间';
+
+  @override
+  String get labelNever => '永不过期';
+
+  @override
+  String get msgConfirmDeleteApiKey => '确定要删除此 API 密钥吗？';
 }

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import '../services/docker_service.dart';
 import 'package:intl/intl.dart';
+import '../theme/theme_extensions.dart';
 import '../widgets/section_title.dart';
 import '../widgets/info_card.dart';
 import '../widgets/info_row.dart';
@@ -155,10 +154,14 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
     final config = details['Config'] ?? {};
     final rootFS = details['RootFS'] ?? {};
     final layers = rootFS['Layers'] as List? ?? [];
+    final accentColor = DockerResourceIconColor.images;
+    final shortId = (details['Id']?.toString() ?? '').replaceFirst('sha256:', '').substring(0, 12);
 
     return ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
+        _buildSummaryCard(details, shortId, accentColor),
+        const SizedBox(height: 20),
         _buildSectionTitle('Basic Info'),
         _buildInfoCard([
           _buildInfoRow('ID', details['Id']?.toString().substring(7, 19) ?? '', showCopyButton: true), // Short ID
@@ -217,6 +220,98 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
     );
   }
 
+  Widget _buildSummaryCard(Map<String, dynamic> details, String shortId, Color accentColor) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final tags = details['RepoTags'] as List?;
+    final primaryTag = (tags != null && tags.isNotEmpty) ? tags.first.toString() : widget.imageName;
+
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      child: Column(
+        children: [
+          Container(height: 4, color: accentColor),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: accentColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(Icons.inventory_2_outlined, color: accentColor, size: 26),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            primaryTag,
+                            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'ID: $shortId',
+                            style: TextStyle(
+                              fontFamily: 'monospace',
+                              fontSize: 13,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Divider(height: 1, color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    _buildStatItem(Icons.data_usage, _formatSize(details['Size']), 'Size', colorScheme),
+                    _buildStatItem(Icons.access_time, _formatDate(details['Created']), 'Created', colorScheme),
+                    _buildStatItem(Icons.memory, '${details['Os']}/${details['Architecture']}', 'OS/Arch', colorScheme),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem(IconData icon, String value, String label, ColorScheme colorScheme) {
+    return Expanded(
+      child: Column(
+        children: [
+          Icon(icon, size: 20, color: colorScheme.onSurfaceVariant),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSectionTitle(String title) {
     return SectionTitle(title: title);
   }
@@ -236,27 +331,24 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
 
   Widget _buildListCard(List<dynamic> items, {bool monospace = false}) {
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.3)),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: items.map((item) {
+          children: items.asMap().entries.map((entry) {
+            final isLast = entry.key == items.length - 1;
             return Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SelectableText(
-                    item.toString(), 
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontFamily: monospace ? 'monospace' : null,
-                    )
-                  ),
-                  const Divider(),
-                ],
+              padding: EdgeInsets.only(bottom: isLast ? 0 : 12),
+              child: SelectableText(
+                entry.value.toString(),
+                style: TextStyle(
+                  fontSize: 13,
+                  fontFamily: monospace ? 'monospace' : null,
+                ),
               ),
             );
           }).toList(),
@@ -267,24 +359,28 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
 
   Widget _buildEnvCard(List<dynamic> envs) {
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.3)),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: envs.map((env) {
-            final parts = env.toString().split('=');
+          children: envs.asMap().entries.map((entry) {
+            final env = entry.value.toString();
+            final parts = env.split('=');
             final key = parts.isNotEmpty ? parts[0] : '';
             final value = parts.length > 1 ? parts.sublist(1).join('=') : '';
+            final isLast = entry.key == envs.length - 1;
             return Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
+              padding: EdgeInsets.only(bottom: isLast ? 0 : 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(key, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey)),
+                  Text(key, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.grey)),
+                  const SizedBox(height: 2),
                   SelectableText(value, style: const TextStyle(fontFamily: 'monospace', fontSize: 13)),
-                  const Divider(),
                 ],
               ),
             );
@@ -295,63 +391,64 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
   }
 
   Widget _buildMapCard(Map<String, dynamic> map) {
-    List<Widget> widgets = [];
-    map.forEach((key, value) {
-       widgets.add(
-         Padding(
-           padding: const EdgeInsets.only(bottom: 8.0),
-           child: Column(
-             crossAxisAlignment: CrossAxisAlignment.start,
-             children: [
-               SelectableText(key, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-               if (value != null && value.toString() != '{}')
-                  SelectableText(value.toString(), style: const TextStyle(fontSize: 13)),
-               const Divider(),
-             ],
-           ),
-         )
-       );
-    });
-
+    final entries = map.entries.toList();
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.3)),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: widgets,
+          children: entries.asMap().entries.map((e) {
+            final key = e.value.key;
+            final value = e.value.value;
+            final isLast = e.key == entries.length - 1;
+            return Padding(
+              padding: EdgeInsets.only(bottom: isLast ? 0 : 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SelectableText(key, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                  if (value != null && value.toString() != '{}')
+                    SelectableText(value.toString(), style: const TextStyle(fontSize: 13)),
+                ],
+              ),
+            );
+          }).toList(),
         ),
       ),
     );
   }
 
   Widget _buildLabelsCard(Map<String, dynamic> labels) {
-    List<Widget> labelWidgets = [];
-    labels.forEach((key, value) {
-      labelWidgets.add(
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(key, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey)),
-              SelectableText(value.toString(), style: const TextStyle(fontSize: 13)),
-              const SizedBox(height: 4),
-            ],
-          ),
-        )
-      );
-    });
-
+    final entries = labels.entries.toList();
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.3)),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: labelWidgets,
+          children: entries.asMap().entries.map((e) {
+            final key = e.value.key;
+            final value = e.value.value;
+            final isLast = e.key == entries.length - 1;
+            return Padding(
+              padding: EdgeInsets.only(bottom: isLast ? 0 : 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(key, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Colors.grey)),
+                  const SizedBox(height: 2),
+                  SelectableText(value.toString(), style: const TextStyle(fontSize: 13)),
+                ],
+              ),
+            );
+          }).toList(),
         ),
       ),
     );

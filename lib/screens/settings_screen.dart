@@ -10,10 +10,12 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../main.dart';
 
 import 'package:mobile_portainer_flutter_module/services/update_service.dart';
+import '../services/auth_service.dart';
 import '../services/harmonyos_platform.dart';
 import '../services/harmonyos_shared_prefs.dart';
 import '../utils/platform_detector.dart';
 import '../widgets/loading_view.dart';
+import 'api_keys_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   final VoidCallback? onSaved;
@@ -32,6 +34,7 @@ class SettingsScreenState extends State<SettingsScreen> {
   // Server Management
   List<Map<String, String>> _servers = [];
   String? _activeApiUrl;
+  String? _webBackendUrl;
 
   @override
   void initState() {
@@ -64,10 +67,16 @@ class SettingsScreenState extends State<SettingsScreen> {
       apiKey = await prefs.getString('docker_api_key');
     }
 
+    String? webBackendUrl;
+    if (PlatformDetector.isWeb) {
+      webBackendUrl = await prefs.getString('docker_auth_server_url');
+    }
+
     setState(() {
       _currentLanguage = languageCode ?? 'system';
       _currentTimezone = timezoneCode ?? 'system';
       _activeApiUrl = activeApiUrl;
+      _webBackendUrl = webBackendUrl;
 
       if (serverListJson != null) {
         try {
@@ -505,15 +514,33 @@ class SettingsScreenState extends State<SettingsScreen> {
                           ],
                           onChanged: _updateTimezone,
                         ),
-                        const SizedBox(height: 16),
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(t.actionUpdate),
-                          leading: const Icon(Icons.system_update),
-                          onTap: _checkUpdate,
-                          trailing: const Icon(Icons.chevron_right),
-                        ),
-                        const Divider(),
+                        if (!PlatformDetector.isWeb) ...[
+                          const SizedBox(height: 16),
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(t.actionUpdate),
+                            leading: const Icon(Icons.system_update),
+                            onTap: _checkUpdate,
+                            trailing: const Icon(Icons.chevron_right),
+                          ),
+                          const Divider(),
+                        ],
+                        if (PlatformDetector.isWeb) ...[
+                          const SizedBox(height: 16),
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(t.titleApiKeys),
+                            leading: const Icon(Icons.vpn_key),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const ApiKeysScreen()),
+                              );
+                            },
+                            trailing: const Icon(Icons.chevron_right),
+                          ),
+                          const Divider(),
+                        ],
                         ListTile(
                           contentPadding: EdgeInsets.zero,
                           title: Text(t.labelGithub),
@@ -560,7 +587,11 @@ class SettingsScreenState extends State<SettingsScreen> {
                   final index = entry.key;
                   final server = entry.value;
                   final isActive = server['url'] == _activeApiUrl;
-                  
+                  final isWebBackend = PlatformDetector.isWeb &&
+                      _webBackendUrl != null &&
+                      _webBackendUrl!.isNotEmpty &&
+                      server['url'] == _webBackendUrl;
+
                   return Card(
                     color: isActive ? Theme.of(context).colorScheme.primaryContainer : null,
                     margin: const EdgeInsets.only(bottom: 8),
@@ -575,42 +606,49 @@ class SettingsScreenState extends State<SettingsScreen> {
                               padding: const EdgeInsets.only(right: 8.0),
                               child: Chip(
                                 label: Text(
-                                  t.labelActive, 
-                                  style: const TextStyle(fontSize: 10, height: 1.0) // Fix for small chips
+                                  t.labelActive,
+                                  style: const TextStyle(fontSize: 10, height: 1.0),
                                 ),
                                 visualDensity: VisualDensity.compact,
                                 padding: EdgeInsets.zero,
                               ),
                             ),
-                          PopupMenuButton<String>(
-                            onSelected: (value) {
-                              if (value == 'edit') {
-                                _showServerDialog(server: server, index: index);
-                              } else if (value == 'copy') {
-                                _copyServer(index);
-                              } else if (value == 'delete') {
-                                _deleteServer(index);
-                              }
-                            },
-                            itemBuilder: (context) => [
-                              PopupMenuItem(
-                                value: 'edit',
-                                child: Text(t.actionEdit),
-                              ),
-                              PopupMenuItem(
-                                value: 'copy',
-                                child: Text(t.actionCopy),
-                              ),
-                              PopupMenuItem(
-                                value: 'delete',
-                                child: Text(t.actionDelete),
-                              ),
-                            ],
-                          ),
+                          if (isWebBackend)
+                            PopupMenuButton<String>(
+                              itemBuilder: (context) => [],
+                              enabled: false,
+                              icon: const Icon(Icons.lock, size: 18),
+                            )
+                          else
+                            PopupMenuButton<String>(
+                              onSelected: (value) {
+                                if (value == 'edit') {
+                                  _showServerDialog(server: server, index: index);
+                                } else if (value == 'copy') {
+                                  _copyServer(index);
+                                } else if (value == 'delete') {
+                                  _deleteServer(index);
+                                }
+                              },
+                              itemBuilder: (context) => [
+                                PopupMenuItem(
+                                  value: 'edit',
+                                  child: Text(t.actionEdit),
+                                ),
+                                PopupMenuItem(
+                                  value: 'copy',
+                                  child: Text(t.actionCopy),
+                                ),
+                                PopupMenuItem(
+                                  value: 'delete',
+                                  child: Text(t.actionDelete),
+                                ),
+                              ],
+                            ),
                         ],
                       ),
                       onTap: () {
-                        if (!isActive) {
+                        if (!isActive && !isWebBackend) {
                           _switchServer(server);
                         }
                       },

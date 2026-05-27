@@ -9,163 +9,103 @@ import 'env_vars_screen.dart';
 import 'ports_screen.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import '../services/docker_service.dart';
-import '../theme/theme_extensions.dart';
 
-class ResourcesScreen extends StatelessWidget {
+class ResourcesScreen extends StatefulWidget {
   const ResourcesScreen({super.key});
+
+  @override
+  State<ResourcesScreen> createState() => _ResourcesScreenState();
+}
+
+class _ResourcesScreenState extends State<ResourcesScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+
+  final _tabs = const [
+    _TabDef(titleKey: 'titleImages', icon: Icons.layers, child: ImagesScreen()),
+    _TabDef(titleKey: 'titleNetworks', icon: Icons.hub, child: NetworksScreen()),
+    _TabDef(titleKey: 'titleStacks', icon: Icons.apps, child: StacksScreen()),
+    _TabDef(titleKey: 'titleVolumes', icon: Icons.storage, child: VolumesScreen()),
+    _TabDef(titleKey: 'titleEnvVars', icon: Icons.settings_ethernet, child: EnvVarsScreen()),
+    _TabDef(titleKey: 'titlePorts', icon: Icons.settings_input_component, child: PortsScreen()),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: _tabs.length, vsync: this);
+    _tabController.addListener(() {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
-    
-    final items = [
-      _ResourceItem(
-        title: t.titleImages,
-        icon: Icons.layers,
-        color: DockerResourceIconColor.images,
-        screen: const ImagesScreen(),
-        hasFab: true,
-      ),
-      _ResourceItem(
-        title: t.titleNetworks,
-        icon: Icons.hub,
-        color: DockerResourceIconColor.networks,
-        screen: const NetworksScreen(),
-      ),
-      _ResourceItem(
-        title: t.titleStacks,
-        icon: Icons.apps,
-        color: DockerResourceIconColor.stacks,
-        screen: const StacksScreen(),
-      ),
-      _ResourceItem(
-        title: t.titleVolumes,
-        icon: Icons.storage,
-        color: DockerResourceIconColor.volumes,
-        screen: const VolumesScreen(),
-      ),
-      _ResourceItem(
-        title: t.titleEnvVars,
-        icon: Icons.settings_ethernet,
-        color: DockerResourceIconColor.envVars,
-        screen: const EnvVarsScreen(),
-      ),
-      _ResourceItem(
-        title: t.titlePorts,
-        icon: Icons.settings_input_component,
-        color: DockerResourceIconColor.ports,
-        screen: const PortsScreen(),
-      ),
-    ];
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isWide = constraints.maxWidth >= 600;
-
-        if (isWide) {
-          int crossAxisCount = constraints.maxWidth >= 900 ? 3 : 2;
-          return GridView.builder(
-            padding: const EdgeInsets.all(16),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 1.5,
-            ),
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              return _buildGridItem(context, items[index]);
-            },
-          );
-        }
-
-        return ListView.separated(
-          padding: const EdgeInsets.all(16),
-          itemCount: items.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 12),
-          itemBuilder: (context, index) {
-            return _buildListItem(context, items[index]);
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildListItem(BuildContext context, _ResourceItem item) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: item.color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
+    return Column(
+      children: [
+        Container(
+          color: colorScheme.surface,
+          child: TabBar(
+            controller: _tabController,
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
+            dividerColor: Colors.transparent,
+            tabs: _tabs.map((tab) {
+              return Tab(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(tab.icon, size: 18),
+                    const SizedBox(width: 6),
+                    Text(_titleFor(t, tab)),
+                  ],
+                ),
+              );
+            }).toList(),
           ),
-          child: Icon(item.icon, color: item.color, size: 28),
         ),
-        title: Text(
-          item.title,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        ),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-        onTap: () => _navigateToScreen(context, item),
-      ),
-    );
-  }
-
-  Widget _buildGridItem(BuildContext context, _ResourceItem item) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        onTap: () => _navigateToScreen(context, item),
-        borderRadius: BorderRadius.circular(12),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: item.color.withOpacity(0.1),
-                shape: BoxShape.circle,
+        Expanded(
+          child: Stack(
+            children: [
+              TabBarView(
+                controller: _tabController,
+                children: _tabs.map((tab) => tab.child).toList(),
               ),
-              child: Icon(item.icon, color: item.color, size: 48),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              item.title,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _navigateToScreen(BuildContext context, _ResourceItem item) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => Scaffold(
-          appBar: AppBar(
-            title: Text(item.title),
+              if (_tabController.index == 0)
+                Positioned(
+                  right: 16,
+                  bottom: 16,
+                  child: FloatingActionButton(
+                    onPressed: () => _showPullImageDialog(context),
+                    child: const Icon(Icons.add),
+                  ),
+                ),
+            ],
           ),
-          body: item.screen,
-          floatingActionButton: item.hasFab
-              ? FloatingActionButton(
-                  onPressed: () => _showPullImageDialog(context),
-                  child: const Icon(Icons.add),
-                )
-              : null,
         ),
-      ),
+      ],
     );
+  }
+
+  String _titleFor(AppLocalizations t, _TabDef tab) {
+    switch (tab.titleKey) {
+      case 'titleImages': return t.titleImages;
+      case 'titleNetworks': return t.titleNetworks;
+      case 'titleStacks': return t.titleStacks;
+      case 'titleVolumes': return t.titleVolumes;
+      case 'titleEnvVars': return t.titleEnvVars;
+      case 'titlePorts': return t.titlePorts;
+      default: return tab.titleKey;
+    }
   }
 
   Future<void> _showPullImageDialog(BuildContext context) async {
@@ -222,10 +162,9 @@ class ResourcesScreen extends StatelessWidget {
                       'http://10.0.2.2:8000';
                   final apiKey = prefs.getString('docker_api_key') ?? '';
                   final ignoreSsl = prefs.getString('docker_ignore_ssl') == 'true';
-                  
+
                   if (!context.mounted) return;
 
-                  // Show progress dialog
                   showDialog(
                     context: context,
                     barrierDismissible: false,
@@ -250,6 +189,18 @@ class ResourcesScreen extends StatelessWidget {
       },
     );
   }
+}
+
+class _TabDef {
+  final String titleKey;
+  final IconData icon;
+  final Widget child;
+
+  const _TabDef({
+    required this.titleKey,
+    required this.icon,
+    required this.child,
+  });
 }
 
 class _PullProgressDialog extends StatefulWidget {
@@ -293,7 +244,7 @@ class _PullProgressDialogState extends State<_PullProgressDialog> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
-    
+
     return AlertDialog(
       title: Text(t.titlePullImage),
       content: SizedBox(
@@ -306,29 +257,28 @@ class _PullProgressDialogState extends State<_PullProgressDialog> {
               final data = snapshot.data;
               String id = '';
               String message = '';
-              
+
               if (data is Map) {
                 if (data.containsKey('error') || data.containsKey('errorDetail')) {
-                   message = 'Error: ${data['error'] ?? data['errorDetail']?['message']}';
-                   _hasError = true;
+                  message = 'Error: ${data['error'] ?? data['errorDetail']?['message']}';
+                  _hasError = true;
                 } else {
-                   final status = data['status'] ?? '';
-                   id = data['id'] ?? '';
-                   final progress = data['progress'] ?? '';
-                   
-                   if (id.isNotEmpty) {
-                     message = '$id: $status $progress';
-                   } else {
-                     message = '$status $progress';
-                   }
+                  final status = data['status'] ?? '';
+                  id = data['id'] ?? '';
+                  final progress = data['progress'] ?? '';
+
+                  if (id.isNotEmpty) {
+                    message = '$id: $status $progress';
+                  } else {
+                    message = '$status $progress';
+                  }
                 }
               } else {
                 message = data.toString();
               }
-              
+
               if (message.trim().isNotEmpty) {
                 if (id.isNotEmpty) {
-                  // Check if we already have an entry for this ID
                   final index = _logs.indexWhere((log) => log['id'] == id);
                   if (index != -1) {
                     _logs[index] = {'id': id, 'message': message};
@@ -336,11 +286,9 @@ class _PullProgressDialogState extends State<_PullProgressDialog> {
                     _logs.add({'id': id, 'message': message});
                   }
                 } else {
-                   // No ID, just append
-                   _logs.add({'id': '', 'message': message});
+                  _logs.add({'id': '', 'message': message});
                 }
-                
-                // Auto scroll
+
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (_scrollController.hasClients) {
                     _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
@@ -348,24 +296,23 @@ class _PullProgressDialogState extends State<_PullProgressDialog> {
                 });
               }
             }
-            
+
             if (snapshot.connectionState == ConnectionState.done) {
               if (!_isDone) {
                 _isDone = true;
                 WidgetsBinding.instance.addPostFrameCallback((_) async {
-                   if (mounted) {
-                     setState(() {});
-                     if (!_hasError) {
-                        await Future.delayed(const Duration(seconds: 1));
-                        if (mounted) {
-                          // ignore: use_build_context_synchronously
-                          Navigator.pop(context);
-                          if(context.mounted){
-                            NotifyUtils.showNotify(context, t.msgImagePullSuccess);
-                          }
+                  if (mounted) {
+                    setState(() {});
+                    if (!_hasError) {
+                      await Future.delayed(const Duration(seconds: 1));
+                      if (mounted) {
+                        Navigator.pop(context);
+                        if (context.mounted) {
+                          NotifyUtils.showNotify(context, t.msgImagePullSuccess);
                         }
                       }
-                   }
+                    }
+                  }
                 });
               }
             }
@@ -375,13 +322,13 @@ class _PullProgressDialogState extends State<_PullProgressDialog> {
               itemCount: _logs.length + (_isDone && !_hasError ? 1 : 0),
               itemBuilder: (context, index) {
                 if (index == _logs.length) {
-                   return Padding(
-                     padding: const EdgeInsets.only(top: 8.0),
-                     child: Text(
-                       t.msgImagePullSuccess, 
-                       style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
-                     ),
-                   );
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      t.msgImagePullSuccess,
+                      style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                    ),
+                  );
                 }
                 return Text(_logs[index]['message']!, style: const TextStyle(fontSize: 12));
               },
@@ -397,20 +344,4 @@ class _PullProgressDialogState extends State<_PullProgressDialog> {
       ],
     );
   }
-}
-
-class _ResourceItem {
-  final String title;
-  final IconData icon;
-  final Color color;
-  final Widget screen;
-  final bool hasFab;
-
-  _ResourceItem({
-    required this.title,
-    required this.icon,
-    required this.color,
-    required this.screen,
-    this.hasFab = false,
-  });
 }

@@ -132,7 +132,7 @@ class DockerColors extends ThemeExtension<DockerColors> {
 }
 
 class DockerResourceIconColor {
-  static const images = Color(0xFF7B1FA2);
+  static const images = Color(0xFF00897B);
   static const networks = Color(0xFFE65100);
   static const stacks = Color(0xFF00695C);
   static const volumes = Color(0xFF4E342E);

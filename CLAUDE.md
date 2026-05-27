@@ -34,6 +34,8 @@ flutter test             # 运行测试
 
 鸿蒙相关的 shared preferences 有独立实现（`HarmonyosPreferences`），因为 `shared_preferences` 插件在鸿蒙上不可用。涉及本地存储时需通过 `PlatformDetector.isOhos` 判断平台。
 
+**引入任何第三方库前，必须确认该库是否支持鸿蒙（OpenHarmony）平台。** 不支持鸿蒙的库需通过平台抽象（如 `io`/`web`/`ohos` 分层实现）隔离，不可直接在核心逻辑中引用。已在项目中采用的平台抽象模式（`http_helper`、`ws_helper`、`file_helper`、`platform_detector`、`notification_service`）作为参考模板。
+
 ## API 连接
 
 用户在 App 设置界面手动输入 Portainer 服务器地址和 API Key，无硬编码端点。`DockerService` 支持 TLS 忽略选项。

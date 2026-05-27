@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/services.dart';
-import 'dart:io';
 import '../services/harmonyos_platform.dart';
 import 'platform_detector.dart';
 
@@ -11,7 +10,7 @@ class ToastUtils {
   static void show(String message) {
     if (PlatformDetector.isOhos) {
       HarmonyosPlatform.showToast(message);
-    } else if (Platform.isAndroid) {
+    } else if (PlatformDetector.isAndroid) {
       _channel.invokeMethod('showToast', message);
     } else {
       Fluttertoast.showToast(

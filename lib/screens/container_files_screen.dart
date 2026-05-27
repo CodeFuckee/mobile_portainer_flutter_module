@@ -1,17 +1,14 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:share_plus/share_plus.dart';
 import '../services/docker_service.dart';
-import '../services/harmonyos_platform.dart';
 import '../models/container_file.dart';
 import '../utils/platform_detector.dart';
+import '../utils/file_helper.dart';
 import '../widgets/error_view.dart';
 import '../widgets/loading_view.dart';
 
@@ -150,7 +147,7 @@ class _ContainerFilesScreenState extends State<ContainerFilesScreen> {
   Future<void> _shareFile(ContainerFile file) async {
     final t = AppLocalizations.of(context)!;
     final fullPath = _currentPath == '/' ? '/${file.name}' : '$_currentPath/${file.name}';
-    
+
     setState(() {
       _isLoading = true;
     });
@@ -163,33 +160,23 @@ class _ContainerFilesScreenState extends State<ContainerFilesScreen> {
 
     try {
       final bytes = await service.downloadContainerFile(widget.containerId, fullPath);
-      
+
       if (!mounted) return;
 
-      final String tempDirPath;
-      if (PlatformDetector.isOhos) {
-        tempDirPath = await HarmonyosPlatform.getTemporaryDirectory();
+      if (PlatformDetector.isWeb) {
+        await FileHelper.shareBytes(bytes, file.name, text: 'Download ${file.name}');
       } else {
-        tempDirPath = (await getTemporaryDirectory()).path;
+        final tempDirPath = await FileHelper.tempDirPath();
+        final filePath = await FileHelper.writeBytes('$tempDirPath/${file.name}', bytes);
+        await FileHelper.shareFile(filePath, file.name, text: 'Download ${file.name}');
       }
-      final tempFile = File('$tempDirPath/${file.name}');
-      await tempFile.writeAsBytes(bytes);
 
       setState(() {
         _isLoading = false;
       });
 
-      if (PlatformDetector.isOhos) {
-        await HarmonyosPlatform.shareFile(tempFile.path, text: 'Download ${file.name}');
-      } else {
-        await Share.shareXFiles(
-          [XFile(tempFile.path)],
-          text: 'Download ${file.name}',
-        );
-      }
-
       if (mounted) NotifyUtils.showNotify(context, t.msgFileSaved);
-      
+
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -203,27 +190,26 @@ class _ContainerFilesScreenState extends State<ContainerFilesScreen> {
   Future<void> _downloadFile(ContainerFile file) async {
     final t = AppLocalizations.of(context)!;
     final fullPath = _currentPath == '/' ? '/${file.name}' : '$_currentPath/${file.name}';
-    
-    // Check permissions
+
     bool hasPermission = false;
     if (PlatformDetector.isOhos) {
-      hasPermission = true; // 鸿蒙无需显式存储权限即可写入应用目录
-    } else if (Platform.isAndroid) {
+      hasPermission = true;
+    } else if (PlatformDetector.isAndroid) {
       final androidInfo = await DeviceInfoPlugin().androidInfo;
       if (androidInfo.version.sdkInt >= 33) {
-         hasPermission = true;
+        hasPermission = true;
       } else if (androidInfo.version.sdkInt >= 30) {
-         var status = await Permission.manageExternalStorage.status;
-         if (!status.isGranted) {
-           status = await Permission.manageExternalStorage.request();
-         }
-         hasPermission = status.isGranted;
+        var status = await Permission.manageExternalStorage.status;
+        if (!status.isGranted) {
+          status = await Permission.manageExternalStorage.request();
+        }
+        hasPermission = status.isGranted;
       } else {
-         var status = await Permission.storage.status;
-         if (!status.isGranted) {
-           status = await Permission.storage.request();
-         }
-         hasPermission = status.isGranted;
+        var status = await Permission.storage.status;
+        if (!status.isGranted) {
+          status = await Permission.storage.request();
+        }
+        hasPermission = status.isGranted;
       }
     } else {
       hasPermission = true;
@@ -246,40 +232,29 @@ class _ContainerFilesScreenState extends State<ContainerFilesScreen> {
 
     try {
       final bytes = await service.downloadContainerFile(widget.containerId, fullPath);
-      
+
       if (!mounted) return;
 
-      Directory? downloadDir;
-      if (PlatformDetector.isOhos) {
-        final dirPath = await HarmonyosPlatform.getDownloadsDirectory();
-        downloadDir = Directory(dirPath);
-        if (!downloadDir.existsSync()) {
-          downloadDir.createSync(recursive: true);
-        }
-      } else if (Platform.isAndroid) {
-        downloadDir = Directory('/storage/emulated/0/Download');
-        if (!downloadDir.existsSync()) {
-          downloadDir = await getExternalStorageDirectory();
-        }
+      if (PlatformDetector.isWeb) {
+        await FileHelper.triggerDownload(file.name, bytes);
       } else {
-        downloadDir = await getDownloadsDirectory();
+        final dirPath = await FileHelper.downloadDirPath();
+        if (dirPath == null) {
+          throw Exception('Could not find download directory');
+        }
+        await FileHelper.ensureDir(dirPath);
+        final filePath = await FileHelper.writeBytes('$dirPath/${file.name}', bytes);
+        if (mounted) NotifyUtils.showNotify(context, '${t.msgFileSaved}: $filePath');
       }
 
-      if (downloadDir == null) {
-        throw Exception('Could not find download directory');
-      }
-
-      final saveFile = File('${downloadDir.path}/${file.name}');
-      // Avoid overwriting?
-      // Simple implementation: overwrite
-      await saveFile.writeAsBytes(bytes);
-      
       setState(() {
         _isLoading = false;
       });
-      
-      if (mounted) NotifyUtils.showNotify(context, '${t.msgFileSaved}: ${saveFile.path}');
-      
+
+      if (mounted && PlatformDetector.isWeb) {
+        NotifyUtils.showNotify(context, t.msgFileSaved);
+      }
+
     } catch (e) {
       if (mounted) {
         setState(() {

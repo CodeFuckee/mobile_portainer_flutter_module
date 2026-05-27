@@ -74,12 +74,14 @@ class VolumesScreenState extends State<VolumesScreen> {
     final service = DockerService(baseUrl: _currentApiUrl, apiKey: _currentApiKey, ignoreSsl: _currentIgnoreSsl);
     try {
       final volumes = await service.getVolumes();
+      if (!mounted) return;
       setState(() {
         _allVolumes = volumes;
         _filterVolumes();
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _error = e.toString();
         _isLoading = false;

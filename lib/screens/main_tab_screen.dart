@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
 import 'dashboard_screen.dart';
@@ -5,8 +7,11 @@ import 'home_screen.dart';
 import 'images_screen.dart';
 import 'resources_screen.dart';
 import 'settings_screen.dart';
+import 'login_screen.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
+import '../services/auth_service.dart';
+import '../utils/platform_detector.dart';
 
 class MainTabScreen extends StatefulWidget {
   const MainTabScreen({super.key});
@@ -102,8 +107,10 @@ class _MainTabScreenState extends State<MainTabScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isWide = screenWidth >= 600;
+    final screenSize = MediaQuery.of(context).size;
+    final screenWidth = screenSize.width;
+    final aspectRatio = screenWidth / screenSize.height;
+    final isWide = screenWidth >= 600 && aspectRatio >= 1.0;
 
     String currentEffectiveMode = 'list';
     if (_selectedIndex == 1) {
@@ -141,11 +148,11 @@ class _MainTabScreenState extends State<MainTabScreen> {
       ],
     );
 
-    if (isWide) {
-      return Scaffold(
-        body: _buildWideLayout(body, t, currentEffectiveMode),
-      );
-    }
+    // if (isWide) {
+    //   return Scaffold(
+    //     body: _buildWideLayout(body, t, currentEffectiveMode),
+    //   );
+    // }
 
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -157,33 +164,88 @@ class _MainTabScreenState extends State<MainTabScreen> {
         title: Text(_getTitle(t)),
         actions: _buildActions(t, currentEffectiveMode),
       ),
+      extendBody: true,
       body: body,
-      bottomNavigationBar: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            height: 0.5,
-            color: colorScheme.outlineVariant,
-          ),
-          NavigationBar(
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: _onItemTapped,
-            animationDuration: const Duration(milliseconds: 400),
-            backgroundColor: colorScheme.surface,
-            surfaceTintColor: Colors.transparent,
-            shadowColor: Colors.transparent,
-            destinations: _buildDestinations(t),
-          ),
-        ],
-      ),
+      bottomNavigationBar: _buildCustomBottomNavBar(context, t),
       floatingActionButton: _selectedIndex != 1
           ? null
           : FloatingActionButton(
-              onPressed: () {
-                _containersKey.currentState?.showRunContainerDialog();
-              },
-              child: const Icon(Icons.add),
+                onPressed: () {
+                  _containersKey.currentState?.showRunContainerDialog();
+                },
+                child: const Icon(Icons.add),
+              ),
+    );
+  }
+
+  Widget _buildCustomBottomNavBar(BuildContext context, AppLocalizations t) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final items = [
+      (Icons.dashboard_outlined, Icons.dashboard, t.titleDashboard),
+      (Icons.dns_outlined, Icons.dns, t.titleContainers),
+      (Icons.category_outlined, Icons.category, t.titleResources),
+      (Icons.settings_outlined, Icons.settings, t.titleSettings),
+    ];
+
+    const double itemWidth = 72.0;
+    const double innerPadding = 24.0;
+    final calculatedWidth = items.length * itemWidth + innerPadding;
+
+    return SafeArea(
+      child: Center(
+        heightFactor: 1.0,
+        child: Container(
+          margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(34),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              child: SizedBox(
+                width: calculatedWidth,
+                height: 68,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: List.generate(items.length, (index) {
+                    final isSelected = _selectedIndex == index;
+                    final item = items[index];
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: () => _onItemTapped(index),
+                        behavior: HitTestBehavior.opaque,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              isSelected ? item.$2 : item.$1,
+                              color: isSelected
+                                  ? colorScheme.primary
+                                  : colorScheme.onSurface.withOpacity(0.8),
+                              size: 26,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              item.$3,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
+                                color: isSelected
+                                    ? colorScheme.primary
+                                    : colorScheme.onSurface.withOpacity(0.5),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
             ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -225,6 +287,19 @@ class _MainTabScreenState extends State<MainTabScreen> {
         ),
       ),
       const SizedBox(width: 8),
+      if (PlatformDetector.isWeb)
+        IconButton(
+          icon: const Icon(Icons.logout),
+          onPressed: () async {
+            await AuthService.logout();
+            if (context.mounted) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+              );
+            }
+          },
+          tooltip: t.btnLogout,
+        ),
     ];
   }
 
@@ -232,116 +307,124 @@ class _MainTabScreenState extends State<MainTabScreen> {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Row(
+    final items = [
+      (Icons.dashboard_outlined, Icons.dashboard, t.titleDashboard),
+      (Icons.dns_outlined, Icons.dns, t.titleContainers),
+      (Icons.category_outlined, Icons.category, t.titleResources),
+      (Icons.settings_outlined, Icons.settings, t.titleSettings),
+    ];
+
+    const double itemHeight = 72.0;
+    const double verticalPadding = 24.0;
+    final navRailHeight = items.length * itemHeight + verticalPadding;
+
+    return Stack(
       children: [
-        Container(
-          color: colorScheme.surface,
-          child: NavigationRail(
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: _onItemTapped,
-            labelType: NavigationRailLabelType.all,
-            backgroundColor: Colors.transparent,
-            destinations: [
-              NavigationRailDestination(
-                icon: const Icon(Icons.dashboard_outlined),
-                selectedIcon: const Icon(Icons.dashboard),
-                label: Text(t.titleDashboard),
-              ),
-              NavigationRailDestination(
-                icon: const Icon(Icons.dns_outlined),
-                selectedIcon: const Icon(Icons.dns),
-                label: Text(t.titleContainers),
-              ),
-              NavigationRailDestination(
-                icon: const Icon(Icons.category_outlined),
-                selectedIcon: const Icon(Icons.category),
-                label: Text(t.titleResources),
-              ),
-              NavigationRailDestination(
-                icon: const Icon(Icons.settings_outlined),
-                selectedIcon: const Icon(Icons.settings),
-                label: Text(t.titleSettings),
-              ),
-            ],
-          ),
-        ),
-        VerticalDivider(width: 1, color: colorScheme.outlineVariant),
-        Expanded(
-          child: Stack(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 60),
-                child: Column(
-                  children: [
-                    Divider(height: 1, color: colorScheme.outlineVariant),
-                    Expanded(child: body),
-                  ],
-                ),
-              ),
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 60,
-                child: Container(
-                  color: colorScheme.surface,
-                  padding: const EdgeInsets.fromLTRB(24, 18, 24, 0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _getTitle(t),
-                          style: textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.onSurface,
-                          ),
-                        ),
+        Column(
+          children: [
+            Container(
+              height: 60,
+              color: colorScheme.surface,
+              padding: const EdgeInsets.fromLTRB(24, 18, 24, 0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      _getTitle(t),
+                      style: textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
                       ),
-                      ..._buildActions(t, currentEffectiveMode),
-                    ],
+                    ),
                   ),
-                ),
+                  ..._buildActions(t, currentEffectiveMode),
+                ],
               ),
-              if (_selectedIndex == 1)
-                Positioned(
-                  right: 16,
-                  bottom: 16,
-                  child: FloatingActionButton(
-                    onPressed: () {
-                      _containersKey.currentState?.showRunContainerDialog();
-                    },
-                    child: const Icon(Icons.add),
+            ),
+            Divider(height: 1, color: colorScheme.outlineVariant),
+            Expanded(child: body),
+          ],
+        ),
+        Positioned(
+          left: 16,
+          top: 0,
+          bottom: 0,
+          child: Center(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(36),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  height: navRailHeight,
+                  width: 72,
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface.withValues(alpha: 0.85),
+                    borderRadius: BorderRadius.circular(36),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 15,
+                    offset: const Offset(0, 5),
                   ),
-                ),
-            ],
+                ],
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(items.length, (index) {
+                  final isSelected = _selectedIndex == index;
+                  final item = items[index];
+                  return Expanded(
+                    child: GestureDetector(
+                      onTap: () => _onItemTapped(index),
+                      behavior: HitTestBehavior.opaque,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            isSelected ? item.$2 : item.$1,
+                            color: isSelected
+                                ? colorScheme.primary
+                                : colorScheme.onSurface.withOpacity(0.5),
+                            size: 26,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            item.$3,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: isSelected
+                                  ? FontWeight.w600
+                                  : FontWeight.normal,
+                              color: isSelected
+                                  ? colorScheme.primary
+                                  : colorScheme.onSurface.withOpacity(0.5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ),
+            ),
+            ),
           ),
         ),
+        if (_selectedIndex == 1)
+          Positioned(
+            right: 16,
+            bottom: 16,
+            child: FloatingActionButton(
+              onPressed: () {
+                _containersKey.currentState?.showRunContainerDialog();
+              },
+              child: const Icon(Icons.add),
+            ),
+          ),
       ],
     );
   }
 
-  List<NavigationDestination> _buildDestinations(AppLocalizations t) {
-    return [
-      NavigationDestination(
-        icon: const Icon(Icons.dashboard_outlined),
-        selectedIcon: const Icon(Icons.dashboard),
-        label: t.titleDashboard,
-      ),
-      NavigationDestination(
-        icon: const Icon(Icons.dns_outlined),
-        selectedIcon: const Icon(Icons.dns),
-        label: t.titleContainers,
-      ),
-      NavigationDestination(
-        icon: const Icon(Icons.category_outlined),
-        selectedIcon: const Icon(Icons.category),
-        label: t.titleResources,
-      ),
-      NavigationDestination(
-        icon: const Icon(Icons.settings_outlined),
-        selectedIcon: const Icon(Icons.settings),
-        label: t.titleSettings,
-      ),
-    ];
-  }
+
 }

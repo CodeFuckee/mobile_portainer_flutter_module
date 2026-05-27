@@ -82,6 +82,7 @@ class _EnvVarsScreenState extends State<EnvVarsScreen> with SingleTickerProvider
           color: Theme.of(context).cardColor,
           child: TabBar(
             controller: _tabController,
+            isScrollable: true,
             labelColor: Theme.of(context).primaryColor,
             unselectedLabelColor: Colors.grey,
             tabs: [

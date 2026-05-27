@@ -7,8 +7,8 @@ class StatusBadge extends StatelessWidget {
 
   const StatusBadge({super.key, required this.status, this.fontSize = 12});
 
-  Color _getColor(BuildContext context) {
-    final dockerColors = Theme.of(context).extension<DockerColors>();
+  static Color colorFor(String status, ThemeData theme) {
+    final dockerColors = theme.extension<DockerColors>();
     switch (status.toLowerCase()) {
       case 'running':
         return dockerColors?.statusRunning ?? Colors.green;
@@ -25,24 +25,41 @@ class StatusBadge extends StatelessWidget {
     }
   }
 
+  Color _getColor(BuildContext context) {
+    return colorFor(status, Theme.of(context));
+  }
+
   @override
   Widget build(BuildContext context) {
     final color = _getColor(context);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        border: Border.all(color: color.withValues(alpha: 0.5)),
         borderRadius: BorderRadius.circular(12),
         color: color.withValues(alpha: 0.1),
       ),
-      child: Text(
-        status,
-        style: TextStyle(
-          fontSize: fontSize,
-          fontWeight: FontWeight.w600,
-          color: color,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 5),
+          Text(
+            status,
+            style: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
+        ],
       ),
     );
   }

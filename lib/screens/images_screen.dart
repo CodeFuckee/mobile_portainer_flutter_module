@@ -6,7 +6,6 @@ import '../services/docker_service.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
 import '../theme/theme_extensions.dart';
-import '../widgets/status_badge.dart';
 import '../widgets/app_search_bar.dart';
 import '../widgets/error_view.dart';
 import '../widgets/empty_view.dart';
@@ -80,12 +79,14 @@ class ImagesScreenState extends State<ImagesScreen> {
     final service = DockerService(baseUrl: _currentApiUrl, apiKey: _currentApiKey, ignoreSsl: _currentIgnoreSsl);
     try {
       final images = await service.getImages();
+      if (!mounted) return;
       setState(() {
         _allImages = images;
         _filterImages();
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _error = e.toString();
         _isLoading = false;
@@ -248,7 +249,7 @@ class ImagesScreenState extends State<ImagesScreen> {
                           crossAxisCount: crossAxisCount,
                           crossAxisSpacing: 16,
                           mainAxisSpacing: 16,
-                          mainAxisExtent: 180,
+                          mainAxisExtent: 140,
                         ),
                         itemCount: _filteredImages.length,
                         itemBuilder: (context, index) {
@@ -256,9 +257,9 @@ class ImagesScreenState extends State<ImagesScreen> {
                           final tags = image.repoTags.isNotEmpty ? image.repoTags.join(', ') : '<none>';
                           String shortId = image.id;
                           if (shortId.startsWith('sha256:')) {
-                             if (shortId.length > 7) {
-                               shortId = shortId.substring(7);
-                             }
+                            if (shortId.length > 7) {
+                              shortId = shortId.substring(7);
+                            }
                           }
                           if (shortId.length > 12) {
                             shortId = shortId.substring(0, 12);
@@ -304,6 +305,13 @@ class ImagesScreenState extends State<ImagesScreen> {
   }
 
   Widget _buildImageTile(DockerImage image, String tags, String shortId, AppLocalizations t) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final dockerColors = Theme.of(context).extension<DockerColors>();
+
+    final tagList = image.repoTags.where((t) => t.isNotEmpty).toList();
+    final primaryTag = tagList.isNotEmpty ? tagList.first : '<none>';
+    final hasMoreTags = tagList.length > 1;
+
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -314,11 +322,7 @@ class ImagesScreenState extends State<ImagesScreen> {
         ),
       ),
       child: ListTile(
-        dense: true,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 0,
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         onTap: () {
           Navigator.push(
             context,
@@ -333,47 +337,55 @@ class ImagesScreenState extends State<ImagesScreen> {
             ),
           );
         },
-        title: Text(
-          tags,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          ),
-          overflow: TextOverflow.ellipsis,
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
+        title: Row(
           children: [
-            if (image.inUse)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  border: Border.all(color: Colors.green),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  t.labelInUse,
-                  style: const TextStyle(
-                    color: Colors.green,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+            Expanded(
+              child: Text(
+                primaryTag,
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                overflow: TextOverflow.ellipsis,
               ),
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              onPressed: () => _confirmDelete(image),
+            ),
+            if (image.inUse) _buildInUseBadge(dockerColors, t),
+          ],
+        ),
+        subtitle: Row(
+          children: [
+            if (hasMoreTags) ...[
+              Text(
+                '+${tagList.length - 1}',
+                style: TextStyle(fontSize: 12, color: colorScheme.primary, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(width: 12),
+            ],
+            Text(
+              '${_formatSize(image.size)}  ${_formatDate(image.created)}',
+              style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
             ),
           ],
+        ),
+        trailing: IconButton(
+          icon: Icon(Icons.delete_outline, size: 20, color: colorScheme.error),
+          onPressed: () => _confirmDelete(image),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
         ),
       ),
     );
   }
 
   Widget _buildImageCard(DockerImage image, String tags, String shortId, AppLocalizations t, {EdgeInsetsGeometry? margin, bool isGrid = false}) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final dockerColors = Theme.of(context).extension<DockerColors>();
+
+    final tagList = image.repoTags.where((t) => t.isNotEmpty).toList();
+    final primaryTag = tagList.isNotEmpty ? tagList.first : '<none>';
+    final hasMoreTags = tagList.length > 1;
+
     return Card(
       margin: margin ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       child: InkWell(
         onTap: () {
           Navigator.push(
@@ -389,76 +401,51 @@ class ImagesScreenState extends State<ImagesScreen> {
             ),
           );
         },
-        borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.all(14),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                tags,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            if (image.inUse)
-                              Container(
-                                margin: const EdgeInsets.only(left: 8),
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: Colors.green.withOpacity(0.1),
-                                  border: Border.all(color: Colors.green),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  t.labelInUse,
-                                  style: const TextStyle(
-                                    color: Colors.green,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, size: 20, color: Colors.red),
-                              onPressed: () => _confirmDelete(image),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'ID: $shortId',
-                          style: TextStyle(
-                            color: Theme.of(context).textTheme.bodySmall?.color,
-                            fontFamily: 'monospace',
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      primaryTag,
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                      maxLines: isGrid ? 2 : 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
+                  ),
+                  if (image.inUse) _buildInUseBadge(dockerColors, t),
+                  const SizedBox(width: 4),
+                  IconButton(
+                    icon: Icon(Icons.delete_outline, size: 20, color: colorScheme.error),
+                    onPressed: () => _confirmDelete(image),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                   ),
                 ],
               ),
-              if (isGrid) const Spacer() else const SizedBox(height: 12),
-              const Divider(height: 24),
+              if (hasMoreTags)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(
+                    tagList.skip(1).join(', '),
+                    style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              const SizedBox(height: 10),
+              Divider(height: 1, color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+              const SizedBox(height: 10),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildInfoItem(Icons.data_usage, _formatSize(image.size)),
-                  _buildInfoItem(Icons.access_time, _formatDate(image.created)),
+                  _buildInfoChip(Icons.data_usage, _formatSize(image.size), colorScheme),
+                  const Spacer(),
+                  _buildInfoChip(Icons.access_time, _formatDate(image.created), colorScheme),
                 ],
               ),
             ],
@@ -468,14 +455,34 @@ class ImagesScreenState extends State<ImagesScreen> {
     );
   }
 
-  Widget _buildInfoItem(IconData icon, String text) {
+  Widget _buildInUseBadge(DockerColors? dockerColors, AppLocalizations t) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: (dockerColors?.inUseBackground ?? Colors.green).withValues(alpha: 0.15),
+        border: Border.all(color: dockerColors?.inUseBorder ?? Colors.green, width: 1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        t.labelInUse,
+        style: TextStyle(
+          color: dockerColors?.inUseBorder ?? Colors.green,
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoChip(IconData icon, String text, ColorScheme colorScheme) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 16, color: Colors.grey),
-        const SizedBox(width: 4),
+        Icon(icon, size: 14, color: colorScheme.onSurfaceVariant),
+        const SizedBox(width: 5),
         Text(
           text,
-          style: const TextStyle(color: Colors.grey),
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: colorScheme.onSurfaceVariant),
         ),
       ],
     );

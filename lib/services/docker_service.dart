@@ -1,11 +1,9 @@
 import 'dart:convert';
-import 'dart:math';
 import 'dart:typed_data';
-import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:http/io_client.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:web_socket_channel/io.dart';
+import 'platform/http_helper.dart';
+import 'platform/ws_helper.dart';
 import '../models/docker_container.dart';
 import '../models/docker_image.dart';
 import '../models/docker_network.dart';
@@ -20,13 +18,20 @@ class DockerService {
   late final http.Client _client;
 
   DockerService({required this.baseUrl, this.apiKey, this.ignoreSsl = false}) {
-    if (ignoreSsl) {
-      final ioc = HttpClient();
-      ioc.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
-      _client = IOClient(ioc);
-    } else {
-      _client = http.Client();
+    _client = HttpHelper.createClient(ignoreSsl: ignoreSsl);
+  }
+
+  Map<String, String> _authHeaders([Map<String, String>? extra]) {
+    final h = <String, String>{};
+    if (extra != null) h.addAll(extra);
+    if (apiKey != null && apiKey!.isNotEmpty) {
+      if (apiKey!.startsWith('eyJ')) {
+        h['Authorization'] = 'Bearer $apiKey';
+      } else {
+        h['X-API-Key'] = apiKey!;
+      }
     }
+    return h;
   }
 
   Future<List<DockerContainer>> getContainers() async {
@@ -37,10 +42,7 @@ class DockerService {
         
     final url = Uri.parse('$cleanBaseUrl/containers/summary');
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.get(url, headers: headers);
@@ -64,10 +66,7 @@ class DockerService {
         
     final url = Uri.parse('$cleanBaseUrl/images');
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.get(url, headers: headers);
@@ -90,10 +89,7 @@ class DockerService {
         
     final url = Uri.parse('$cleanBaseUrl/networks');
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.get(url, headers: headers);
@@ -116,10 +112,7 @@ class DockerService {
 
     final url = Uri.parse('$cleanBaseUrl/networks/$id');
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.get(url, headers: headers);
@@ -141,10 +134,7 @@ class DockerService {
 
     final url = Uri.parse('$cleanBaseUrl/volumes');
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.get(url, headers: headers);
@@ -175,10 +165,7 @@ class DockerService {
 
     final url = Uri.parse('$cleanBaseUrl/volumes/$name');
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.get(url, headers: headers);
@@ -200,10 +187,7 @@ class DockerService {
 
     final url = Uri.parse('$cleanBaseUrl/volumes/$name');
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.delete(url, headers: headers);
@@ -232,10 +216,7 @@ class DockerService {
 
     final url = Uri.parse('$cleanBaseUrl/usage');
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.get(url, headers: headers);
@@ -258,10 +239,7 @@ class DockerService {
         
     final url = Uri.parse('$cleanBaseUrl/images/$id');
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.get(url, headers: headers);
@@ -282,10 +260,7 @@ class DockerService {
         : baseUrl;
     final url = Uri.parse('$cleanBaseUrl/images/$id');
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.delete(url, headers: headers);
@@ -312,12 +287,7 @@ class DockerService {
         : baseUrl;
     final url = Uri.parse('$cleanBaseUrl/images/pull');
 
-    final headers = <String, String>{
-      'Content-Type': 'application/json',
-    };
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders({'Content-Type': 'application/json'});
 
     final body = json.encode({
       'image': name,
@@ -344,10 +314,7 @@ class DockerService {
         
     final url = Uri.parse('$cleanBaseUrl/containers/$id');
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.get(url, headers: headers);
@@ -369,10 +336,7 @@ class DockerService {
         
     final url = Uri.parse('$cleanBaseUrl/containers/$id/$action');
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.post(url, headers: headers);
@@ -392,10 +356,7 @@ class DockerService {
         
     final url = Uri.parse('$cleanBaseUrl/containers/$id/files').replace(queryParameters: {'path': path});
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.get(url, headers: headers);
@@ -418,10 +379,7 @@ class DockerService {
         
     final url = Uri.parse('$cleanBaseUrl/containers/$id/files').replace(queryParameters: {'path': path});
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.get(url, headers: headers);
@@ -444,10 +402,7 @@ class DockerService {
         
     final url = Uri.parse('$cleanBaseUrl/containers/$id/download').replace(queryParameters: {'path': path});
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.get(url, headers: headers);
@@ -469,12 +424,7 @@ class DockerService {
         
     final url = Uri.parse('$cleanBaseUrl/containers/$id/files').replace(queryParameters: {'path': path});
 
-    final headers = <String, String>{
-      'Content-Type': 'application/json',
-    };
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders({'Content-Type': 'application/json'});
 
     final body = json.encode({'path':path,'content': content});
 
@@ -502,12 +452,7 @@ class DockerService {
         : baseUrl;
     final url = Uri.parse('$cleanBaseUrl/containers/run');
 
-    final headers = <String, String>{
-      'Content-Type': 'application/json',
-    };
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders({'Content-Type': 'application/json'});
 
     final body = json.encode({'command': command});
 
@@ -540,10 +485,7 @@ class DockerService {
       queryParameters: {'force': force.toString()},
     );
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.delete(url, headers: headers);
@@ -563,10 +505,7 @@ class DockerService {
         
     final url = Uri.parse('$cleanBaseUrl/stacks');
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.get(url, headers: headers);
@@ -595,10 +534,7 @@ class DockerService {
         
     final url = Uri.parse('$cleanBaseUrl/stacks/$stackName/containers');
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.get(url, headers: headers);
@@ -620,10 +556,7 @@ class DockerService {
         : baseUrl;
     final url = Uri.parse('$cleanBaseUrl/git/version');
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.get(url, headers: headers);
@@ -644,10 +577,7 @@ class DockerService {
         : baseUrl;
     final url = Uri.parse('$cleanBaseUrl/info');
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.get(url, headers: headers);
@@ -660,13 +590,12 @@ class DockerService {
       throw Exception('Network error: $e');
     }
   }
- 
+
   Future<WebSocketChannel> connectToEvents() async {
     final cleanBaseUrl = baseUrl.endsWith('/')
         ? baseUrl.substring(0, baseUrl.length - 1)
         : baseUrl;
 
-    // 使用 HTTP scheme（不是 ws/wss），因为走 HttpClient.openUrl 路径
     String httpUrl;
     if (cleanBaseUrl.startsWith('https')) {
       httpUrl = '$cleanBaseUrl/ws/events';
@@ -686,55 +615,7 @@ class DockerService {
     print('WebSocket URL: $logUrl');
 
     final uri = Uri.parse(httpUrl);
-
-    // 使用 HttpClient.openUrl 手动进行 WebSocket 升级
-    // 这避免了 WebSocket.connect 在 macOS 沙盒中直接调用 BSD socket 的问题
-    final client = HttpClient();
-    client.connectionTimeout = const Duration(seconds: 10);
-    if (ignoreSsl) {
-      client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
-    }
-
-    try {
-      print('Attempting WebSocket upgrade via HttpClient...');
-      final request = await client.openUrl('GET', uri);
-
-      // WebSocket 升级握手 headers
-      request.headers.set('Connection', 'Upgrade');
-      request.headers.set('Upgrade', 'websocket');
-      request.headers.set('Sec-WebSocket-Version', '13');
-      // 生成随机的 Sec-WebSocket-Key
-      final rng = Random();
-      final bytes = List<int>.generate(16, (_) => rng.nextInt(256));
-      final key = base64Encode(bytes);
-      request.headers.set('Sec-WebSocket-Key', key);
-
-      if (apiKey != null && apiKey!.isNotEmpty) {
-        request.headers.set('X-API-Key', apiKey!);
-      }
-
-      final response = await request.close();
-
-      if (response.statusCode == 101) {
-        print('WebSocket upgrade successful (101)');
-        final socket = await response.detachSocket();
-        final ws = WebSocket.fromUpgradedSocket(
-          socket,
-          serverSide: false,
-        );
-        return IOWebSocketChannel(ws);
-      } else {
-        final body = await response.transform(utf8.decoder).join();
-        print('WebSocket upgrade failed: HTTP ${response.statusCode}');
-        print('Response body: $body');
-        throw Exception(
-          'WebSocket upgrade failed: HTTP ${response.statusCode}',
-        );
-      }
-    } catch (e) {
-      print('WebSocket connection error: $e');
-      throw Exception('WebSocket connection failed: $e');
-    }
+    return WsHelper.connectUpgrade(uri, apiKey: apiKey, ignoreSsl: ignoreSsl);
   }
 
   Stream<dynamic> pullImageWs(String name, String tag) async* {
@@ -750,30 +631,17 @@ class DockerService {
     } else {
       wsUrl = cleanBaseUrl.replaceFirst('http', 'ws');
     }
-    
-    // Using /ws/images/pull endpoint
+
     wsUrl = '$wsUrl/ws/images/pull?api_key=$apiKey';
 
-    final headers = <String, dynamic>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
-    WebSocketChannel channel;
-    if (ignoreSsl) {
-      final client = HttpClient();
-      client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
-      try {
-        final ws = await WebSocket.connect(wsUrl, headers: headers, customClient: client);
-        channel = IOWebSocketChannel(ws);
-      } catch (e) {
-        throw Exception('WebSocket connection failed: $e');
-      }
-    } else {
-      channel = IOWebSocketChannel.connect(Uri.parse(wsUrl), headers: headers);
-    }
+    final channel = await WsHelper.connectDirect(
+      Uri.parse(wsUrl),
+      headers: headers,
+      ignoreSsl: ignoreSsl,
+    );
 
-    // Send request
     final request = json.encode({
       'image': name,
       'tag': tag,
@@ -806,10 +674,7 @@ class DockerService {
         
     final url = Uri.parse('$cleanBaseUrl/containers/$id/logs?stdout=1&stderr=1&tail=100&timestamps=0');
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.get(url, headers: headers);
@@ -886,10 +751,7 @@ class DockerService {
         
     final url = Uri.parse('$cleanBaseUrl/ports/available');
 
-    final headers = <String, String>{};
-    if (apiKey != null && apiKey!.isNotEmpty) {
-      headers['X-API-Key'] = apiKey!;
-    }
+    final headers = _authHeaders();
 
     try {
       final response = await _client.get(url, headers: headers);

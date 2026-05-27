@@ -15,7 +15,7 @@ import '../theme/theme_extensions.dart';
 import '../widgets/env_vars_selector.dart';
 import '../widgets/status_badge.dart';
 import '../widgets/app_search_bar.dart';
-import '../widgets/info_row.dart';
+
 import '../widgets/error_view.dart';
 import '../widgets/empty_view.dart';
 import '../widgets/loading_view.dart';
@@ -377,27 +377,11 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   void _onSearchChanged(String query) {
-    setState(() {
-      _filterContainers();
-    });
+    _filterContainers();
   }
 
   Color _getStatusColor(String status) {
-    final dockerColors = Theme.of(context).extension<DockerColors>();
-    switch (status.toLowerCase()) {
-      case 'running':
-        return dockerColors?.statusRunning ?? Colors.green;
-      case 'exited':
-        return dockerColors?.statusExited ?? Colors.red;
-      case 'created':
-        return dockerColors?.statusCreated ?? Colors.blue;
-      case 'restarting':
-        return dockerColors?.statusRestarting ?? Colors.orange;
-      case 'paused':
-        return dockerColors?.statusPaused ?? Colors.amber;
-      default:
-        return Colors.grey;
-    }
+    return StatusBadge.colorFor(status, Theme.of(context));
   }
 
   void _showFilterDialog() {
@@ -657,6 +641,89 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildStatsBar() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    int running = 0, stopped = 0, paused = 0;
+    for (final c in _allContainers) {
+      switch (c.status) {
+        case 'running': running++; break;
+        case 'exited': stopped++; break;
+        case 'paused': paused++; break;
+      }
+    }
+
+    final filterChips = [
+      ('running', Icons.play_circle_outline, running, StatusBadge.colorFor('running', theme)),
+      ('exited', Icons.stop_circle_outlined, stopped, StatusBadge.colorFor('exited', theme)),
+      ('paused', Icons.pause_circle_outline, paused, StatusBadge.colorFor('paused', theme)),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: SizedBox(
+        height: 44,
+        child: Row(
+          children: [
+            Text(
+              '${_allContainers.length} 个容器',
+              style: TextStyle(
+                fontSize: 12,
+                color: colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(width: 8),
+            ...filterChips.map((chip) {
+              final (statusKey, icon, count, color) = chip;
+              final isSelected = _selectedStatus == statusKey;
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      _selectedStatus = _selectedStatus == statusKey ? 'all' : statusKey;
+                      _filterContainers();
+                    },
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? color.withValues(alpha: 0.15)
+                            : colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(20),
+                        border: isSelected
+                            ? Border.all(color: color.withValues(alpha: 0.5))
+                            : null,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(icon, size: 14, color: color),
+                          const SizedBox(width: 4),
+                          Text(
+                            '$count',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: isSelected ? color : colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
@@ -697,6 +764,8 @@ class HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
+        if (!_isLoading && _error == null && _allContainers.isNotEmpty)
+          _buildStatsBar(),
         if (_isLoading)
           const Expanded(child: LoadingView(type: LoadingType.list))
         else if (_error != null)
@@ -1005,43 +1074,85 @@ class HomeScreenState extends State<HomeScreen> {
 
   Widget _buildContainerTile(DockerContainer container, AppLocalizations t) {
     final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+    final statusColor = _getStatusColor(container.status);
 
     return Container(
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: Theme.of(context).dividerColor,
+            color: colorScheme.outlineVariant,
             width: 0.5,
           ),
         ),
       ),
-      child: ListTile(
-        dense: true,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 0,
-        ),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ContainerDetailsScreen(
-                containerId: container.id,
-                containerName: container.name,
-                apiUrl: _currentApiUrl,
-                apiKey: _currentApiKey,
-                ignoreSsl: _currentIgnoreSsl,
-                isSelf: container.isSelf,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ContainerDetailsScreen(
+                  containerId: container.id,
+                  containerName: container.name,
+                  apiUrl: _currentApiUrl,
+                  apiKey: _currentApiKey,
+                  ignoreSsl: _currentIgnoreSsl,
+                  isSelf: container.isSelf,
+                ),
               ),
+            );
+          },
+          onLongPress: () => _showContainerActions(container),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              children: [
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: statusColor,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        container.name,
+                        style: textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          color: colorScheme.onSurface,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (container.image.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          container.image,
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                            fontSize: 12,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                StatusBadge(status: container.status, fontSize: 11),
+                const SizedBox(width: 4),
+                Icon(Icons.chevron_right, size: 18, color: colorScheme.onSurfaceVariant),
+              ],
             ),
-          );
-        },
-        title: Text(
-          container.name,
-          style: textTheme.titleMedium?.copyWith(fontSize: 14),
-          overflow: TextOverflow.ellipsis,
+          ),
         ),
-        trailing: StatusBadge(status: container.status),
       ),
     );
   }
@@ -1051,88 +1162,173 @@ class HomeScreenState extends State<HomeScreen> {
     AppLocalizations t, {
     EdgeInsetsGeometry? margin,
   }) {
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final isDark = theme.brightness == Brightness.dark;
 
-    return Card(
-      margin: margin ?? EdgeInsets.zero,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ContainerDetailsScreen(
-                containerId: container.id,
-                containerName: container.name,
-                apiUrl: _currentApiUrl,
-                apiKey: _currentApiKey,
-                ignoreSsl: _currentIgnoreSsl,
-                isSelf: container.isSelf,
+    return Container(
+      margin: margin ?? const EdgeInsets.only(bottom: 8, left: 16, right: 16),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ContainerDetailsScreen(
+                  containerId: container.id,
+                  containerName: container.name,
+                  apiUrl: _currentApiUrl,
+                  apiKey: _currentApiKey,
+                  ignoreSsl: _currentIgnoreSsl,
+                  isSelf: container.isSelf,
+                ),
               ),
-            ),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          container.name,
-                          style: textTheme.titleMedium,
-                          overflow: TextOverflow.ellipsis,
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        container.name.isNotEmpty
+                            ? container.name[0].toUpperCase()
+                            : '?',
+                        style: TextStyle(
+                          color: colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 17,
                         ),
-                        const SizedBox(height: 4),
-                        StatusBadge(status: container.status),
-                      ],
+                      ),
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.article_outlined),
-                    tooltip: 'Logs',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ContainerLogsScreen(
-                            containerId: container.id,
-                            containerName: container.name,
-                            apiUrl: _currentApiUrl,
-                            apiKey: _currentApiKey,
-                            ignoreSsl: _currentIgnoreSsl,
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            container.name,
+                            style: textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: colorScheme.onSurface,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.more_vert),
-                    onPressed: () => _showContainerActions(container),
-                  ),
-                ],
-              ),
-              const Divider(height: 16),
-              if (container.stack.isNotEmpty) ...[
-                InfoRow(label: t.labelStack, value: container.stack, labelWidth: 60),
-                const SizedBox(height: 4),
+                          const SizedBox(height: 3),
+                          StatusBadge(status: container.status, fontSize: 11),
+                        ],
+                      ),
+                    ),
+                    _buildIconBtn(
+                      Icons.article_outlined,
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ContainerLogsScreen(
+                              containerId: container.id,
+                              containerName: container.name,
+                              apiUrl: _currentApiUrl,
+                              apiKey: _currentApiKey,
+                              ignoreSsl: _currentIgnoreSsl,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 2),
+                    _buildIconBtn(
+                      Icons.more_vert,
+                      () => _showContainerActions(container),
+                    ),
+                  ],
+                ),
+              const SizedBox(height: 10),
+              Divider(height: 1, color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+              const SizedBox(height: 10),
+              if (container.stack.isNotEmpty)
+                _buildInfoChip(Icons.layers_outlined, t.labelStack, container.stack),
+              if (container.image.isNotEmpty)
+                _buildInfoChip(Icons.image_outlined, t.labelImage, container.image),
+              if (container.ports.isNotEmpty)
+                _buildInfoChip(Icons.link, t.labelPorts, container.ports),
               ],
-              if (container.image.isNotEmpty) ...[
-                InfoRow(label: t.labelImage, value: container.image, labelWidth: 60),
-                const SizedBox(height: 4),
-              ],
-              if (container.ports.isNotEmpty) ...[
-                InfoRow(label: t.labelPorts, value: container.ports, labelWidth: 60),
-              ],
-            ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildIconBtn(IconData icon, VoidCallback onTap) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.all(6),
+          child: Icon(icon, size: 20, color: colorScheme.onSurfaceVariant),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoChip(IconData icon, String label, String value) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 5),
+      child: Row(
+        children: [
+          Icon(icon, size: 14, color: colorScheme.onSurfaceVariant),
+          const SizedBox(width: 6),
+          Text(
+            '$label: ',
+            style: textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontSize: 12,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w500,
+                fontSize: 12,
+                color: colorScheme.onSurface,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
       ),
     );
   }
