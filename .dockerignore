@@ -1,0 +1,14 @@
+.dart_tool
+.dart_tool/
+build/
+.git
+.git/
+.DS_Store
+*.log
+.flutter-plugins*
+.packages
+.idea/
+.vscode/
+.metadata
+*.iml
+pubspec.lock
