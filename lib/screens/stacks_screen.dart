@@ -10,7 +10,10 @@ import '../widgets/layout_toggle.dart';
 import 'stack_containers_screen.dart';
 
 class StacksScreen extends StatefulWidget {
-  const StacksScreen({super.key});
+  final void Function(String stackName)? onStackSelected;
+  final String? selectedStackName;
+
+  const StacksScreen({super.key, this.onStackSelected, this.selectedStackName});
 
   @override
   State<StacksScreen> createState() => StacksScreenState();
@@ -58,6 +61,19 @@ class StacksScreenState extends State<StacksScreen> {
 
   bool get isLoading => _isLoading;
   Future<void> manualRefresh() => _fetchStacks();
+
+  void _onStackTap(String stackName) {
+    if (widget.onStackSelected != null) {
+      widget.onStackSelected!(stackName);
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => StackContainersScreen(stackName: stackName),
+      ),
+    );
+  }
 
   Future<void> _fetchStacks() async {
     setState(() {
@@ -151,16 +167,7 @@ class StacksScreenState extends State<StacksScreen> {
                               horizontal: 16,
                               vertical: 0,
                             ),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => StackContainersScreen(
-                                    stackName: stackName,
-                                  ),
-                                ),
-                              );
-                            },
+                            onTap: () => _onStackTap(stackName),
                             title: Text(
                               stackName,
                               style: const TextStyle(

@@ -12,7 +12,10 @@ import '../widgets/layout_toggle.dart';
 import 'network_details_screen.dart';
 
 class NetworksScreen extends StatefulWidget {
-  const NetworksScreen({super.key});
+  final void Function(String networkId, String networkName)? onNetworkSelected;
+  final String? selectedNetworkId;
+
+  const NetworksScreen({super.key, this.onNetworkSelected, this.selectedNetworkId});
 
   @override
   State<NetworksScreen> createState() => NetworksScreenState();
@@ -60,6 +63,28 @@ class NetworksScreenState extends State<NetworksScreen> {
 
   bool get isLoading => _isLoading;
   Future<void> manualRefresh() => _fetchNetworks();
+  String get currentApiUrl => _currentApiUrl;
+  String get currentApiKey => _currentApiKey;
+  bool get currentIgnoreSsl => _currentIgnoreSsl;
+
+  void _onNetworkTap(DockerNetwork network) {
+    if (widget.onNetworkSelected != null) {
+      widget.onNetworkSelected!(network.id, network.name);
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => NetworkDetailsScreen(
+          networkId: network.id,
+          networkName: network.name,
+          apiUrl: _currentApiUrl,
+          apiKey: _currentApiKey,
+          ignoreSsl: _currentIgnoreSsl,
+        ),
+      ),
+    );
+  }
 
   Future<void> _fetchNetworks() async {
     setState(() {
@@ -169,20 +194,7 @@ class NetworksScreenState extends State<NetworksScreen> {
                               horizontal: 16,
                               vertical: 0,
                             ),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => NetworkDetailsScreen(
-                                    networkId: network.id,
-                                    networkName: network.name,
-                                    apiUrl: _currentApiUrl,
-                                    apiKey: _currentApiKey,
-                                    ignoreSsl: _currentIgnoreSsl,
-                                  ),
-                                ),
-                              );
-                            },
+                            onTap: () => _onNetworkTap(network),
                             title: Text(
                               network.name,
                               style: const TextStyle(
@@ -198,20 +210,7 @@ class NetworksScreenState extends State<NetworksScreen> {
                         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(12),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => NetworkDetailsScreen(
-                                  networkId: network.id,
-                                  networkName: network.name,
-                                  apiUrl: _currentApiUrl,
-                                  apiKey: _currentApiKey,
-                                  ignoreSsl: _currentIgnoreSsl,
-                                ),
-                              ),
-                            );
-                          },
+                          onTap: () => _onNetworkTap(network),
                           child: Padding(
                             padding: const EdgeInsets.all(12.0),
                             child: Column(

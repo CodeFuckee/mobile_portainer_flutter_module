@@ -567,4 +567,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get msgConfirmDeleteApiKey => '确定要删除此 API 密钥吗？';
+
+  @override
+  String get msgNoContainerSelected => '选择一个容器查看详情';
 }

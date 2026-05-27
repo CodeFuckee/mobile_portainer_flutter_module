@@ -39,10 +39,7 @@ class AuthService {
     String username,
     String password,
   ) async {
-    final cleanUrl = serverUrl.endsWith('/')
-        ? serverUrl.substring(0, serverUrl.length - 1)
-        : serverUrl;
-
+    final cleanUrl = _cleanUrl(serverUrl);
     final url = Uri.parse('$cleanUrl/admin/login');
     final client = http.Client();
 
@@ -85,10 +82,7 @@ class AuthService {
     String password,
     bool ignoreSsl,
   ) async {
-    final cleanUrl = serverUrl.endsWith('/')
-        ? serverUrl.substring(0, serverUrl.length - 1)
-        : serverUrl;
-
+    final cleanUrl = _cleanUrl(serverUrl);
     final authUrl = Uri.parse('$cleanUrl/api/auth');
     final client = HttpHelper.createClient(ignoreSsl: ignoreSsl);
 
@@ -150,41 +144,44 @@ class AuthService {
     return null;
   }
 
+  static String _cleanUrl(String serverUrl) {
+    return serverUrl.endsWith('/')
+        ? serverUrl.substring(0, serverUrl.length - 1)
+        : serverUrl;
+  }
+
   /// 检查是否已登录（web 端使用）
   static Future<bool> isLoggedIn() async {
     if (!PlatformDetector.isWeb) return true;
     final prefs = await PreferencesService.getInstance();
-    final token = await prefs.getString(_tokenKey);
-    final url = await prefs.getString(_serverUrlKey);
+    final token = prefs.getString(_tokenKey);
+    final url = prefs.getString(_serverUrlKey);
     return token != null && token.isNotEmpty && url != null && url.isNotEmpty;
   }
 
   /// 获取存储的认证令牌（供 DockerService 使用）
   static Future<String?> getToken() async {
     final prefs = await PreferencesService.getInstance();
-    return await prefs.getString(_tokenKey);
+    return prefs.getString(_tokenKey);
   }
 
   /// 获取存储的服务器 URL
   static Future<String?> getServerUrl() async {
     final prefs = await PreferencesService.getInstance();
-    return await prefs.getString(_serverUrlKey);
+    return prefs.getString(_serverUrlKey);
   }
 
   /// 获取 API Key 列表（Web 端）
   static Future<List<Map<String, dynamic>>> getApiKeys() async {
     final prefs = await PreferencesService.getInstance();
-    final serverUrl = await prefs.getString(_serverUrlKey);
-    final token = await prefs.getString(_tokenKey);
+    final serverUrl = prefs.getString(_serverUrlKey);
+    final token = prefs.getString(_tokenKey);
 
     if (serverUrl == null || token == null) {
       throw Exception('未登录');
     }
 
-    final cleanUrl = serverUrl.endsWith('/')
-        ? serverUrl.substring(0, serverUrl.length - 1)
-        : serverUrl;
-
+    final cleanUrl = _cleanUrl(serverUrl);
     final url = Uri.parse('$cleanUrl/admin/keys');
     final client = http.Client();
 
@@ -212,17 +209,14 @@ class AuthService {
     String? expiresAt,
   }) async {
     final prefs = await PreferencesService.getInstance();
-    final serverUrl = await prefs.getString(_serverUrlKey);
-    final token = await prefs.getString(_tokenKey);
+    final serverUrl = prefs.getString(_serverUrlKey);
+    final token = prefs.getString(_tokenKey);
 
     if (serverUrl == null || token == null) {
       throw Exception('未登录');
     }
 
-    final cleanUrl = serverUrl.endsWith('/')
-        ? serverUrl.substring(0, serverUrl.length - 1)
-        : serverUrl;
-
+    final cleanUrl = _cleanUrl(serverUrl);
     final url = Uri.parse('$cleanUrl/admin/keys');
     final client = http.Client();
 
@@ -257,17 +251,14 @@ class AuthService {
   /// 删除 API Key（Web 端）
   static Future<void> deleteApiKey(String keyId) async {
     final prefs = await PreferencesService.getInstance();
-    final serverUrl = await prefs.getString(_serverUrlKey);
-    final token = await prefs.getString(_tokenKey);
+    final serverUrl = prefs.getString(_serverUrlKey);
+    final token = prefs.getString(_tokenKey);
 
     if (serverUrl == null || token == null) {
       throw Exception('未登录');
     }
 
-    final cleanUrl = serverUrl.endsWith('/')
-        ? serverUrl.substring(0, serverUrl.length - 1)
-        : serverUrl;
-
+    final cleanUrl = _cleanUrl(serverUrl);
     final url = Uri.parse('$cleanUrl/admin/keys/$keyId');
     final client = http.Client();
 

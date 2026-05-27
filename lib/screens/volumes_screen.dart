@@ -15,7 +15,10 @@ import '../utils/notify_utils.dart';
 enum VolumeFilter { all, inUse, unused }
 
 class VolumesScreen extends StatefulWidget {
-  const VolumesScreen({super.key});
+  final void Function(String volumeName)? onVolumeSelected;
+  final String? selectedVolumeName;
+
+  const VolumesScreen({super.key, this.onVolumeSelected, this.selectedVolumeName});
 
   @override
   State<VolumesScreen> createState() => VolumesScreenState();
@@ -64,6 +67,29 @@ class VolumesScreenState extends State<VolumesScreen> {
 
   bool get isLoading => _isLoading;
   Future<void> manualRefresh() => _fetchVolumes();
+  String get currentApiUrl => _currentApiUrl;
+  String get currentApiKey => _currentApiKey;
+  bool get currentIgnoreSsl => _currentIgnoreSsl;
+
+  void _onVolumeTap(DockerVolume volume) {
+    if (widget.onVolumeSelected != null) {
+      widget.onVolumeSelected!(volume.name);
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VolumeDetailsScreen(
+          volumeName: volume.name,
+          apiUrl: _currentApiUrl,
+          apiKey: _currentApiKey,
+          ignoreSsl: _currentIgnoreSsl,
+        ),
+      ),
+    ).then((result) {
+      if (result == true) _fetchVolumes();
+    });
+  }
 
   Future<void> _fetchVolumes() async {
     setState(() {
@@ -253,22 +279,7 @@ class VolumesScreenState extends State<VolumesScreen> {
                               horizontal: 16,
                               vertical: 0,
                             ),
-                            onTap: () async {
-                              final result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => VolumeDetailsScreen(
-                                    volumeName: volume.name,
-                                    apiUrl: _currentApiUrl,
-                                    apiKey: _currentApiKey,
-                                    ignoreSsl: _currentIgnoreSsl,
-                                  ),
-                                ),
-                              );
-                              if (result == true) {
-                                _fetchVolumes();
-                              }
-                            },
+                            onTap: () => _onVolumeTap(volume),
                             title: Text(
                               volume.name,
                               style: const TextStyle(
@@ -332,22 +343,7 @@ class VolumesScreenState extends State<VolumesScreen> {
                         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(12),
-                          onTap: () async {
-                            final result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => VolumeDetailsScreen(
-                                  volumeName: volume.name,
-                                  apiUrl: _currentApiUrl,
-                                  apiKey: _currentApiKey,
-                                  ignoreSsl: _currentIgnoreSsl,
-                                ),
-                              ),
-                            );
-                            if (result == true) {
-                              _fetchVolumes();
-                            }
-                          },
+                          onTap: () => _onVolumeTap(volume),
                           child: Padding(
                             padding: const EdgeInsets.all(12.0),
                             child: Column(

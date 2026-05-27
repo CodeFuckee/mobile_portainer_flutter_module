@@ -178,5 +178,6 @@
   "labelCreatedAt": "创建时间",
   "labelExpiresAt": "过期时间",
   "labelNever": "永不过期",
-  "msgConfirmDeleteApiKey": "确定要删除此 API 密钥吗？"
+  "msgConfirmDeleteApiKey": "确定要删除此 API 密钥吗？",
+  "msgNoContainerSelected": "选择一个容器查看详情"
 }

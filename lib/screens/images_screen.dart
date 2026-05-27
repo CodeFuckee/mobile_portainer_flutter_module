@@ -14,7 +14,10 @@ import '../widgets/layout_toggle.dart';
 import 'image_details_screen.dart';
 
 class ImagesScreen extends StatefulWidget {
-  const ImagesScreen({super.key});
+  final void Function(String imageId, String imageName)? onImageSelected;
+  final String? selectedImageId;
+
+  const ImagesScreen({super.key, this.onImageSelected, this.selectedImageId});
 
   @override
   State<ImagesScreen> createState() => ImagesScreenState();
@@ -69,6 +72,29 @@ class ImagesScreenState extends State<ImagesScreen> {
 
   bool get isLoading => _isLoading;
   Future<void> manualRefresh() => _fetchImages();
+  String get currentApiUrl => _currentApiUrl;
+  String get currentApiKey => _currentApiKey;
+  bool get currentIgnoreSsl => _currentIgnoreSsl;
+
+  void _onImageTap(DockerImage image, String tags) {
+    final targetId = image.id;
+    if (widget.onImageSelected != null) {
+      widget.onImageSelected!(targetId, tags);
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ImageDetailsScreen(
+          imageId: image.id,
+          imageName: tags,
+          apiUrl: _currentApiUrl,
+          apiKey: _currentApiKey,
+          ignoreSsl: _currentIgnoreSsl,
+        ),
+      ),
+    );
+  }
 
   Future<void> _fetchImages() async {
     setState(() {
@@ -323,20 +349,7 @@ class ImagesScreenState extends State<ImagesScreen> {
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ImageDetailsScreen(
-                imageId: image.id,
-                imageName: tags,
-                apiUrl: _currentApiUrl,
-                apiKey: _currentApiKey,
-                ignoreSsl: _currentIgnoreSsl,
-              ),
-            ),
-          );
-        },
+        onTap: () => _onImageTap(image, tags),
         title: Row(
           children: [
             Expanded(
@@ -387,20 +400,7 @@ class ImagesScreenState extends State<ImagesScreen> {
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ImageDetailsScreen(
-                imageId: image.id,
-                imageName: tags,
-                apiUrl: _currentApiUrl,
-                apiKey: _currentApiKey,
-                ignoreSsl: _currentIgnoreSsl,
-              ),
-            ),
-          );
-        },
+        onTap: () => _onImageTap(image, tags),
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Column(

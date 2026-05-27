@@ -216,61 +216,40 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
     if (actions.isEmpty) return const SizedBox();
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 24.0),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
-          childAspectRatio: 0.9,
+      padding: const EdgeInsets.only(bottom: 20.0),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: actions.map((a) => Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: _buildActionChip(a),
+          )).toList(),
         ),
-        itemCount: actions.length,
-        itemBuilder: (context, index) {
-          return _buildActionTile(actions[index]);
-        },
       ),
     );
   }
 
-  Widget _buildActionTile(_ActionItem action) {
-    return Container(
-      decoration: BoxDecoration(
-        color: action.color.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: action.color.withOpacity(0.15),
-          width: 1,
-        ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => _performAction(action.actionCode),
-          borderRadius: BorderRadius.circular(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+  Widget _buildActionChip(_ActionItem action) {
+    return Material(
+      color: action.color.withOpacity(0.08),
+      borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: () => _performAction(action.actionCode),
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: action.color.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(action.icon, color: action.color, size: 22),
-              ),
-              const SizedBox(height: 8),
+              Icon(action.icon, color: action.color, size: 16),
+              const SizedBox(width: 4),
               Text(
                 action.label,
                 style: TextStyle(
                   color: action.color,
                   fontSize: 12,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                 ),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

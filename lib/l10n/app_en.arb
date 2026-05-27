@@ -178,5 +178,6 @@
   "labelCreatedAt": "Created",
   "labelExpiresAt": "Expires",
   "labelNever": "Never",
-  "msgConfirmDeleteApiKey": "Are you sure you want to delete this API key?"
+  "msgConfirmDeleteApiKey": "Are you sure you want to delete this API key?",
+  "msgNoContainerSelected": "Select a container to view details"
 }

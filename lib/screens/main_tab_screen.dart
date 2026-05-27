@@ -8,6 +8,8 @@ import 'images_screen.dart';
 import 'resources_screen.dart';
 import 'settings_screen.dart';
 import 'login_screen.dart';
+import 'container_details_screen.dart';
+import '../widgets/resize_handle.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import '../services/auth_service.dart';
@@ -23,8 +25,12 @@ class MainTabScreen extends StatefulWidget {
 class _MainTabScreenState extends State<MainTabScreen> {
   int _selectedIndex = 0;
   bool _settingsChanged = false;
-  // String _dashboardLayoutMode = 'auto'; // 'auto', 'list', 'grid' - Removed
-  String _containerLayoutMode = 'grid'; // 'list', 'grid'
+  String _containerLayoutMode = 'grid';
+
+  String? _selectedContainerId;
+  String? _selectedContainerName;
+  bool _selectedContainerIsSelf = false;
+  double _splitRatio = 0.5;
 
   final GlobalKey<DashboardScreenState> _dashboardKey =
       GlobalKey<DashboardScreenState>();
@@ -75,6 +81,11 @@ class _MainTabScreenState extends State<MainTabScreen> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      if (index != 1) {
+        _selectedContainerId = null;
+        _selectedContainerName = null;
+        _selectedContainerIsSelf = false;
+      }
     });
     if (_settingsChanged) {
       _dashboardKey.currentState?.refresh();
@@ -107,15 +118,20 @@ class _MainTabScreenState extends State<MainTabScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
-    final screenSize = MediaQuery.of(context).size;
-    final screenWidth = screenSize.width;
-    final aspectRatio = screenWidth / screenSize.height;
-    final isWide = screenWidth >= 600 && aspectRatio >= 1.0;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isWide = screenWidth / screenHeight > 18 / 16;
+
+    if (isWide && _selectedIndex == 1) {
+      return _buildContainersMasterDetail(t, screenWidth);
+    }
 
     String currentEffectiveMode = 'list';
     if (_selectedIndex == 1) {
       currentEffectiveMode = _containerLayoutMode;
     }
+
+    final bottomNavBar = _buildCustomBottomNavBar(context, t);
 
     final body = IndexedStack(
       index: _selectedIndex,
@@ -136,7 +152,9 @@ class _MainTabScreenState extends State<MainTabScreen> {
           key: _containersKey,
           layoutMode: _containerLayoutMode,
         ),
-        const ResourcesScreen(),
+        ResourcesScreen(
+          bottomNavigationBar: bottomNavBar,
+        ),
         SettingsScreen(
           key: _settingsKey,
           onSaved: () {
@@ -147,12 +165,6 @@ class _MainTabScreenState extends State<MainTabScreen> {
         ),
       ],
     );
-
-    // if (isWide) {
-    //   return Scaffold(
-    //     body: _buildWideLayout(body, t, currentEffectiveMode),
-    //   );
-    // }
 
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -166,7 +178,7 @@ class _MainTabScreenState extends State<MainTabScreen> {
       ),
       extendBody: true,
       body: body,
-      bottomNavigationBar: _buildCustomBottomNavBar(context, t),
+      bottomNavigationBar: (isWide && _selectedIndex == 2) ? null : bottomNavBar,
       floatingActionButton: _selectedIndex != 1
           ? null
           : FloatingActionButton(
@@ -175,6 +187,78 @@ class _MainTabScreenState extends State<MainTabScreen> {
                 },
                 child: const Icon(Icons.add),
               ),
+    );
+  }
+
+  Widget _buildContainersMasterDetail(AppLocalizations t, double totalWidth) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final hasSelection = _selectedContainerId != null;
+    final leftFlex = (_splitRatio * 1000).round();
+    final rightFlex = 1000 - leftFlex;
+
+    return Scaffold(
+      body: Row(
+        children: [
+          Expanded(
+            flex: hasSelection ? leftFlex : 1,
+            child: Scaffold(
+              appBar: AppBar(
+                backgroundColor: colorScheme.surface,
+                elevation: 0,
+                scrolledUnderElevation: 0,
+                title: Text(t.titleContainers),
+                actions: _buildActions(t, _containerLayoutMode),
+              ),
+              body: HomeScreen(
+                key: _containersKey,
+                layoutMode: _containerLayoutMode,
+                onContainerSelected: (id, name, isSelf) {
+                  setState(() {
+                    if (_selectedContainerId == id) {
+                      _selectedContainerId = null;
+                      _selectedContainerName = null;
+                      _selectedContainerIsSelf = false;
+                    } else {
+                      _selectedContainerId = id;
+                      _selectedContainerName = name;
+                      _selectedContainerIsSelf = isSelf;
+                    }
+                  });
+                },
+                selectedContainerId: _selectedContainerId,
+              ),
+              bottomNavigationBar: _buildCustomBottomNavBar(context, t),
+              floatingActionButton: FloatingActionButton(
+                onPressed: () {
+                  _containersKey.currentState?.showRunContainerDialog();
+                },
+                child: const Icon(Icons.add),
+              ),
+            ),
+          ),
+          if (hasSelection) ...[
+            ResizeHandle(
+              totalWidth: totalWidth,
+              onResized: (delta) {
+                setState(() {
+                  _splitRatio = (_splitRatio + delta).clamp(0.2, 0.8);
+                });
+              },
+            ),
+            Expanded(
+              flex: rightFlex,
+              child: ContainerDetailsScreen(
+                containerId: _selectedContainerId!,
+                containerName: _selectedContainerName!,
+                apiUrl: _containersKey.currentState?.currentApiUrl ?? '',
+                apiKey: _containersKey.currentState?.currentApiKey ?? '',
+                isSelf: _selectedContainerIsSelf,
+                ignoreSsl: _containersKey.currentState?.currentIgnoreSsl ?? false,
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 

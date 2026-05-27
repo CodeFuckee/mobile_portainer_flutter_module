@@ -567,4 +567,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get msgConfirmDeleteApiKey => 'Are you sure you want to delete this API key?';
+
+  @override
+  String get msgNoContainerSelected => 'Select a container to view details';
 }

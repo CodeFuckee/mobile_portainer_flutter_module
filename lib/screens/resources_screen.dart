@@ -7,11 +7,18 @@ import 'stacks_screen.dart';
 import 'volumes_screen.dart';
 import 'env_vars_screen.dart';
 import 'ports_screen.dart';
+import 'image_details_screen.dart';
+import 'network_details_screen.dart';
+import 'stack_containers_screen.dart';
+import 'volume_details_screen.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import '../services/docker_service.dart';
+import '../widgets/resize_handle.dart';
 
 class ResourcesScreen extends StatefulWidget {
-  const ResourcesScreen({super.key});
+  final Widget? bottomNavigationBar;
+
+  const ResourcesScreen({super.key, this.bottomNavigationBar});
 
   @override
   State<ResourcesScreen> createState() => _ResourcesScreenState();
@@ -20,6 +27,16 @@ class ResourcesScreen extends StatefulWidget {
 class _ResourcesScreenState extends State<ResourcesScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
+
+  final _imagesKey = GlobalKey<ImagesScreenState>();
+  final _networksKey = GlobalKey<NetworksScreenState>();
+  final _stacksKey = GlobalKey<StacksScreenState>();
+  final _volumesKey = GlobalKey<VolumesScreenState>();
+
+  String? _detailId;
+  String? _detailName;
+  int? _detailTab;
+  double _splitRatio = 0.5;
 
   final _tabs = const [
     _TabDef(titleKey: 'titleImages', icon: Icons.layers, child: ImagesScreen()),
@@ -35,7 +52,15 @@ class _ResourcesScreenState extends State<ResourcesScreen>
     super.initState();
     _tabController = TabController(length: _tabs.length, vsync: this);
     _tabController.addListener(() {
-      if (mounted) setState(() {});
+      if (!mounted) return;
+      if (!_tabController.indexIsChanging) {
+        if (_detailTab != null && _detailTab != _tabController.index) {
+          _detailId = null;
+          _detailName = null;
+          _detailTab = null;
+        }
+      }
+      setState(() {});
     });
   }
 
@@ -49,6 +74,13 @@ class _ResourcesScreenState extends State<ResourcesScreen>
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isWide = screenWidth / screenHeight > 18 / 16;
+
+    if (isWide) {
+      return _buildMasterDetail(t, colorScheme, screenWidth);
+    }
 
     return Column(
       children: [
@@ -94,6 +126,172 @@ class _ResourcesScreenState extends State<ResourcesScreen>
         ),
       ],
     );
+  }
+
+  Widget _buildMasterDetail(AppLocalizations t, ColorScheme colorScheme, double totalWidth) {
+    final tabIndex = _tabController.index;
+    final hasSelection = _detailTab == tabIndex && _detailId != null;
+    final leftFlex = (_splitRatio * 1000).round();
+    final rightFlex = 1000 - leftFlex;
+
+    Widget detailPanel;
+    if (hasSelection) {
+      switch (tabIndex) {
+        case 0:
+          final apiUrl = _imagesKey.currentState?.currentApiUrl ?? '';
+          final apiKey = _imagesKey.currentState?.currentApiKey ?? '';
+          final ignoreSsl = _imagesKey.currentState?.currentIgnoreSsl ?? false;
+          detailPanel = ImageDetailsScreen(
+            imageId: _detailId!,
+            imageName: _detailName!,
+            apiUrl: apiUrl,
+            apiKey: apiKey,
+            ignoreSsl: ignoreSsl,
+          );
+          break;
+        case 1:
+          final apiUrl = _networksKey.currentState?.currentApiUrl ?? '';
+          final apiKey = _networksKey.currentState?.currentApiKey ?? '';
+          final ignoreSsl = _networksKey.currentState?.currentIgnoreSsl ?? false;
+          detailPanel = NetworkDetailsScreen(
+            networkId: _detailId!,
+            networkName: _detailName!,
+            apiUrl: apiUrl,
+            apiKey: apiKey,
+            ignoreSsl: ignoreSsl,
+          );
+          break;
+        case 2:
+          detailPanel = StackContainersScreen(stackName: _detailName!);
+          break;
+        case 3:
+          final apiUrl = _volumesKey.currentState?.currentApiUrl ?? '';
+          final apiKey = _volumesKey.currentState?.currentApiKey ?? '';
+          final ignoreSsl = _volumesKey.currentState?.currentIgnoreSsl ?? false;
+          detailPanel = VolumeDetailsScreen(
+            volumeName: _detailName!,
+            apiUrl: apiUrl,
+            apiKey: apiKey,
+            ignoreSsl: ignoreSsl,
+          );
+          break;
+        default:
+          detailPanel = const SizedBox();
+      }
+    } else {
+      detailPanel = const SizedBox();
+    }
+
+    return Row(
+      children: [
+        Expanded(
+          flex: hasSelection ? leftFlex : 1,
+          child: Column(
+            children: [
+              Container(
+                color: colorScheme.surface,
+                child: TabBar(
+                  controller: _tabController,
+                  isScrollable: true,
+                  tabAlignment: TabAlignment.start,
+                  dividerColor: Colors.transparent,
+                  tabs: _tabs.map((tab) {
+                    return Tab(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(tab.icon, size: 18),
+                          const SizedBox(width: 6),
+                          Text(_titleFor(t, tab)),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              Expanded(
+                child: Stack(
+                  children: [
+                    _buildActiveListScreen(),
+                    if (tabIndex == 0)
+                      Positioned(
+                        right: 16,
+                        bottom: 16,
+                        child: FloatingActionButton(
+                          onPressed: () => _showPullImageDialog(context),
+                          child: const Icon(Icons.add),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              if (widget.bottomNavigationBar != null) widget.bottomNavigationBar!,
+            ],
+          ),
+        ),
+        if (hasSelection) ...[
+          ResizeHandle(
+            totalWidth: totalWidth,
+            onResized: (delta) {
+              setState(() {
+                _splitRatio = (_splitRatio + delta).clamp(0.2, 0.8);
+              });
+            },
+          ),
+          Expanded(
+            flex: rightFlex,
+            child: detailPanel,
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildActiveListScreen() {
+    final tabIndex = _tabController.index;
+    final selectedId = _detailTab == tabIndex ? _detailId : null;
+    switch (tabIndex) {
+      case 0:
+        return ImagesScreen(
+          key: _imagesKey,
+          onImageSelected: (id, name) => _onDetailSelected(0, id, name),
+          selectedImageId: selectedId,
+        );
+      case 1:
+        return NetworksScreen(
+          key: _networksKey,
+          onNetworkSelected: (id, name) => _onDetailSelected(1, id, name),
+          selectedNetworkId: selectedId,
+        );
+      case 2:
+        return StacksScreen(
+          key: _stacksKey,
+          onStackSelected: (name) => _onDetailSelected(2, name, name),
+          selectedStackName: selectedId,
+        );
+      case 3:
+        return VolumesScreen(
+          key: _volumesKey,
+          onVolumeSelected: (name) => _onDetailSelected(3, name, name),
+          selectedVolumeName: selectedId,
+        );
+      default:
+        return _tabs[tabIndex].child;
+    }
+  }
+
+  void _onDetailSelected(int tab, String id, String name) {
+    setState(() {
+      if (_detailTab == tab && _detailId == id) {
+        _detailId = null;
+        _detailName = null;
+        _detailTab = null;
+      } else {
+        _detailId = id;
+        _detailName = name;
+        _detailTab = tab;
+      }
+    });
   }
 
   String _titleFor(AppLocalizations t, _TabDef tab) {

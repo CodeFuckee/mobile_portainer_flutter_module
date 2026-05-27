@@ -23,10 +23,14 @@ import '../widgets/action_sheet.dart';
 
 class HomeScreen extends StatefulWidget {
   final String layoutMode;
+  final void Function(String containerId, String containerName, bool isSelf)? onContainerSelected;
+  final String? selectedContainerId;
 
   const HomeScreen({
     super.key,
     this.layoutMode = 'grid',
+    this.onContainerSelected,
+    this.selectedContainerId,
   });
 
   @override
@@ -96,6 +100,9 @@ class HomeScreenState extends State<HomeScreen> {
   bool get isLoading => _isLoading;
   Future<void> manualRefresh() => _fetchContainers();
   bool get isWsConnected => _isWsConnected;
+  String get currentApiUrl => _currentApiUrl;
+  String get currentApiKey => _currentApiKey;
+  bool get currentIgnoreSsl => _currentIgnoreSsl;
 
   Future<void> _fetchContainers({bool silent = false}) async {
     if (!silent) {
@@ -838,6 +845,26 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _onContainerTap(DockerContainer container) {
+    if (widget.onContainerSelected != null) {
+      widget.onContainerSelected!(container.id, container.name, container.isSelf);
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ContainerDetailsScreen(
+          containerId: container.id,
+          containerName: container.name,
+          apiUrl: _currentApiUrl,
+          apiKey: _currentApiKey,
+          ignoreSsl: _currentIgnoreSsl,
+          isSelf: container.isSelf,
+        ),
+      ),
+    );
+  }
+
   void _showContainerActions(DockerContainer container) {
     final t = AppLocalizations.of(context)!;
 
@@ -1077,8 +1104,11 @@ class HomeScreenState extends State<HomeScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     final statusColor = _getStatusColor(container.status);
 
+    final isSelected = container.id == widget.selectedContainerId;
+
     return Container(
       decoration: BoxDecoration(
+        color: isSelected ? colorScheme.primary.withOpacity(0.08) : null,
         border: Border(
           bottom: BorderSide(
             color: colorScheme.outlineVariant,
@@ -1089,21 +1119,7 @@ class HomeScreenState extends State<HomeScreen> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ContainerDetailsScreen(
-                  containerId: container.id,
-                  containerName: container.name,
-                  apiUrl: _currentApiUrl,
-                  apiKey: _currentApiKey,
-                  ignoreSsl: _currentIgnoreSsl,
-                  isSelf: container.isSelf,
-                ),
-              ),
-            );
-          },
+          onTap: () => _onContainerTap(container),
           onLongPress: () => _showContainerActions(container),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -1167,11 +1183,16 @@ class HomeScreenState extends State<HomeScreen> {
     final textTheme = theme.textTheme;
     final isDark = theme.brightness == Brightness.dark;
 
+    final isSelected = container.id == widget.selectedContainerId;
+
     return Container(
       margin: margin ?? const EdgeInsets.only(bottom: 8, left: 16, right: 16),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(14),
+        border: isSelected
+            ? Border.all(color: colorScheme.primary, width: 2)
+            : null,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
@@ -1185,21 +1206,7 @@ class HomeScreenState extends State<HomeScreen> {
         borderRadius: BorderRadius.circular(14),
         child: InkWell(
           borderRadius: BorderRadius.circular(14),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ContainerDetailsScreen(
-                  containerId: container.id,
-                  containerName: container.name,
-                  apiUrl: _currentApiUrl,
-                  apiKey: _currentApiKey,
-                  ignoreSsl: _currentIgnoreSsl,
-                  isSelf: container.isSelf,
-                ),
-              ),
-            );
-          },
+          onTap: () => _onContainerTap(container),
           child: Padding(
             padding: const EdgeInsets.all(14),
             child: Column(
