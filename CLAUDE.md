@@ -47,6 +47,7 @@ flutter test             # 运行测试
 ## 编译规则
 
 **每次代码修改后，必须运行 `flutter analyze` 确保零 error**。warning 和 info 级别可以保留，但 error 必须为零。修改代码前先跑一次分析确认基线，修改后再跑一次确认没有新引入 error。
+**每次代码修改完成后，必须运行 `flutter build web` 验证 Web 端编译成功。**
 
 ## 注意事项
 

@@ -1,0 +1,2128 @@
+versions pytest-9.0.3, python-3.14.3.final.0
+invocation_dir=/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests
+cwd=/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests
+args=('--debug', '-v')
+
+  pytest_cmdline_main [hook]
+      config: <_pytest.config.Config object at 0x1085dbe00>
+    pytest_plugin_registered [hook]
+        plugin: <Session  exitstatus='<UNSET>' testsfailed=0 testscollected=0>
+        plugin_name: session
+        manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+    finish pytest_plugin_registered --> [] [hook]
+    pytest_configure [hook]
+        config: <_pytest.config.Config object at 0x1085dbe00>
+    early skip of rewriting module: plistlib [assertion]
+    early skip of rewriting module: xml.parsers [assertion]
+    early skip of rewriting module: xml.parsers.expat [assertion]
+    early skip of rewriting module: importlib.metadata._adapters [assertion]
+    early skip of rewriting module: importlib.metadata._text [assertion]
+      pytest_metadata [hook]
+          metadata: {'Python': '3.14.3', 'Platform': 'macOS-26.5-arm64-arm-64bit-Mach-O', 'Packages': {'pytest': '9.0.3', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'html': '4.2.0'}}
+          config: <_pytest.config.Config object at 0x1085dbe00>
+      finish pytest_metadata --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.cacheprovider.LFPlugin object at 0x1097cfa10>
+          plugin_name: lfplugin
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.cacheprovider.NFPlugin object at 0x1097cfe00>
+          plugin_name: nfplugin
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+    early skip of rewriting module: faulthandler [assertion]
+      pytest_plugin_registered [hook]
+          plugin: <class '_pytest.legacypath.LegacyTmpdirPlugin'>
+          plugin_name: legacypath-tmpdir
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+    early skip of rewriting module: pdb [assertion]
+    early skip of rewriting module: cmd [assertion]
+    early skip of rewriting module: code [assertion]
+    early skip of rewriting module: asyncio [assertion]
+    early skip of rewriting module: asyncio.base_events [assertion]
+    early skip of rewriting module: concurrent [assertion]
+    early skip of rewriting module: concurrent.futures [assertion]
+    early skip of rewriting module: concurrent.futures._base [assertion]
+    early skip of rewriting module: _interpreters [assertion]
+    early skip of rewriting module: asyncio.constants [assertion]
+    early skip of rewriting module: asyncio.coroutines [assertion]
+    early skip of rewriting module: asyncio.events [assertion]
+    early skip of rewriting module: contextvars [assertion]
+    early skip of rewriting module: asyncio.format_helpers [assertion]
+    early skip of rewriting module: _asyncio [assertion]
+    early skip of rewriting module: asyncio.base_futures [assertion]
+    early skip of rewriting module: asyncio.exceptions [assertion]
+    early skip of rewriting module: asyncio.base_tasks [assertion]
+    early skip of rewriting module: asyncio.futures [assertion]
+    early skip of rewriting module: asyncio.protocols [assertion]
+    early skip of rewriting module: asyncio.sslproto [assertion]
+    early skip of rewriting module: asyncio.transports [assertion]
+    early skip of rewriting module: asyncio.log [assertion]
+    early skip of rewriting module: asyncio.staggered [assertion]
+    early skip of rewriting module: asyncio.locks [assertion]
+    early skip of rewriting module: asyncio.mixins [assertion]
+    early skip of rewriting module: asyncio.tasks [assertion]
+    early skip of rewriting module: asyncio.queues [assertion]
+    early skip of rewriting module: asyncio.timeouts [assertion]
+    early skip of rewriting module: asyncio.trsock [assertion]
+    early skip of rewriting module: asyncio.graph [assertion]
+    early skip of rewriting module: asyncio.runners [assertion]
+    early skip of rewriting module: asyncio.streams [assertion]
+    early skip of rewriting module: asyncio.subprocess [assertion]
+    early skip of rewriting module: asyncio.taskgroups [assertion]
+    early skip of rewriting module: asyncio.threads [assertion]
+    early skip of rewriting module: asyncio.unix_events [assertion]
+    early skip of rewriting module: asyncio.base_subprocess [assertion]
+    early skip of rewriting module: asyncio.selector_events [assertion]
+    early skip of rewriting module: _pyrepl [assertion]
+    early skip of rewriting module: _pyrepl.utils [assertion]
+    early skip of rewriting module: _pyrepl.types [assertion]
+    early skip of rewriting module: _pyrepl.trace [assertion]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+          plugin_name: 4435321792
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.config.Config object at 0x1085dbe00>
+          plugin_name: pytestconfig
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.mark' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/mark/__init__.py'>
+          plugin_name: mark
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.main' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/main.py'>
+          plugin_name: main
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.runner' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/runner.py'>
+          plugin_name: runner
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.fixtures' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/fixtures.py'>
+          plugin_name: fixtures
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.helpconfig' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/helpconfig.py'>
+          plugin_name: helpconfig
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.python' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/python.py'>
+          plugin_name: python
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.terminal' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/terminal.py'>
+          plugin_name: terminal
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.debugging' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/debugging.py'>
+          plugin_name: debugging
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.unittest' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/unittest.py'>
+          plugin_name: unittest
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.capture' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/capture.py'>
+          plugin_name: capture
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.skipping' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/skipping.py'>
+          plugin_name: skipping
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.legacypath' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/legacypath.py'>
+          plugin_name: legacypath
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.tmpdir' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/tmpdir.py'>
+          plugin_name: tmpdir
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.monkeypatch' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/monkeypatch.py'>
+          plugin_name: monkeypatch
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.recwarn' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/recwarn.py'>
+          plugin_name: recwarn
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.pastebin' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/pastebin.py'>
+          plugin_name: pastebin
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.assertion' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/assertion/__init__.py'>
+          plugin_name: assertion
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.junitxml' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/junitxml.py'>
+          plugin_name: junitxml
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.doctest' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/doctest.py'>
+          plugin_name: doctest
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.cacheprovider' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/cacheprovider.py'>
+          plugin_name: cacheprovider
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.setuponly' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/setuponly.py'>
+          plugin_name: setuponly
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.setupplan' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/setupplan.py'>
+          plugin_name: setupplan
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.stepwise' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/stepwise.py'>
+          plugin_name: stepwise
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.unraisableexception' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/unraisableexception.py'>
+          plugin_name: unraisableexception
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.threadexception' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/threadexception.py'>
+          plugin_name: threadexception
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.warnings' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/warnings.py'>
+          plugin_name: warnings
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.logging' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/logging.py'>
+          plugin_name: logging
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.reports' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/reports.py'>
+          plugin_name: reports
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.faulthandler' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/faulthandler.py'>
+          plugin_name: faulthandler
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.subtests' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/subtests.py'>
+          plugin_name: subtests
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module 'pytest_metadata.plugin' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/pytest_metadata/plugin.py'>
+          plugin_name: metadata
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module 'pytest_html.plugin' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/pytest_html/plugin.py'>
+          plugin_name: html
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module 'pytest_html.fixtures' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/pytest_html/fixtures.py'>
+          plugin_name: html_fixtures
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <CaptureManager _method='fd' _global_capturing=<MultiCapture out=<FDCapture 1 oldfd=5 _state='suspended' tmpfile=<EncodedFile name="<_io.FileIO name=6 mode='rb+' closefd=True>" mode='r+' encoding='utf-8'>> err=<FDCapture 2 oldfd=7 _state='suspended' tmpfile=<EncodedFile name="<_io.FileIO name=8 mode='rb+' closefd=True>" mode='r+' encoding='utf-8'>> in_=<FDCapture 0 oldfd=3 _state='started' tmpfile=<_io.TextIOWrapper name='/dev/null' mode='r' encoding='utf-8'>> _state='suspended' _in_suspended=False> _capture_fixture=None>
+          plugin_name: capturemanager
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module 'conftest' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/conftest.py'>
+          plugin_name: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/conftest.py
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <Session  exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+          plugin_name: session
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.cacheprovider.LFPlugin object at 0x1097cfa10>
+          plugin_name: lfplugin
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.cacheprovider.NFPlugin object at 0x1097cfe00>
+          plugin_name: nfplugin
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <class '_pytest.legacypath.LegacyTmpdirPlugin'>
+          plugin_name: legacypath-tmpdir
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.terminal.TerminalReporter object at 0x1099682f0>
+          plugin_name: terminalreporter
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.logging.LoggingPlugin object at 0x1097cf8c0>
+          plugin_name: logging-plugin
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+    finish pytest_configure --> [] [hook]
+    pytest_sessionstart [hook]
+        session: <Session  exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+          plugin_name: 4435321792
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.config.Config object at 0x1085dbe00>
+          plugin_name: pytestconfig
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.mark' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/mark/__init__.py'>
+          plugin_name: mark
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.main' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/main.py'>
+          plugin_name: main
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.runner' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/runner.py'>
+          plugin_name: runner
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.fixtures' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/fixtures.py'>
+          plugin_name: fixtures
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.helpconfig' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/helpconfig.py'>
+          plugin_name: helpconfig
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.python' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/python.py'>
+          plugin_name: python
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.terminal' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/terminal.py'>
+          plugin_name: terminal
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.debugging' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/debugging.py'>
+          plugin_name: debugging
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.unittest' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/unittest.py'>
+          plugin_name: unittest
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.capture' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/capture.py'>
+          plugin_name: capture
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.skipping' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/skipping.py'>
+          plugin_name: skipping
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.legacypath' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/legacypath.py'>
+          plugin_name: legacypath
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.tmpdir' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/tmpdir.py'>
+          plugin_name: tmpdir
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.monkeypatch' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/monkeypatch.py'>
+          plugin_name: monkeypatch
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.recwarn' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/recwarn.py'>
+          plugin_name: recwarn
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.pastebin' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/pastebin.py'>
+          plugin_name: pastebin
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.assertion' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/assertion/__init__.py'>
+          plugin_name: assertion
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.junitxml' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/junitxml.py'>
+          plugin_name: junitxml
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.doctest' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/doctest.py'>
+          plugin_name: doctest
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.cacheprovider' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/cacheprovider.py'>
+          plugin_name: cacheprovider
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.setuponly' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/setuponly.py'>
+          plugin_name: setuponly
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.setupplan' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/setupplan.py'>
+          plugin_name: setupplan
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.stepwise' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/stepwise.py'>
+          plugin_name: stepwise
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.unraisableexception' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/unraisableexception.py'>
+          plugin_name: unraisableexception
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.threadexception' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/threadexception.py'>
+          plugin_name: threadexception
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.warnings' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/warnings.py'>
+          plugin_name: warnings
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.logging' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/logging.py'>
+          plugin_name: logging
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.reports' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/reports.py'>
+          plugin_name: reports
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.faulthandler' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/faulthandler.py'>
+          plugin_name: faulthandler
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.subtests' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/subtests.py'>
+          plugin_name: subtests
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module 'pytest_metadata.plugin' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/pytest_metadata/plugin.py'>
+          plugin_name: metadata
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module 'pytest_html.plugin' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/pytest_html/plugin.py'>
+          plugin_name: html
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module 'pytest_html.fixtures' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/pytest_html/fixtures.py'>
+          plugin_name: html_fixtures
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <CaptureManager _method='fd' _global_capturing=<MultiCapture out=<FDCapture 1 oldfd=5 _state='suspended' tmpfile=<EncodedFile name="<_io.FileIO name=6 mode='rb+' closefd=True>" mode='r+' encoding='utf-8'>> err=<FDCapture 2 oldfd=7 _state='suspended' tmpfile=<EncodedFile name="<_io.FileIO name=8 mode='rb+' closefd=True>" mode='r+' encoding='utf-8'>> in_=<FDCapture 0 oldfd=3 _state='started' tmpfile=<_io.TextIOWrapper name='/dev/null' mode='r' encoding='utf-8'>> _state='suspended' _in_suspended=False> _capture_fixture=None>
+          plugin_name: capturemanager
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module 'conftest' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/conftest.py'>
+          plugin_name: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/conftest.py
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <Session  exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+          plugin_name: session
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.cacheprovider.LFPlugin object at 0x1097cfa10>
+          plugin_name: lfplugin
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.cacheprovider.NFPlugin object at 0x1097cfe00>
+          plugin_name: nfplugin
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <class '_pytest.legacypath.LegacyTmpdirPlugin'>
+          plugin_name: legacypath-tmpdir
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.terminal.TerminalReporter object at 0x1099682f0>
+          plugin_name: terminalreporter
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.logging.LoggingPlugin object at 0x1097cf8c0>
+          plugin_name: logging-plugin
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.fixtures.FixtureManager object at 0x109a4e270>
+          plugin_name: funcmanage
+          manager: <_pytest.config.PytestPluginManager object at 0x1085da3c0>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_report_header [hook]
+          config: <_pytest.config.Config object at 0x1085dbe00>
+          start_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests
+          startdir: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests
+      finish pytest_report_header --> [['rootdir: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests', 'configfile: pytest.ini', 'testpaths: tests', 'plugins: metadata-3.1.1, html-4.2.0'], "metadata: {'Python': '3.14.3', 'Platform': 'macOS-26.5-arm64-arm-64bit-Mach-O', 'Packages': {'pytest': '9.0.3', 'pluggy': '1.6.0'}, 'Plugins': {'metadata': '3.1.1', 'html': '4.2.0'}}", 'cachedir: .pytest_cache', ['using: pytest-9.0.3', 'registered third-party plugins:', '  pytest-metadata-3.1.1 at /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/pytest_metadata/plugin.py', '  pytest-html-4.2.0 at /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/pytest_html/plugin.py', '  pytest-html-4.2.0 at /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/pytest_html/fixtures.py']] [hook]
+    finish pytest_sessionstart --> [] [hook]
+    pytest_collection [hook]
+        session: <Session  exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+    perform_collect <Session  exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0> ['tests'] [collection]
+        pytest_collectstart [hook]
+            collector: <Session  exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+        finish pytest_collectstart --> [] [hook]
+        pytest_make_collect_report [hook]
+            collector: <Session  exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+        processing argument CollectionArgument(path=PosixPath('/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests'), parts=[], parametrization=None, module_name=None, original_index=0) [collection]
+            pytest_collect_directory [hook]
+                path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests
+                parent: <Session  exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+            finish pytest_collect_directory --> <Dir selenium_tests> [hook]
+            pytest_collectstart [hook]
+                collector: <Dir selenium_tests>
+            finish pytest_collectstart --> [] [hook]
+            pytest_make_collect_report [hook]
+                collector: <Dir selenium_tests>
+              pytest_ignore_collect [hook]
+                  config: <_pytest.config.Config object at 0x1085dbe00>
+                  collection_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/.gitignore
+                  path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/.gitignore
+              finish pytest_ignore_collect --> None [hook]
+              pytest_collect_file [hook]
+                  parent: <Dir selenium_tests>
+                  file_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/.gitignore
+                  path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/.gitignore
+              finish pytest_collect_file --> [] [hook]
+              pytest_ignore_collect [hook]
+                  config: <_pytest.config.Config object at 0x1085dbe00>
+                  collection_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/.pytest_cache
+                  path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/.pytest_cache
+              finish pytest_ignore_collect --> True [hook]
+              pytest_ignore_collect [hook]
+                  config: <_pytest.config.Config object at 0x1085dbe00>
+                  collection_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/__pycache__
+                  path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/__pycache__
+              finish pytest_ignore_collect --> True [hook]
+              pytest_ignore_collect [hook]
+                  config: <_pytest.config.Config object at 0x1085dbe00>
+                  collection_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/config.py
+                  path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/config.py
+              finish pytest_ignore_collect --> None [hook]
+              pytest_collect_file [hook]
+                  parent: <Dir selenium_tests>
+                  file_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/config.py
+                  path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/config.py
+              finish pytest_collect_file --> [] [hook]
+              pytest_ignore_collect [hook]
+                  config: <_pytest.config.Config object at 0x1085dbe00>
+                  collection_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/conftest.py
+                  path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/conftest.py
+              finish pytest_ignore_collect --> None [hook]
+              pytest_collect_file [hook]
+                  parent: <Dir selenium_tests>
+                  file_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/conftest.py
+                  path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/conftest.py
+              finish pytest_collect_file --> [] [hook]
+              pytest_ignore_collect [hook]
+                  config: <_pytest.config.Config object at 0x1085dbe00>
+                  collection_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/pages
+                  path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/pages
+              finish pytest_ignore_collect --> None [hook]
+              pytest_collect_directory [hook]
+                  path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/pages
+                  parent: <Dir selenium_tests>
+              finish pytest_collect_directory --> <Package pages> [hook]
+              pytest_ignore_collect [hook]
+                  config: <_pytest.config.Config object at 0x1085dbe00>
+                  collection_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/pytest.ini
+                  path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/pytest.ini
+              finish pytest_ignore_collect --> None [hook]
+              pytest_collect_file [hook]
+                  parent: <Dir selenium_tests>
+                  file_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/pytest.ini
+                  path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/pytest.ini
+              finish pytest_collect_file --> [] [hook]
+              pytest_ignore_collect [hook]
+                  config: <_pytest.config.Config object at 0x1085dbe00>
+                  collection_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/pytestdebug.log
+                  path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/pytestdebug.log
+              finish pytest_ignore_collect --> None [hook]
+              pytest_collect_file [hook]
+                  parent: <Dir selenium_tests>
+                  file_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/pytestdebug.log
+                  path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/pytestdebug.log
+              finish pytest_collect_file --> [] [hook]
+              pytest_ignore_collect [hook]
+                  config: <_pytest.config.Config object at 0x1085dbe00>
+                  collection_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/requirements.txt
+                  path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/requirements.txt
+              finish pytest_ignore_collect --> None [hook]
+              pytest_collect_file [hook]
+                  parent: <Dir selenium_tests>
+                  file_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/requirements.txt
+                  path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/requirements.txt
+              finish pytest_collect_file --> [] [hook]
+              pytest_ignore_collect [hook]
+                  config: <_pytest.config.Config object at 0x1085dbe00>
+                  collection_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/run_tests.sh
+                  path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/run_tests.sh
+              finish pytest_ignore_collect --> None [hook]
+              pytest_collect_file [hook]
+                  parent: <Dir selenium_tests>
+                  file_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/run_tests.sh
+                  path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/run_tests.sh
+              finish pytest_collect_file --> [] [hook]
+              pytest_collect_directory [hook]
+                  path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests
+                  parent: <Dir selenium_tests>
+              finish pytest_collect_directory --> <Package tests> [hook]
+              pytest_ignore_collect [hook]
+                  config: <_pytest.config.Config object at 0x1085dbe00>
+                  collection_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv
+                  path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv
+              finish pytest_ignore_collect --> True [hook]
+            finish pytest_make_collect_report --> <CollectReport '.' lenresult=2 outcome='passed'> [hook]
+        finish pytest_make_collect_report --> <CollectReport '' lenresult=1 outcome='passed'> [hook]
+        pytest_collectreport [hook]
+            report: <CollectReport '' lenresult=1 outcome='passed'>
+        finish pytest_collectreport --> [] [hook]
+    genitems <Package tests> [collection]
+      pytest_collectstart [hook]
+          collector: <Package tests>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Package tests>
+        pytest_ignore_collect [hook]
+            config: <_pytest.config.Config object at 0x1085dbe00>
+            collection_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/__init__.py
+            path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/__init__.py
+        finish pytest_ignore_collect --> None [hook]
+        pytest_collect_file [hook]
+            parent: <Package tests>
+            file_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/__init__.py
+            path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/__init__.py
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            config: <_pytest.config.Config object at 0x1085dbe00>
+            collection_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/__pycache__
+            path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/__pycache__
+        finish pytest_ignore_collect --> True [hook]
+        pytest_ignore_collect [hook]
+            config: <_pytest.config.Config object at 0x1085dbe00>
+            collection_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_app.py
+            path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_app.py
+        finish pytest_ignore_collect --> None [hook]
+        pytest_collect_file [hook]
+            parent: <Package tests>
+            file_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_app.py
+            path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_app.py
+          pytest_pycollect_makemodule [hook]
+              parent: <Package tests>
+              module_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_app.py
+              path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_app.py
+          finish pytest_pycollect_makemodule --> <Module test_app.py> [hook]
+        finish pytest_collect_file --> [<Module test_app.py>] [hook]
+        pytest_ignore_collect [hook]
+            config: <_pytest.config.Config object at 0x1085dbe00>
+            collection_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_nav_bar.py
+            path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_nav_bar.py
+        finish pytest_ignore_collect --> None [hook]
+        pytest_collect_file [hook]
+            parent: <Package tests>
+            file_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_nav_bar.py
+            path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_nav_bar.py
+          pytest_pycollect_makemodule [hook]
+              parent: <Package tests>
+              module_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_nav_bar.py
+              path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_nav_bar.py
+          finish pytest_pycollect_makemodule --> <Module test_nav_bar.py> [hook]
+        finish pytest_collect_file --> [<Module test_nav_bar.py>] [hook]
+        pytest_ignore_collect [hook]
+            config: <_pytest.config.Config object at 0x1085dbe00>
+            collection_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_smoke.py
+            path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_smoke.py
+        finish pytest_ignore_collect --> None [hook]
+        pytest_collect_file [hook]
+            parent: <Package tests>
+            file_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_smoke.py
+            path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_smoke.py
+          pytest_pycollect_makemodule [hook]
+              parent: <Package tests>
+              module_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_smoke.py
+              path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_smoke.py
+          finish pytest_pycollect_makemodule --> <Module test_smoke.py> [hook]
+        finish pytest_collect_file --> [<Module test_smoke.py>] [hook]
+      finish pytest_make_collect_report --> <CollectReport 'tests' lenresult=3 outcome='passed'> [hook]
+    genitems <Module test_app.py> [collection]
+      pytest_collectstart [hook]
+          collector: <Module test_app.py>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Module test_app.py>
+      find_module called for: tests [assertion]
+      find_module called for: tests.test_app [assertion]
+      matched test file '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_app.py' [assertion]
+      found cached rewritten pyc for /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_app.py [assertion]
+      early skip of rewriting module: pages [assertion]
+      early skip of rewriting module: selenium.webdriver.remote [assertion]
+      early skip of rewriting module: selenium.webdriver.remote.webdriver [assertion]
+      early skip of rewriting module: pkgutil [assertion]
+      early skip of rewriting module: typing_extensions [assertion]
+      early skip of rewriting module: selenium.webdriver.common.api_request_context [assertion]
+      early skip of rewriting module: selenium.webdriver.common.bidi [assertion]
+      early skip of rewriting module: selenium.webdriver.common.bidi.bluetooth [assertion]
+      early skip of rewriting module: selenium.webdriver.common.bidi.common [assertion]
+      early skip of rewriting module: selenium.webdriver.common.bidi._event_manager [assertion]
+      early skip of rewriting module: selenium.webdriver.common.bidi.session [assertion]
+      early skip of rewriting module: selenium.webdriver.common.bidi.browser [assertion]
+      early skip of rewriting module: selenium.webdriver.common.bidi.browsing_context [assertion]
+      early skip of rewriting module: selenium.webdriver.common.bidi.emulation [assertion]
+      early skip of rewriting module: selenium.webdriver.common.bidi.input [assertion]
+      early skip of rewriting module: selenium.webdriver.common.bidi.log [assertion]
+      early skip of rewriting module: selenium.webdriver.common.bidi.network [assertion]
+      early skip of rewriting module: selenium.webdriver.common.bidi.permissions [assertion]
+      early skip of rewriting module: selenium.webdriver.common.bidi.script [assertion]
+      early skip of rewriting module: selenium.webdriver.common.bidi.speculation [assertion]
+      early skip of rewriting module: selenium.webdriver.common.bidi.storage [assertion]
+      early skip of rewriting module: selenium.webdriver.common.bidi.user_agent_client_hints [assertion]
+      early skip of rewriting module: selenium.webdriver.common.bidi.webextension [assertion]
+      early skip of rewriting module: selenium.webdriver.common.by [assertion]
+      early skip of rewriting module: selenium.webdriver.common.fedcm [assertion]
+      early skip of rewriting module: selenium.webdriver.common.fedcm.dialog [assertion]
+      early skip of rewriting module: selenium.webdriver.common.fedcm.account [assertion]
+      early skip of rewriting module: selenium.webdriver.common.options [assertion]
+      early skip of rewriting module: selenium.webdriver.common.proxy [assertion]
+      early skip of rewriting module: selenium.webdriver.common.print_page_options [assertion]
+      early skip of rewriting module: selenium.webdriver.common.timeouts [assertion]
+      early skip of rewriting module: selenium.webdriver.common.virtual_authenticator [assertion]
+      early skip of rewriting module: selenium.webdriver.remote.bidi_connection [assertion]
+      early skip of rewriting module: selenium.webdriver.remote.client_config [assertion]
+      early skip of rewriting module: selenium.webdriver.remote.command [assertion]
+      early skip of rewriting module: selenium.webdriver.remote.errorhandler [assertion]
+      early skip of rewriting module: selenium.webdriver.remote.fedcm [assertion]
+      early skip of rewriting module: selenium.webdriver.remote.file_detector [assertion]
+      early skip of rewriting module: selenium.webdriver.remote.locator_converter [assertion]
+      early skip of rewriting module: selenium.webdriver.remote.mobile [assertion]
+      early skip of rewriting module: selenium.webdriver.remote.remote_connection [assertion]
+      early skip of rewriting module: selenium.webdriver.remote.utils [assertion]
+      early skip of rewriting module: selenium.webdriver.remote.script_key [assertion]
+      early skip of rewriting module: selenium.webdriver.remote.shadowroot [assertion]
+      early skip of rewriting module: selenium.webdriver.remote.switch_to [assertion]
+      early skip of rewriting module: selenium.webdriver.common.alert [assertion]
+      early skip of rewriting module: selenium.webdriver.remote.webelement [assertion]
+      early skip of rewriting module: selenium.webdriver.remote.websocket_connection [assertion]
+      early skip of rewriting module: websocket [assertion]
+      early skip of rewriting module: websocket._abnf [assertion]
+      early skip of rewriting module: array [assertion]
+      early skip of rewriting module: websocket._exceptions [assertion]
+      early skip of rewriting module: websocket._utils [assertion]
+      early skip of rewriting module: wsaccel [assertion]
+      early skip of rewriting module: wsaccel [assertion]
+      early skip of rewriting module: websocket._app [assertion]
+      early skip of rewriting module: websocket._logging [assertion]
+      early skip of rewriting module: websocket._core [assertion]
+      early skip of rewriting module: websocket._handshake [assertion]
+      early skip of rewriting module: websocket._cookiejar [assertion]
+      early skip of rewriting module: websocket._http [assertion]
+      early skip of rewriting module: websocket._socket [assertion]
+      early skip of rewriting module: websocket._ssl_compat [assertion]
+      early skip of rewriting module: websocket._url [assertion]
+      early skip of rewriting module: python_socks [assertion]
+      early skip of rewriting module: websocket._dispatcher [assertion]
+      early skip of rewriting module: selenium.webdriver.support [assertion]
+      early skip of rewriting module: selenium.webdriver.support.relative_locator [assertion]
+      early skip of rewriting module: selenium.webdriver.support.ui [assertion]
+      early skip of rewriting module: selenium.webdriver.support.select [assertion]
+      early skip of rewriting module: selenium.webdriver.support.wait [assertion]
+      early skip of rewriting module: selenium.webdriver.support.expected_conditions [assertion]
+      early skip of rewriting module: pages.login_page [assertion]
+      early skip of rewriting module: pages.nav_bar [assertion]
+      early skip of rewriting module: pages.containers_page [assertion]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_app.py>
+            name: @py_builtins
+            obj: <module 'builtins' (built-in)>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_app.py>
+            name: @pytest_ar
+            obj: <module '_pytest.assertion.rewrite' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/assertion/rewrite.py'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_app.py>
+            name: time
+            obj: <module 'time' (built-in)>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_app.py>
+            name: pytest
+            obj: <module 'pytest' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/pytest/__init__.py'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_app.py>
+            name: LoginPage
+            obj: <class 'pages.login_page.LoginPage'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_app.py>
+            name: NavBar
+            obj: <class 'pages.nav_bar.NavBar'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_app.py>
+            name: ContainersPage
+            obj: <class 'pages.containers_page.ContainersPage'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_app.py>
+            name: BASE_URL
+            obj: http://localhost:8082
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_app.py>
+            name: TEST_USERNAME
+            obj: admin
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_app.py>
+            name: TEST_PASSWORD
+            obj: password
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_app.py>
+            name: TAB_NAMES
+            obj: ['Dashboard', 'Containers', 'Resources', 'Settings']
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_app.py>
+            name: TestAppLoad
+            obj: <class 'tests.test_app.TestAppLoad'>
+        finish pytest_pycollect_makeitem --> <Class TestAppLoad> [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_app.py>
+            name: TestLogin
+            obj: <class 'tests.test_app.TestLogin'>
+        finish pytest_pycollect_makeitem --> <Class TestLogin> [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_app.py>
+            name: TestLoginAndNavigate
+            obj: <class 'tests.test_app.TestLoginAndNavigate'>
+        finish pytest_pycollect_makeitem --> <Class TestLoginAndNavigate> [hook]
+      finish pytest_make_collect_report --> <CollectReport 'tests/test_app.py' lenresult=3 outcome='passed'> [hook]
+    genitems <Class TestAppLoad> [collection]
+      pytest_collectstart [hook]
+          collector: <Class TestAppLoad>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Class TestAppLoad>
+        pytest_pycollect_makeitem [hook]
+            collector: <Class TestAppLoad>
+            name: test_page_opens
+            obj: <function TestAppLoad.test_page_opens at 0x109e6c880>
+          pytest_generate_tests [hook]
+              metafunc: <_pytest.python.Metafunc object at 0x109e64980>
+          finish pytest_generate_tests --> [] [hook]
+        finish pytest_pycollect_makeitem --> [<Function test_page_opens>] [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Class TestAppLoad>
+            name: test_title_not_empty
+            obj: <function TestAppLoad.test_title_not_empty at 0x109e6ceb0>
+          pytest_generate_tests [hook]
+              metafunc: <_pytest.python.Metafunc object at 0x109da3d90>
+          finish pytest_generate_tests --> [] [hook]
+        finish pytest_pycollect_makeitem --> [<Function test_title_not_empty>] [hook]
+      finish pytest_make_collect_report --> <CollectReport 'tests/test_app.py::TestAppLoad' lenresult=2 outcome='passed'> [hook]
+    genitems <Function test_page_opens> [collection]
+      pytest_itemcollected [hook]
+          item: <Function test_page_opens>
+      finish pytest_itemcollected --> [] [hook]
+    genitems <Function test_title_not_empty> [collection]
+      pytest_itemcollected [hook]
+          item: <Function test_title_not_empty>
+      finish pytest_itemcollected --> [] [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'tests/test_app.py::TestAppLoad' lenresult=2 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+    genitems <Class TestLogin> [collection]
+      pytest_collectstart [hook]
+          collector: <Class TestLogin>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Class TestLogin>
+        pytest_pycollect_makeitem [hook]
+            collector: <Class TestLogin>
+            name: test_text_input_visible
+            obj: <function TestLogin.test_text_input_visible at 0x109e6d640>
+          pytest_generate_tests [hook]
+              metafunc: <_pytest.python.Metafunc object at 0x109da3d90>
+          finish pytest_generate_tests --> [] [hook]
+        finish pytest_pycollect_makeitem --> [<Function test_text_input_visible>] [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Class TestLogin>
+            name: test_login_button_visible
+            obj: <function TestLogin.test_login_button_visible at 0x109e6d6f0>
+          pytest_generate_tests [hook]
+              metafunc: <_pytest.python.Metafunc object at 0x109e8c050>
+          finish pytest_generate_tests --> [] [hook]
+        finish pytest_pycollect_makeitem --> [<Function test_login_button_visible>] [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Class TestLogin>
+            name: test_login_with_invalid_credentials_shows_error
+            obj: <function TestLogin.test_login_with_invalid_credentials_shows_error at 0x109e6d7a0>
+          pytest_generate_tests [hook]
+              metafunc: <_pytest.python.Metafunc object at 0x109e8c180>
+          finish pytest_generate_tests --> [] [hook]
+        finish pytest_pycollect_makeitem --> [<Function test_login_with_invalid_credentials_shows_error>] [hook]
+      finish pytest_make_collect_report --> <CollectReport 'tests/test_app.py::TestLogin' lenresult=3 outcome='passed'> [hook]
+    genitems <Function test_text_input_visible> [collection]
+      pytest_itemcollected [hook]
+          item: <Function test_text_input_visible>
+      finish pytest_itemcollected --> [] [hook]
+    genitems <Function test_login_button_visible> [collection]
+      pytest_itemcollected [hook]
+          item: <Function test_login_button_visible>
+      finish pytest_itemcollected --> [] [hook]
+    genitems <Function test_login_with_invalid_credentials_shows_error> [collection]
+      pytest_itemcollected [hook]
+          item: <Function test_login_with_invalid_credentials_shows_error>
+      finish pytest_itemcollected --> [] [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'tests/test_app.py::TestLogin' lenresult=3 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+    genitems <Class TestLoginAndNavigate> [collection]
+      pytest_collectstart [hook]
+          collector: <Class TestLoginAndNavigate>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Class TestLoginAndNavigate>
+        pytest_pycollect_makeitem [hook]
+            collector: <Class TestLoginAndNavigate>
+            name: login
+            obj: <pytest_fixture(<function TestLoginAndNavigate.login at 0x109e6d850>)>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Class TestLoginAndNavigate>
+            name: test_nav_bar_visible_after_login
+            obj: <function TestLoginAndNavigate.test_nav_bar_visible_after_login at 0x109e6d900>
+          pytest_generate_tests [hook]
+              metafunc: <_pytest.python.Metafunc object at 0x109e315b0>
+          finish pytest_generate_tests --> [] [hook]
+        finish pytest_pycollect_makeitem --> [<Function test_nav_bar_visible_after_login>] [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Class TestLoginAndNavigate>
+            name: test_navigation_tabs_and_pages
+            obj: <function TestLoginAndNavigate.test_navigation_tabs_and_pages at 0x109e6d9b0>
+          pytest_generate_tests [hook]
+              metafunc: <_pytest.python.Metafunc object at 0x109dd3790>
+          finish pytest_generate_tests --> [] [hook]
+        finish pytest_pycollect_makeitem --> [<Function test_navigation_tabs_and_pages>] [hook]
+      finish pytest_make_collect_report --> <CollectReport 'tests/test_app.py::TestLoginAndNavigate' lenresult=2 outcome='passed'> [hook]
+    genitems <Function test_nav_bar_visible_after_login> [collection]
+      pytest_itemcollected [hook]
+          item: <Function test_nav_bar_visible_after_login>
+      finish pytest_itemcollected --> [] [hook]
+    genitems <Function test_navigation_tabs_and_pages> [collection]
+      pytest_itemcollected [hook]
+          item: <Function test_navigation_tabs_and_pages>
+      finish pytest_itemcollected --> [] [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'tests/test_app.py::TestLoginAndNavigate' lenresult=2 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'tests/test_app.py' lenresult=3 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+    genitems <Module test_nav_bar.py> [collection]
+      pytest_collectstart [hook]
+          collector: <Module test_nav_bar.py>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Module test_nav_bar.py>
+      find_module called for: tests.test_nav_bar [assertion]
+      matched test file '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_nav_bar.py' [assertion]
+      found cached rewritten pyc for /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_nav_bar.py [assertion]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_nav_bar.py>
+            name: @py_builtins
+            obj: <module 'builtins' (built-in)>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_nav_bar.py>
+            name: @pytest_ar
+            obj: <module '_pytest.assertion.rewrite' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/assertion/rewrite.py'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_nav_bar.py>
+            name: time
+            obj: <module 'time' (built-in)>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_nav_bar.py>
+            name: pytest
+            obj: <module 'pytest' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/pytest/__init__.py'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_nav_bar.py>
+            name: NavBar
+            obj: <class 'pages.nav_bar.NavBar'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_nav_bar.py>
+            name: TAB_NAMES
+            obj: ['Dashboard', 'Containers', 'Resources', 'Settings']
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_nav_bar.py>
+            name: login
+            obj: <pytest_fixture(<function login at 0x109e6e560>)>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_nav_bar.py>
+            name: TestNavBar
+            obj: <class 'tests.test_nav_bar.TestNavBar'>
+        finish pytest_pycollect_makeitem --> <Class TestNavBar> [hook]
+      finish pytest_make_collect_report --> <CollectReport 'tests/test_nav_bar.py' lenresult=1 outcome='passed'> [hook]
+    genitems <Class TestNavBar> [collection]
+      pytest_collectstart [hook]
+          collector: <Class TestNavBar>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Class TestNavBar>
+        pytest_pycollect_makeitem [hook]
+            collector: <Class TestNavBar>
+            name: test_nav_bar_exists_and_has_tabs
+            obj: <function TestNavBar.test_nav_bar_exists_and_has_tabs at 0x109e6e610>
+          pytest_generate_tests [hook]
+              metafunc: <_pytest.python.Metafunc object at 0x109dd3ac0>
+          finish pytest_generate_tests --> [] [hook]
+        finish pytest_pycollect_makeitem --> [<Function test_nav_bar_exists_and_has_tabs>] [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Class TestNavBar>
+            name: test_nav_bar_visible_after_scroll
+            obj: <function TestNavBar.test_nav_bar_visible_after_scroll at 0x109e6e6c0>
+          pytest_generate_tests [hook]
+              metafunc: <_pytest.python.Metafunc object at 0x109acc650>
+          finish pytest_generate_tests --> [] [hook]
+        finish pytest_pycollect_makeitem --> [<Function test_nav_bar_visible_after_scroll>] [hook]
+      finish pytest_make_collect_report --> <CollectReport 'tests/test_nav_bar.py::TestNavBar' lenresult=2 outcome='passed'> [hook]
+    genitems <Function test_nav_bar_exists_and_has_tabs> [collection]
+      pytest_itemcollected [hook]
+          item: <Function test_nav_bar_exists_and_has_tabs>
+      finish pytest_itemcollected --> [] [hook]
+    genitems <Function test_nav_bar_visible_after_scroll> [collection]
+      pytest_itemcollected [hook]
+          item: <Function test_nav_bar_visible_after_scroll>
+      finish pytest_itemcollected --> [] [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'tests/test_nav_bar.py::TestNavBar' lenresult=2 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'tests/test_nav_bar.py' lenresult=1 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+    genitems <Module test_smoke.py> [collection]
+      pytest_collectstart [hook]
+          collector: <Module test_smoke.py>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Module test_smoke.py>
+      find_module called for: tests.test_smoke [assertion]
+      matched test file '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_smoke.py' [assertion]
+      found cached rewritten pyc for /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/tests/test_smoke.py [assertion]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_smoke.py>
+            name: @py_builtins
+            obj: <module 'builtins' (built-in)>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_smoke.py>
+            name: @pytest_ar
+            obj: <module '_pytest.assertion.rewrite' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/_pytest/assertion/rewrite.py'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_smoke.py>
+            name: pytest
+            obj: <module 'pytest' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/pytest/__init__.py'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_smoke.py>
+            name: webdriver
+            obj: <module 'selenium.webdriver' from '/Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests/venv/lib/python3.14/site-packages/selenium/webdriver/__init__.py'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_smoke.py>
+            name: ChromeService
+            obj: <class 'selenium.webdriver.chrome.service.Service'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_smoke.py>
+            name: ChromeDriverManager
+            obj: <class 'webdriver_manager.chrome.ChromeDriverManager'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_smoke.py>
+            name: chromedriver_path
+            obj: <pytest_fixture(<function chromedriver_path at 0x109e6ecf0>)>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_smoke.py>
+            name: chrome_driver
+            obj: <pytest_fixture(<function chrome_driver at 0x109e6eda0>)>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module test_smoke.py>
+            name: TestSeleniumFramework
+            obj: <class 'tests.test_smoke.TestSeleniumFramework'>
+        finish pytest_pycollect_makeitem --> <Class TestSeleniumFramework> [hook]
+      finish pytest_make_collect_report --> <CollectReport 'tests/test_smoke.py' lenresult=1 outcome='passed'> [hook]
+    genitems <Class TestSeleniumFramework> [collection]
+      pytest_collectstart [hook]
+          collector: <Class TestSeleniumFramework>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Class TestSeleniumFramework>
+        pytest_pycollect_makeitem [hook]
+            collector: <Class TestSeleniumFramework>
+            name: test_webdriver_manager_can_download
+            obj: <function TestSeleniumFramework.test_webdriver_manager_can_download at 0x109e6ef00>
+          pytest_generate_tests [hook]
+              metafunc: <_pytest.python.Metafunc object at 0x109e61c50>
+          finish pytest_generate_tests --> [] [hook]
+        finish pytest_pycollect_makeitem --> [<Function test_webdriver_manager_can_download>] [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Class TestSeleniumFramework>
+            name: test_can_create_driver
+            obj: <function TestSeleniumFramework.test_can_create_driver at 0x109e6efb0>
+          pytest_generate_tests [hook]
+              metafunc: <_pytest.python.Metafunc object at 0x109e5db80>
+          finish pytest_generate_tests --> [] [hook]
+        finish pytest_pycollect_makeitem --> [<Function test_can_create_driver>] [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Class TestSeleniumFramework>
+            name: test_driver_can_navigate
+            obj: <function TestSeleniumFramework.test_driver_can_navigate at 0x109e6f060>
+          pytest_generate_tests [hook]
+              metafunc: <_pytest.python.Metafunc object at 0x109e5db80>
+          finish pytest_generate_tests --> [] [hook]
+        finish pytest_pycollect_makeitem --> [<Function test_driver_can_navigate>] [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Class TestSeleniumFramework>
+            name: pytestmark
+            obj: [Mark(name='smoke', args=(), kwargs={})]
+        finish pytest_pycollect_makeitem --> None [hook]
+      finish pytest_make_collect_report --> <CollectReport 'tests/test_smoke.py::TestSeleniumFramework' lenresult=3 outcome='passed'> [hook]
+    genitems <Function test_webdriver_manager_can_download> [collection]
+      pytest_itemcollected [hook]
+          item: <Function test_webdriver_manager_can_download>
+      finish pytest_itemcollected --> [] [hook]
+    genitems <Function test_can_create_driver> [collection]
+      pytest_itemcollected [hook]
+          item: <Function test_can_create_driver>
+      finish pytest_itemcollected --> [] [hook]
+    genitems <Function test_driver_can_navigate> [collection]
+      pytest_itemcollected [hook]
+          item: <Function test_driver_can_navigate>
+      finish pytest_itemcollected --> [] [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'tests/test_smoke.py::TestSeleniumFramework' lenresult=3 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'tests/test_smoke.py' lenresult=1 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'tests' lenresult=3 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+      pytest_collection_modifyitems [hook]
+          session: <Session  exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+          config: <_pytest.config.Config object at 0x1085dbe00>
+          items: [<Function test_page_opens>, <Function test_title_not_empty>, <Function test_text_input_visible>, <Function test_login_button_visible>, <Function test_login_with_invalid_credentials_shows_error>, <Function test_nav_bar_visible_after_login>, <Function test_navigation_tabs_and_pages>, <Function test_nav_bar_exists_and_has_tabs>, <Function test_nav_bar_visible_after_scroll>, <Function test_webdriver_manager_can_download>, <Function test_can_create_driver>, <Function test_driver_can_navigate>]
+      finish pytest_collection_modifyitems --> [] [hook]
+      pytest_collection_finish [hook]
+          session: <Session  exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=0>
+        pytest_report_collectionfinish [hook]
+            config: <_pytest.config.Config object at 0x1085dbe00>
+            items: [<Function test_page_opens>, <Function test_title_not_empty>, <Function test_text_input_visible>, <Function test_login_button_visible>, <Function test_login_with_invalid_credentials_shows_error>, <Function test_nav_bar_visible_after_login>, <Function test_navigation_tabs_and_pages>, <Function test_nav_bar_exists_and_has_tabs>, <Function test_nav_bar_visible_after_scroll>, <Function test_webdriver_manager_can_download>, <Function test_can_create_driver>, <Function test_driver_can_navigate>]
+            start_path: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests
+            startdir: /Users/mac/codes/FlutterProjects/mobile_portainer_flutter_module/selenium_tests
+        finish pytest_report_collectionfinish --> [] [hook]
+      finish pytest_collection_finish --> [] [hook]
+    finish pytest_collection --> None [hook]
+    pytest_runtestloop [hook]
+        session: <Session  exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=12>
+      pytest_runtest_protocol [hook]
+          item: <Function test_page_opens>
+          nextitem: <Function test_title_not_empty>
+        pytest_runtest_logstart [hook]
+            nodeid: tests/test_app.py::TestAppLoad::test_page_opens
+            location: ('tests/test_app.py', 11, 'TestAppLoad.test_page_opens')
+        finish pytest_runtest_logstart --> [] [hook]
+        pytest_runtest_setup [hook]
+            item: <Function test_page_opens>
+          pytest_fixture_setup [hook]
+              fixturedef: <FixtureDef argname='base_url' scope='session' baseid=''>
+              request: <SubRequest 'base_url' for <Function test_page_opens>>
+          finish pytest_fixture_setup --> http://localhost:8082 [hook]
+          pytest_fixture_setup [hook]
+              fixturedef: <FixtureDef argname='server_reachable' scope='session' baseid=''>
+              request: <SubRequest 'server_reachable' for <Function test_page_opens>>
+          finish pytest_fixture_setup --> True [hook]
+          pytest_fixture_setup [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_page_opens>>
+          early skip of rewriting module: selenium.webdriver.chrome.options [assertion]
+          early skip of rewriting module: selenium.webdriver.chromium.options [assertion]
+          early skip of rewriting module: selenium.webdriver.common.desired_capabilities [assertion]
+          early skip of rewriting module: selenium.webdriver.chrome.webdriver [assertion]
+          early skip of rewriting module: selenium.webdriver.chromium.webdriver [assertion]
+          early skip of rewriting module: selenium.webdriver.chromium.remote_connection [assertion]
+          early skip of rewriting module: selenium.webdriver.common.driver_finder [assertion]
+          early skip of rewriting module: selenium.webdriver.common.selenium_manager [assertion]
+          early skip of rewriting module: sysconfig [assertion]
+          early skip of rewriting module: selenium.webdriver.common.webdriver [assertion]
+          early skip of rewriting module: encodings.utf_16_le [assertion]
+          early skip of rewriting module: _strptime [assertion]
+          finish pytest_fixture_setup --> <selenium.webdriver.chrome.webdriver.WebDriver (session="4c15604acf0f13fb075ff907d39983ed")> [hook]
+        finish pytest_runtest_setup --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_page_opens>
+            call: <CallInfo when='setup' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_app.py::TestAppLoad::test_page_opens' when='setup' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_app.py::TestAppLoad::test_page_opens' when='setup' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_app.py::TestAppLoad::test_page_opens' when='setup' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_call [hook]
+            item: <Function test_page_opens>
+          pytest_pyfunc_call [hook]
+              pyfuncitem: <Function test_page_opens>
+          finish pytest_pyfunc_call --> True [hook]
+        finish pytest_runtest_call --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_page_opens>
+            call: <CallInfo when='call' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_app.py::TestAppLoad::test_page_opens' when='call' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_app.py::TestAppLoad::test_page_opens' when='call' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_app.py::TestAppLoad::test_page_opens' when='call' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('passed', '.', 'PASSED') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_teardown [hook]
+            item: <Function test_page_opens>
+            nextitem: <Function test_title_not_empty>
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_page_opens>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+        finish pytest_runtest_teardown --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_page_opens>
+            call: <CallInfo when='teardown' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_app.py::TestAppLoad::test_page_opens' when='teardown' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_app.py::TestAppLoad::test_page_opens' when='teardown' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_app.py::TestAppLoad::test_page_opens' when='teardown' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_logfinish [hook]
+            nodeid: tests/test_app.py::TestAppLoad::test_page_opens
+            location: ('tests/test_app.py', 11, 'TestAppLoad.test_page_opens')
+        finish pytest_runtest_logfinish --> [] [hook]
+      finish pytest_runtest_protocol --> True [hook]
+      pytest_runtest_protocol [hook]
+          item: <Function test_title_not_empty>
+          nextitem: <Function test_text_input_visible>
+        pytest_runtest_logstart [hook]
+            nodeid: tests/test_app.py::TestAppLoad::test_title_not_empty
+            location: ('tests/test_app.py', 16, 'TestAppLoad.test_title_not_empty')
+        finish pytest_runtest_logstart --> [] [hook]
+        pytest_runtest_setup [hook]
+            item: <Function test_title_not_empty>
+          pytest_fixture_setup [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_title_not_empty>>
+          finish pytest_fixture_setup --> <selenium.webdriver.chrome.webdriver.WebDriver (session="084dd7eda7ceb8793fc8ce40d9f646cc")> [hook]
+        finish pytest_runtest_setup --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_title_not_empty>
+            call: <CallInfo when='setup' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_app.py::TestAppLoad::test_title_not_empty' when='setup' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_app.py::TestAppLoad::test_title_not_empty' when='setup' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_app.py::TestAppLoad::test_title_not_empty' when='setup' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_call [hook]
+            item: <Function test_title_not_empty>
+          pytest_pyfunc_call [hook]
+              pyfuncitem: <Function test_title_not_empty>
+          finish pytest_pyfunc_call --> True [hook]
+        finish pytest_runtest_call --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_title_not_empty>
+            call: <CallInfo when='call' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_app.py::TestAppLoad::test_title_not_empty' when='call' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_app.py::TestAppLoad::test_title_not_empty' when='call' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_app.py::TestAppLoad::test_title_not_empty' when='call' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('passed', '.', 'PASSED') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_teardown [hook]
+            item: <Function test_title_not_empty>
+            nextitem: <Function test_text_input_visible>
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_title_not_empty>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+        finish pytest_runtest_teardown --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_title_not_empty>
+            call: <CallInfo when='teardown' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_app.py::TestAppLoad::test_title_not_empty' when='teardown' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_app.py::TestAppLoad::test_title_not_empty' when='teardown' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_app.py::TestAppLoad::test_title_not_empty' when='teardown' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_logfinish [hook]
+            nodeid: tests/test_app.py::TestAppLoad::test_title_not_empty
+            location: ('tests/test_app.py', 16, 'TestAppLoad.test_title_not_empty')
+        finish pytest_runtest_logfinish --> [] [hook]
+      finish pytest_runtest_protocol --> True [hook]
+      pytest_runtest_protocol [hook]
+          item: <Function test_text_input_visible>
+          nextitem: <Function test_login_button_visible>
+        pytest_runtest_logstart [hook]
+            nodeid: tests/test_app.py::TestLogin::test_text_input_visible
+            location: ('tests/test_app.py', 21, 'TestLogin.test_text_input_visible')
+        finish pytest_runtest_logstart --> [] [hook]
+        pytest_runtest_setup [hook]
+            item: <Function test_text_input_visible>
+          pytest_fixture_setup [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_text_input_visible>>
+          finish pytest_fixture_setup --> <selenium.webdriver.chrome.webdriver.WebDriver (session="251bc48652e10c1b5626736243b4e31a")> [hook]
+        finish pytest_runtest_setup --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_text_input_visible>
+            call: <CallInfo when='setup' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_app.py::TestLogin::test_text_input_visible' when='setup' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_app.py::TestLogin::test_text_input_visible' when='setup' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_app.py::TestLogin::test_text_input_visible' when='setup' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_call [hook]
+            item: <Function test_text_input_visible>
+          pytest_pyfunc_call [hook]
+              pyfuncitem: <Function test_text_input_visible>
+          finish pytest_pyfunc_call --> True [hook]
+        finish pytest_runtest_call --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_text_input_visible>
+            call: <CallInfo when='call' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_app.py::TestLogin::test_text_input_visible' when='call' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_app.py::TestLogin::test_text_input_visible' when='call' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_app.py::TestLogin::test_text_input_visible' when='call' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('passed', '.', 'PASSED') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_teardown [hook]
+            item: <Function test_text_input_visible>
+            nextitem: <Function test_login_button_visible>
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_text_input_visible>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+        finish pytest_runtest_teardown --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_text_input_visible>
+            call: <CallInfo when='teardown' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_app.py::TestLogin::test_text_input_visible' when='teardown' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_app.py::TestLogin::test_text_input_visible' when='teardown' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_app.py::TestLogin::test_text_input_visible' when='teardown' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_logfinish [hook]
+            nodeid: tests/test_app.py::TestLogin::test_text_input_visible
+            location: ('tests/test_app.py', 21, 'TestLogin.test_text_input_visible')
+        finish pytest_runtest_logfinish --> [] [hook]
+      finish pytest_runtest_protocol --> True [hook]
+      pytest_runtest_protocol [hook]
+          item: <Function test_login_button_visible>
+          nextitem: <Function test_login_with_invalid_credentials_shows_error>
+        pytest_runtest_logstart [hook]
+            nodeid: tests/test_app.py::TestLogin::test_login_button_visible
+            location: ('tests/test_app.py', 26, 'TestLogin.test_login_button_visible')
+        finish pytest_runtest_logstart --> [] [hook]
+        pytest_runtest_setup [hook]
+            item: <Function test_login_button_visible>
+          pytest_fixture_setup [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_login_button_visible>>
+          finish pytest_fixture_setup --> <selenium.webdriver.chrome.webdriver.WebDriver (session="c04f3fe9155dfa64fa4a777c13f3b2c3")> [hook]
+        finish pytest_runtest_setup --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_login_button_visible>
+            call: <CallInfo when='setup' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_app.py::TestLogin::test_login_button_visible' when='setup' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_app.py::TestLogin::test_login_button_visible' when='setup' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_app.py::TestLogin::test_login_button_visible' when='setup' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_call [hook]
+            item: <Function test_login_button_visible>
+          pytest_pyfunc_call [hook]
+              pyfuncitem: <Function test_login_button_visible>
+          finish pytest_pyfunc_call --> True [hook]
+        finish pytest_runtest_call --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_login_button_visible>
+            call: <CallInfo when='call' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_app.py::TestLogin::test_login_button_visible' when='call' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_app.py::TestLogin::test_login_button_visible' when='call' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_app.py::TestLogin::test_login_button_visible' when='call' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('passed', '.', 'PASSED') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_teardown [hook]
+            item: <Function test_login_button_visible>
+            nextitem: <Function test_login_with_invalid_credentials_shows_error>
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_login_button_visible>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+        finish pytest_runtest_teardown --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_login_button_visible>
+            call: <CallInfo when='teardown' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_app.py::TestLogin::test_login_button_visible' when='teardown' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_app.py::TestLogin::test_login_button_visible' when='teardown' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_app.py::TestLogin::test_login_button_visible' when='teardown' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_logfinish [hook]
+            nodeid: tests/test_app.py::TestLogin::test_login_button_visible
+            location: ('tests/test_app.py', 26, 'TestLogin.test_login_button_visible')
+        finish pytest_runtest_logfinish --> [] [hook]
+      finish pytest_runtest_protocol --> True [hook]
+      pytest_runtest_protocol [hook]
+          item: <Function test_login_with_invalid_credentials_shows_error>
+          nextitem: <Function test_nav_bar_visible_after_login>
+        pytest_runtest_logstart [hook]
+            nodeid: tests/test_app.py::TestLogin::test_login_with_invalid_credentials_shows_error
+            location: ('tests/test_app.py', 31, 'TestLogin.test_login_with_invalid_credentials_shows_error')
+        finish pytest_runtest_logstart --> [] [hook]
+        pytest_runtest_setup [hook]
+            item: <Function test_login_with_invalid_credentials_shows_error>
+          pytest_fixture_setup [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_login_with_invalid_credentials_shows_error>>
+          finish pytest_fixture_setup --> <selenium.webdriver.chrome.webdriver.WebDriver (session="0ef4fc900ff5ad2a57ae0d556cb8e7f0")> [hook]
+        finish pytest_runtest_setup --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_login_with_invalid_credentials_shows_error>
+            call: <CallInfo when='setup' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_app.py::TestLogin::test_login_with_invalid_credentials_shows_error' when='setup' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_app.py::TestLogin::test_login_with_invalid_credentials_shows_error' when='setup' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_app.py::TestLogin::test_login_with_invalid_credentials_shows_error' when='setup' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_call [hook]
+            item: <Function test_login_with_invalid_credentials_shows_error>
+          pytest_pyfunc_call [hook]
+              pyfuncitem: <Function test_login_with_invalid_credentials_shows_error>
+          finish pytest_pyfunc_call --> True [hook]
+        finish pytest_runtest_call --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_login_with_invalid_credentials_shows_error>
+            call: <CallInfo when='call' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_app.py::TestLogin::test_login_with_invalid_credentials_shows_error' when='call' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_app.py::TestLogin::test_login_with_invalid_credentials_shows_error' when='call' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_app.py::TestLogin::test_login_with_invalid_credentials_shows_error' when='call' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('passed', '.', 'PASSED') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_teardown [hook]
+            item: <Function test_login_with_invalid_credentials_shows_error>
+            nextitem: <Function test_nav_bar_visible_after_login>
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_login_with_invalid_credentials_shows_error>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+        finish pytest_runtest_teardown --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_login_with_invalid_credentials_shows_error>
+            call: <CallInfo when='teardown' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_app.py::TestLogin::test_login_with_invalid_credentials_shows_error' when='teardown' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_app.py::TestLogin::test_login_with_invalid_credentials_shows_error' when='teardown' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_app.py::TestLogin::test_login_with_invalid_credentials_shows_error' when='teardown' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_logfinish [hook]
+            nodeid: tests/test_app.py::TestLogin::test_login_with_invalid_credentials_shows_error
+            location: ('tests/test_app.py', 31, 'TestLogin.test_login_with_invalid_credentials_shows_error')
+        finish pytest_runtest_logfinish --> [] [hook]
+      finish pytest_runtest_protocol --> True [hook]
+      pytest_runtest_protocol [hook]
+          item: <Function test_nav_bar_visible_after_login>
+          nextitem: <Function test_navigation_tabs_and_pages>
+        pytest_runtest_logstart [hook]
+            nodeid: tests/test_app.py::TestLoginAndNavigate::test_nav_bar_visible_after_login
+            location: ('tests/test_app.py', 45, 'TestLoginAndNavigate.test_nav_bar_visible_after_login')
+        finish pytest_runtest_logstart --> [] [hook]
+        pytest_runtest_setup [hook]
+            item: <Function test_nav_bar_visible_after_login>
+          pytest_fixture_setup [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_nav_bar_visible_after_login>>
+          finish pytest_fixture_setup --> <selenium.webdriver.chrome.webdriver.WebDriver (session="3beda73f35a08f869a3da580fb37aae0")> [hook]
+          pytest_fixture_setup [hook]
+              fixturedef: <FixtureDef argname='do_login' scope='function' baseid=''>
+              request: <SubRequest 'do_login' for <Function test_nav_bar_visible_after_login>>
+        pytest_runtest_makereport [hook]
+            item: <Function test_nav_bar_visible_after_login>
+            call: <CallInfo when='setup' excinfo=<ExceptionInfo 登录交互失败: 找不到 Flutter 文本编辑 input tblen=37>>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_app.py::TestLoginAndNavigate::test_nav_bar_visible_after_login' when='setup' outcome='skipped'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_app.py::TestLoginAndNavigate::test_nav_bar_visible_after_login' when='setup' outcome='skipped'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_app.py::TestLoginAndNavigate::test_nav_bar_visible_after_login' when='setup' outcome='skipped'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('skipped', 's', 'SKIPPED') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_teardown [hook]
+            item: <Function test_nav_bar_visible_after_login>
+            nextitem: <Function test_navigation_tabs_and_pages>
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='do_login' scope='function' baseid=''>
+              request: <SubRequest 'do_login' for <Function test_nav_bar_visible_after_login>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='do_login' scope='function' baseid=''>
+              request: <SubRequest 'do_login' for <Function test_nav_bar_visible_after_login>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_nav_bar_visible_after_login>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+        finish pytest_runtest_teardown --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_nav_bar_visible_after_login>
+            call: <CallInfo when='teardown' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_app.py::TestLoginAndNavigate::test_nav_bar_visible_after_login' when='teardown' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_app.py::TestLoginAndNavigate::test_nav_bar_visible_after_login' when='teardown' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_app.py::TestLoginAndNavigate::test_nav_bar_visible_after_login' when='teardown' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_logfinish [hook]
+            nodeid: tests/test_app.py::TestLoginAndNavigate::test_nav_bar_visible_after_login
+            location: ('tests/test_app.py', 45, 'TestLoginAndNavigate.test_nav_bar_visible_after_login')
+        finish pytest_runtest_logfinish --> [] [hook]
+      finish pytest_runtest_protocol --> True [hook]
+      pytest_runtest_protocol [hook]
+          item: <Function test_navigation_tabs_and_pages>
+          nextitem: <Function test_nav_bar_exists_and_has_tabs>
+        pytest_runtest_logstart [hook]
+            nodeid: tests/test_app.py::TestLoginAndNavigate::test_navigation_tabs_and_pages
+            location: ('tests/test_app.py', 49, 'TestLoginAndNavigate.test_navigation_tabs_and_pages')
+        finish pytest_runtest_logstart --> [] [hook]
+        pytest_runtest_setup [hook]
+            item: <Function test_navigation_tabs_and_pages>
+          pytest_fixture_setup [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_navigation_tabs_and_pages>>
+          finish pytest_fixture_setup --> <selenium.webdriver.chrome.webdriver.WebDriver (session="b378042ffdb0f17d3ce6ec40488366b4")> [hook]
+          pytest_fixture_setup [hook]
+              fixturedef: <FixtureDef argname='do_login' scope='function' baseid=''>
+              request: <SubRequest 'do_login' for <Function test_navigation_tabs_and_pages>>
+        pytest_runtest_makereport [hook]
+            item: <Function test_navigation_tabs_and_pages>
+            call: <CallInfo when='setup' excinfo=<ExceptionInfo 登录交互失败: 找不到 Flutter 文本编辑 input tblen=37>>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_app.py::TestLoginAndNavigate::test_navigation_tabs_and_pages' when='setup' outcome='skipped'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_app.py::TestLoginAndNavigate::test_navigation_tabs_and_pages' when='setup' outcome='skipped'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_app.py::TestLoginAndNavigate::test_navigation_tabs_and_pages' when='setup' outcome='skipped'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('skipped', 's', 'SKIPPED') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_teardown [hook]
+            item: <Function test_navigation_tabs_and_pages>
+            nextitem: <Function test_nav_bar_exists_and_has_tabs>
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='do_login' scope='function' baseid=''>
+              request: <SubRequest 'do_login' for <Function test_navigation_tabs_and_pages>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='do_login' scope='function' baseid=''>
+              request: <SubRequest 'do_login' for <Function test_navigation_tabs_and_pages>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_navigation_tabs_and_pages>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+        finish pytest_runtest_teardown --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_navigation_tabs_and_pages>
+            call: <CallInfo when='teardown' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_app.py::TestLoginAndNavigate::test_navigation_tabs_and_pages' when='teardown' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_app.py::TestLoginAndNavigate::test_navigation_tabs_and_pages' when='teardown' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_app.py::TestLoginAndNavigate::test_navigation_tabs_and_pages' when='teardown' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_logfinish [hook]
+            nodeid: tests/test_app.py::TestLoginAndNavigate::test_navigation_tabs_and_pages
+            location: ('tests/test_app.py', 49, 'TestLoginAndNavigate.test_navigation_tabs_and_pages')
+        finish pytest_runtest_logfinish --> [] [hook]
+      finish pytest_runtest_protocol --> True [hook]
+      pytest_runtest_protocol [hook]
+          item: <Function test_nav_bar_exists_and_has_tabs>
+          nextitem: <Function test_nav_bar_visible_after_scroll>
+        pytest_runtest_logstart [hook]
+            nodeid: tests/test_nav_bar.py::TestNavBar::test_nav_bar_exists_and_has_tabs
+            location: ('tests/test_nav_bar.py', 15, 'TestNavBar.test_nav_bar_exists_and_has_tabs')
+        finish pytest_runtest_logstart --> [] [hook]
+        pytest_runtest_setup [hook]
+            item: <Function test_nav_bar_exists_and_has_tabs>
+          pytest_fixture_setup [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_nav_bar_exists_and_has_tabs>>
+          finish pytest_fixture_setup --> <selenium.webdriver.chrome.webdriver.WebDriver (session="866022eafa57e32557b693daba7e270b")> [hook]
+          pytest_fixture_setup [hook]
+              fixturedef: <FixtureDef argname='do_login' scope='function' baseid=''>
+              request: <SubRequest 'do_login' for <Function test_nav_bar_exists_and_has_tabs>>
+          finish pytest_fixture_setup --> None [hook]
+          pytest_fixture_setup [hook]
+              fixturedef: <FixtureDef argname='login' scope='function' baseid='tests/test_nav_bar.py'>
+              request: <SubRequest 'login' for <Function test_nav_bar_exists_and_has_tabs>>
+          finish pytest_fixture_setup --> None [hook]
+        finish pytest_runtest_setup --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_nav_bar_exists_and_has_tabs>
+            call: <CallInfo when='setup' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_nav_bar.py::TestNavBar::test_nav_bar_exists_and_has_tabs' when='setup' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_nav_bar.py::TestNavBar::test_nav_bar_exists_and_has_tabs' when='setup' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_nav_bar.py::TestNavBar::test_nav_bar_exists_and_has_tabs' when='setup' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_call [hook]
+            item: <Function test_nav_bar_exists_and_has_tabs>
+          pytest_pyfunc_call [hook]
+              pyfuncitem: <Function test_nav_bar_exists_and_has_tabs>
+          finish pytest_pyfunc_call --> True [hook]
+        finish pytest_runtest_call --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_nav_bar_exists_and_has_tabs>
+            call: <CallInfo when='call' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_nav_bar.py::TestNavBar::test_nav_bar_exists_and_has_tabs' when='call' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_nav_bar.py::TestNavBar::test_nav_bar_exists_and_has_tabs' when='call' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_nav_bar.py::TestNavBar::test_nav_bar_exists_and_has_tabs' when='call' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('passed', '.', 'PASSED') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_teardown [hook]
+            item: <Function test_nav_bar_exists_and_has_tabs>
+            nextitem: <Function test_nav_bar_visible_after_scroll>
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='login' scope='function' baseid='tests/test_nav_bar.py'>
+              request: <SubRequest 'login' for <Function test_nav_bar_exists_and_has_tabs>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='login' scope='function' baseid='tests/test_nav_bar.py'>
+              request: <SubRequest 'login' for <Function test_nav_bar_exists_and_has_tabs>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='do_login' scope='function' baseid=''>
+              request: <SubRequest 'do_login' for <Function test_nav_bar_exists_and_has_tabs>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='do_login' scope='function' baseid=''>
+              request: <SubRequest 'do_login' for <Function test_nav_bar_exists_and_has_tabs>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_nav_bar_exists_and_has_tabs>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+        finish pytest_runtest_teardown --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_nav_bar_exists_and_has_tabs>
+            call: <CallInfo when='teardown' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_nav_bar.py::TestNavBar::test_nav_bar_exists_and_has_tabs' when='teardown' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_nav_bar.py::TestNavBar::test_nav_bar_exists_and_has_tabs' when='teardown' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_nav_bar.py::TestNavBar::test_nav_bar_exists_and_has_tabs' when='teardown' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_logfinish [hook]
+            nodeid: tests/test_nav_bar.py::TestNavBar::test_nav_bar_exists_and_has_tabs
+            location: ('tests/test_nav_bar.py', 15, 'TestNavBar.test_nav_bar_exists_and_has_tabs')
+        finish pytest_runtest_logfinish --> [] [hook]
+      finish pytest_runtest_protocol --> True [hook]
+      pytest_runtest_protocol [hook]
+          item: <Function test_nav_bar_visible_after_scroll>
+          nextitem: <Function test_webdriver_manager_can_download>
+        pytest_runtest_logstart [hook]
+            nodeid: tests/test_nav_bar.py::TestNavBar::test_nav_bar_visible_after_scroll
+            location: ('tests/test_nav_bar.py', 22, 'TestNavBar.test_nav_bar_visible_after_scroll')
+        finish pytest_runtest_logstart --> [] [hook]
+        pytest_runtest_setup [hook]
+            item: <Function test_nav_bar_visible_after_scroll>
+          pytest_fixture_setup [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_nav_bar_visible_after_scroll>>
+          finish pytest_fixture_setup --> <selenium.webdriver.chrome.webdriver.WebDriver (session="a28b9b176c15ec6b6c761d93d86370f4")> [hook]
+          pytest_fixture_setup [hook]
+              fixturedef: <FixtureDef argname='do_login' scope='function' baseid=''>
+              request: <SubRequest 'do_login' for <Function test_nav_bar_visible_after_scroll>>
+        pytest_runtest_makereport [hook]
+            item: <Function test_nav_bar_visible_after_scroll>
+            call: <CallInfo when='setup' excinfo=<ExceptionInfo 登录交互失败: 找不到 Flutter 文本编辑 input tblen=37>>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_nav_bar.py::TestNavBar::test_nav_bar_visible_after_scroll' when='setup' outcome='skipped'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_nav_bar.py::TestNavBar::test_nav_bar_visible_after_scroll' when='setup' outcome='skipped'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_nav_bar.py::TestNavBar::test_nav_bar_visible_after_scroll' when='setup' outcome='skipped'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('skipped', 's', 'SKIPPED') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_teardown [hook]
+            item: <Function test_nav_bar_visible_after_scroll>
+            nextitem: <Function test_webdriver_manager_can_download>
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='do_login' scope='function' baseid=''>
+              request: <SubRequest 'do_login' for <Function test_nav_bar_visible_after_scroll>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='do_login' scope='function' baseid=''>
+              request: <SubRequest 'do_login' for <Function test_nav_bar_visible_after_scroll>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_nav_bar_visible_after_scroll>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+        finish pytest_runtest_teardown --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_nav_bar_visible_after_scroll>
+            call: <CallInfo when='teardown' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_nav_bar.py::TestNavBar::test_nav_bar_visible_after_scroll' when='teardown' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_nav_bar.py::TestNavBar::test_nav_bar_visible_after_scroll' when='teardown' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_nav_bar.py::TestNavBar::test_nav_bar_visible_after_scroll' when='teardown' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_logfinish [hook]
+            nodeid: tests/test_nav_bar.py::TestNavBar::test_nav_bar_visible_after_scroll
+            location: ('tests/test_nav_bar.py', 22, 'TestNavBar.test_nav_bar_visible_after_scroll')
+        finish pytest_runtest_logfinish --> [] [hook]
+      finish pytest_runtest_protocol --> True [hook]
+      pytest_runtest_protocol [hook]
+          item: <Function test_webdriver_manager_can_download>
+          nextitem: <Function test_can_create_driver>
+        pytest_runtest_logstart [hook]
+            nodeid: tests/test_smoke.py::TestSeleniumFramework::test_webdriver_manager_can_download
+            location: ('tests/test_smoke.py', 30, 'TestSeleniumFramework.test_webdriver_manager_can_download')
+        finish pytest_runtest_logstart --> [] [hook]
+        pytest_runtest_setup [hook]
+            item: <Function test_webdriver_manager_can_download>
+          pytest_fixture_setup [hook]
+              fixturedef: <FixtureDef argname='chromedriver_path' scope='session' baseid='tests/test_smoke.py'>
+              request: <SubRequest 'chromedriver_path' for <Function test_webdriver_manager_can_download>>
+          finish pytest_fixture_setup --> /Users/mac/.wdm/drivers/chromedriver/mac-arm64/148.0.7778.178/chromedriver-mac-arm64/chromedriver [hook]
+        finish pytest_runtest_setup --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_webdriver_manager_can_download>
+            call: <CallInfo when='setup' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_webdriver_manager_can_download' when='setup' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_webdriver_manager_can_download' when='setup' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_webdriver_manager_can_download' when='setup' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_call [hook]
+            item: <Function test_webdriver_manager_can_download>
+          pytest_pyfunc_call [hook]
+              pyfuncitem: <Function test_webdriver_manager_can_download>
+          finish pytest_pyfunc_call --> True [hook]
+        finish pytest_runtest_call --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_webdriver_manager_can_download>
+            call: <CallInfo when='call' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_webdriver_manager_can_download' when='call' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_webdriver_manager_can_download' when='call' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_webdriver_manager_can_download' when='call' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('passed', '.', 'PASSED') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_teardown [hook]
+            item: <Function test_webdriver_manager_can_download>
+            nextitem: <Function test_can_create_driver>
+        finish pytest_runtest_teardown --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_webdriver_manager_can_download>
+            call: <CallInfo when='teardown' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_webdriver_manager_can_download' when='teardown' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_webdriver_manager_can_download' when='teardown' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_webdriver_manager_can_download' when='teardown' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_logfinish [hook]
+            nodeid: tests/test_smoke.py::TestSeleniumFramework::test_webdriver_manager_can_download
+            location: ('tests/test_smoke.py', 30, 'TestSeleniumFramework.test_webdriver_manager_can_download')
+        finish pytest_runtest_logfinish --> [] [hook]
+      finish pytest_runtest_protocol --> True [hook]
+      pytest_runtest_protocol [hook]
+          item: <Function test_can_create_driver>
+          nextitem: <Function test_driver_can_navigate>
+        pytest_runtest_logstart [hook]
+            nodeid: tests/test_smoke.py::TestSeleniumFramework::test_can_create_driver
+            location: ('tests/test_smoke.py', 34, 'TestSeleniumFramework.test_can_create_driver')
+        finish pytest_runtest_logstart --> [] [hook]
+        pytest_runtest_setup [hook]
+            item: <Function test_can_create_driver>
+          pytest_fixture_setup [hook]
+              fixturedef: <FixtureDef argname='chrome_driver' scope='function' baseid='tests/test_smoke.py'>
+              request: <SubRequest 'chrome_driver' for <Function test_can_create_driver>>
+          finish pytest_fixture_setup --> <selenium.webdriver.chrome.webdriver.WebDriver (session="6e8a5287c1c89af4246a2b7cbc07827a")> [hook]
+        finish pytest_runtest_setup --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_can_create_driver>
+            call: <CallInfo when='setup' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_can_create_driver' when='setup' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_can_create_driver' when='setup' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_can_create_driver' when='setup' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_call [hook]
+            item: <Function test_can_create_driver>
+          pytest_pyfunc_call [hook]
+              pyfuncitem: <Function test_can_create_driver>
+          finish pytest_pyfunc_call --> True [hook]
+        finish pytest_runtest_call --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_can_create_driver>
+            call: <CallInfo when='call' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_can_create_driver' when='call' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_can_create_driver' when='call' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_can_create_driver' when='call' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('passed', '.', 'PASSED') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_teardown [hook]
+            item: <Function test_can_create_driver>
+            nextitem: <Function test_driver_can_navigate>
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='chrome_driver' scope='function' baseid='tests/test_smoke.py'>
+              request: <SubRequest 'chrome_driver' for <Function test_can_create_driver>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+        finish pytest_runtest_teardown --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_can_create_driver>
+            call: <CallInfo when='teardown' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_can_create_driver' when='teardown' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_can_create_driver' when='teardown' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_can_create_driver' when='teardown' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_logfinish [hook]
+            nodeid: tests/test_smoke.py::TestSeleniumFramework::test_can_create_driver
+            location: ('tests/test_smoke.py', 34, 'TestSeleniumFramework.test_can_create_driver')
+        finish pytest_runtest_logfinish --> [] [hook]
+      finish pytest_runtest_protocol --> True [hook]
+      pytest_runtest_protocol [hook]
+          item: <Function test_driver_can_navigate>
+          nextitem: None
+        pytest_runtest_logstart [hook]
+            nodeid: tests/test_smoke.py::TestSeleniumFramework::test_driver_can_navigate
+            location: ('tests/test_smoke.py', 38, 'TestSeleniumFramework.test_driver_can_navigate')
+        finish pytest_runtest_logstart --> [] [hook]
+        pytest_runtest_setup [hook]
+            item: <Function test_driver_can_navigate>
+          pytest_fixture_setup [hook]
+              fixturedef: <FixtureDef argname='chrome_driver' scope='function' baseid='tests/test_smoke.py'>
+              request: <SubRequest 'chrome_driver' for <Function test_driver_can_navigate>>
+          finish pytest_fixture_setup --> <selenium.webdriver.chrome.webdriver.WebDriver (session="3afdb14662394e05ab551732c7847f32")> [hook]
+        finish pytest_runtest_setup --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_driver_can_navigate>
+            call: <CallInfo when='setup' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_driver_can_navigate' when='setup' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_driver_can_navigate' when='setup' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_driver_can_navigate' when='setup' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_call [hook]
+            item: <Function test_driver_can_navigate>
+          pytest_pyfunc_call [hook]
+              pyfuncitem: <Function test_driver_can_navigate>
+          finish pytest_pyfunc_call --> True [hook]
+        finish pytest_runtest_call --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_driver_can_navigate>
+            call: <CallInfo when='call' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_driver_can_navigate' when='call' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_driver_can_navigate' when='call' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_driver_can_navigate' when='call' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('passed', '.', 'PASSED') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_teardown [hook]
+            item: <Function test_driver_can_navigate>
+            nextitem: None
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='chrome_driver' scope='function' baseid='tests/test_smoke.py'>
+              request: <SubRequest 'chrome_driver' for <Function test_driver_can_navigate>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='chrome_driver' scope='function' baseid='tests/test_smoke.py'>
+              request: <SubRequest 'chrome_driver' for <Function test_driver_can_navigate>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='chrome_driver' scope='function' baseid='tests/test_smoke.py'>
+              request: <SubRequest 'chrome_driver' for <Function test_can_create_driver>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='chromedriver_path' scope='session' baseid='tests/test_smoke.py'>
+              request: <SubRequest 'chromedriver_path' for <Function test_webdriver_manager_can_download>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_nav_bar_visible_after_scroll>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_nav_bar_exists_and_has_tabs>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_navigation_tabs_and_pages>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_nav_bar_visible_after_login>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_login_with_invalid_credentials_shows_error>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_login_button_visible>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_text_input_visible>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_title_not_empty>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_page_opens>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='server_reachable' scope='session' baseid=''>
+              request: <SubRequest 'server_reachable' for <Function test_page_opens>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_nav_bar_visible_after_scroll>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_nav_bar_exists_and_has_tabs>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_navigation_tabs_and_pages>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_nav_bar_visible_after_login>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_login_with_invalid_credentials_shows_error>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_login_button_visible>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_text_input_visible>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_title_not_empty>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='driver' scope='function' baseid=''>
+              request: <SubRequest 'driver' for <Function test_page_opens>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='server_reachable' scope='session' baseid=''>
+              request: <SubRequest 'server_reachable' for <Function test_page_opens>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+          pytest_fixture_post_finalizer [hook]
+              fixturedef: <FixtureDef argname='base_url' scope='session' baseid=''>
+              request: <SubRequest 'base_url' for <Function test_page_opens>>
+          finish pytest_fixture_post_finalizer --> [] [hook]
+        finish pytest_runtest_teardown --> None [hook]
+        pytest_runtest_makereport [hook]
+            item: <Function test_driver_can_navigate>
+            call: <CallInfo when='teardown' result: None>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_driver_can_navigate' when='teardown' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_driver_can_navigate' when='teardown' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_smoke.py::TestSeleniumFramework::test_driver_can_navigate' when='teardown' outcome='passed'>
+              config: <_pytest.config.Config object at 0x1085dbe00>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_logfinish [hook]
+            nodeid: tests/test_smoke.py::TestSeleniumFramework::test_driver_can_navigate
+            location: ('tests/test_smoke.py', 38, 'TestSeleniumFramework.test_driver_can_navigate')
+        finish pytest_runtest_logfinish --> [] [hook]
+      finish pytest_runtest_protocol --> True [hook]
+    finish pytest_runtestloop --> True [hook]
+    pytest_sessionfinish [hook]
+        session: <Session  exitstatus=0 testsfailed=0 testscollected=12>
+        exitstatus: 0
+      pytest_terminal_summary [hook]
+          terminalreporter: <_pytest.terminal.TerminalReporter object at 0x1099682f0>
+          exitstatus: 0
+          config: <_pytest.config.Config object at 0x1085dbe00>
+      finish pytest_terminal_summary --> [] [hook]
+    finish pytest_sessionfinish --> [] [hook]
+    pytest_unconfigure [hook]
+        config: <_pytest.config.Config object at 0x1085dbe00>
+    finish pytest_unconfigure --> [] [hook]

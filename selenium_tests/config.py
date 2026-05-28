@@ -1,0 +1,18 @@
+import os
+
+BASE_URL = os.environ.get("TEST_BASE_URL", "http://localhost:8082")
+IMPLICIT_WAIT = 10
+PAGE_LOAD_TIMEOUT = 30
+BROWSER = os.environ.get("TEST_BROWSER", "chrome")
+HEADLESS = os.environ.get("TEST_HEADLESS", "true").lower() == "true"
+
+TEST_USERNAME = os.environ.get("TEST_USERNAME", "admin")
+TEST_PASSWORD = os.environ.get("TEST_PASSWORD", "password")
+DEBUG = os.environ.get("TEST_DEBUG", "false").lower() == "true"
+
+
+def debug_sleep(seconds: float = 1.5):
+    """调试模式下暂停指定秒数，便于观察操作过程。非调试模式立即返回。"""
+    if DEBUG:
+        import time
+        time.sleep(seconds)
