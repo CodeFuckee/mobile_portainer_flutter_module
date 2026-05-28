@@ -55,3 +55,24 @@ jobs:
             将 `web-build.zip` 解压后部署到任意静态文件服务器即可使用。
           files: web-build.zip
           prerelease: true
+
+      - name: 更新 latest 标签
+        run: |
+          git tag -f latest
+          git push -f origin latest
+
+      - name: 发布 Latest Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest Build
+          body: |
+            ## Portable CE Flutter Web 最新构建
+
+            - 提交: `${{ github.sha }}`
+            - 分支: `${{ github.ref_name }}`
+
+            将 `web-build.zip` 解压后部署到任意静态文件服务器即可使用。
+          files: web-build.zip
+          prerelease: false
+          make_latest: true
