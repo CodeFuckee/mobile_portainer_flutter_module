@@ -1,0 +1,71 @@
+stages:
+  - analyze
+  - build
+  - selenium
+
+variables:
+  FLUTTER_IMAGE: cirrusci/flutter:stable
+
+flutter_analyze:
+  image: ${FLUTTER_IMAGE}
+  stage: analyze
+  script:
+    - flutter pub get
+    - flutter analyze
+    - flutter test
+
+flutter_build_web:
+  image: ${FLUTTER_IMAGE}
+  stage: build
+  script:
+    - flutter pub get
+    - flutter build web
+
+# HarmonyOS HAR 构建需要 HarmonyOS SDK 和 DevEco Studio 工具链。
+# Runner 需安装以下环境：
+#   1. HarmonyOS SDK（通过 DevEco Studio 或命令行安装）
+#   2. Node.js >= 18（hvigor 构建工具依赖）
+#   3. ohpm（HarmonyOS 包管理器）
+# 推荐为此作业配置独立的 shell executor runner 并打上 ohos 标签。
+flutter_build_har:
+  image: ${FLUTTER_IMAGE}
+  stage: build
+  tags:
+    - ohos
+  script:
+    - flutter pub get
+    - flutter build har --release
+  allow_failure: true
+
+selenium_tests:
+  image: ${FLUTTER_IMAGE}
+  stage: selenium
+  before_script:
+    - flutter pub get
+    - flutter build web
+    # 安装 Chrome 浏览器
+    - apt-get update -qq && apt-get install -y -qq wget gnupg ca-certificates
+    - wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg
+    - echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
+    - apt-get update -qq && apt-get install -y -qq google-chrome-stable
+    # 安装 Python 测试依赖
+    - cd selenium_tests
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - pip install -r requirements.txt
+    - deactivate
+    - cd ..
+  script:
+    # 后台启动 Web 服务
+    - python3 -m http.server 8082 --directory build/web &
+    - sleep 3
+    # 运行 Selenium 测试
+    - cd selenium_tests
+    - source venv/bin/activate
+    - TEST_BASE_URL=http://localhost:8082 pytest tests/ -v --html=report.html --self-contained-html
+    - deactivate
+  artifacts:
+    when: always
+    paths:
+      - selenium_tests/report.html
+    expire_in: 7 days
