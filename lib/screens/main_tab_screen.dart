@@ -7,13 +7,12 @@ import 'home_screen.dart';
 import 'images_screen.dart';
 import 'resources_screen.dart';
 import 'settings_screen.dart';
-import 'login_screen.dart';
 import 'container_details_screen.dart';
 import '../widgets/resize_handle.dart';
+import '../theme/app_theme.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
-import '../services/auth_service.dart';
-import '../utils/platform_detector.dart';
+
 
 class MainTabScreen extends StatefulWidget {
   const MainTabScreen({super.key});
@@ -153,7 +152,7 @@ class _MainTabScreenState extends State<MainTabScreen> {
           layoutMode: _containerLayoutMode,
         ),
         ResourcesScreen(
-          bottomNavigationBar: bottomNavBar,
+          bottomNavBar: isWide ? bottomNavBar : null,
         ),
         SettingsScreen(
           key: _settingsKey,
@@ -176,17 +175,29 @@ class _MainTabScreenState extends State<MainTabScreen> {
         title: Text(_getTitle(t)),
         actions: _buildActions(t, currentEffectiveMode),
       ),
-      extendBody: true,
-      body: body,
-      bottomNavigationBar: (isWide && _selectedIndex == 2) ? null : bottomNavBar,
-      floatingActionButton: _selectedIndex != 1
-          ? null
-          : FloatingActionButton(
+      body: Stack(
+        children: [
+          body,
+          if (!isWide || _selectedIndex != 2)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: bottomNavBar,
+            ),
+          if (_selectedIndex == 1)
+            Positioned(
+              right: 16,
+              bottom: AppTheme.fabBottomInset,
+              child: FloatingActionButton(
                 onPressed: () {
                   _containersKey.currentState?.showRunContainerDialog();
                 },
                 child: const Icon(Icons.add),
               ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -209,30 +220,43 @@ class _MainTabScreenState extends State<MainTabScreen> {
                 title: Text(t.titleContainers),
                 actions: _buildActions(t, _containerLayoutMode),
               ),
-              body: HomeScreen(
-                key: _containersKey,
-                layoutMode: _containerLayoutMode,
-                onContainerSelected: (id, name, isSelf) {
-                  setState(() {
-                    if (_selectedContainerId == id) {
-                      _selectedContainerId = null;
-                      _selectedContainerName = null;
-                      _selectedContainerIsSelf = false;
-                    } else {
-                      _selectedContainerId = id;
-                      _selectedContainerName = name;
-                      _selectedContainerIsSelf = isSelf;
-                    }
-                  });
-                },
-                selectedContainerId: _selectedContainerId,
-              ),
-              bottomNavigationBar: _buildCustomBottomNavBar(context, t),
-              floatingActionButton: FloatingActionButton(
-                onPressed: () {
-                  _containersKey.currentState?.showRunContainerDialog();
-                },
-                child: const Icon(Icons.add),
+              body: Stack(
+                children: [
+                  HomeScreen(
+                    key: _containersKey,
+                    layoutMode: _containerLayoutMode,
+                    onContainerSelected: (id, name, isSelf) {
+                      setState(() {
+                        if (_selectedContainerId == id) {
+                          _selectedContainerId = null;
+                          _selectedContainerName = null;
+                          _selectedContainerIsSelf = false;
+                        } else {
+                          _selectedContainerId = id;
+                          _selectedContainerName = name;
+                          _selectedContainerIsSelf = isSelf;
+                        }
+                      });
+                    },
+                    selectedContainerId: _selectedContainerId,
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: _buildCustomBottomNavBar(context, t),
+                  ),
+                  Positioned(
+                    right: 16,
+                    bottom: AppTheme.fabBottomInset,
+                    child: FloatingActionButton(
+                      onPressed: () {
+                        _containersKey.currentState?.showRunContainerDialog();
+                      },
+                      child: const Icon(Icons.add),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -370,20 +394,6 @@ class _MainTabScreenState extends State<MainTabScreen> {
               : Theme.of(context).colorScheme.onSurfaceVariant,
         ),
       ),
-      const SizedBox(width: 8),
-      if (PlatformDetector.isWeb)
-        IconButton(
-          icon: const Icon(Icons.logout),
-          onPressed: () async {
-            await AuthService.logout();
-            if (context.mounted) {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-              );
-            }
-          },
-          tooltip: t.btnLogout,
-        ),
     ];
   }
 

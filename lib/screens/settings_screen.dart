@@ -16,6 +16,7 @@ import '../services/harmonyos_shared_prefs.dart';
 import '../utils/platform_detector.dart';
 import '../widgets/loading_view.dart';
 import 'api_keys_screen.dart';
+import 'login_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   final VoidCallback? onSaved;
@@ -540,6 +541,20 @@ class SettingsScreenState extends State<SettingsScreen> {
                             trailing: const Icon(Icons.chevron_right),
                           ),
                           const Divider(),
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(t.btnLogout),
+                            leading: const Icon(Icons.logout),
+                            onTap: () async {
+                              await AuthService.logout();
+                              if (context.mounted) {
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                                );
+                              }
+                            },
+                            trailing: const Icon(Icons.chevron_right),
+                          ),
                         ],
                         ListTile(
                           contentPadding: EdgeInsets.zero,

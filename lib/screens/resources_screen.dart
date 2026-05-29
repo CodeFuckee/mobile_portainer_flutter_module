@@ -13,12 +13,13 @@ import 'stack_containers_screen.dart';
 import 'volume_details_screen.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import '../services/docker_service.dart';
+import '../theme/app_theme.dart';
 import '../widgets/resize_handle.dart';
 
 class ResourcesScreen extends StatefulWidget {
-  final Widget? bottomNavigationBar;
+  final Widget? bottomNavBar;
 
-  const ResourcesScreen({super.key, this.bottomNavigationBar});
+  const ResourcesScreen({super.key, this.bottomNavBar});
 
   @override
   State<ResourcesScreen> createState() => _ResourcesScreenState();
@@ -115,7 +116,7 @@ class _ResourcesScreenState extends State<ResourcesScreen>
               if (_tabController.index == 0)
                 Positioned(
                   right: 16,
-                  bottom: 16,
+                  bottom: AppTheme.fabBottomInset,
                   child: FloatingActionButton(
                     onPressed: () => _showPullImageDialog(context),
                     child: const Icon(Icons.add),
@@ -213,10 +214,17 @@ class _ResourcesScreenState extends State<ResourcesScreen>
                 child: Stack(
                   children: [
                     _buildActiveListScreen(),
+                    if (widget.bottomNavBar != null)
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: widget.bottomNavBar!,
+                      ),
                     if (tabIndex == 0)
                       Positioned(
                         right: 16,
-                        bottom: 16,
+                        bottom: AppTheme.fabBottomInset,
                         child: FloatingActionButton(
                           onPressed: () => _showPullImageDialog(context),
                           child: const Icon(Icons.add),
@@ -225,7 +233,6 @@ class _ResourcesScreenState extends State<ResourcesScreen>
                   ],
                 ),
               ),
-              if (widget.bottomNavigationBar != null) widget.bottomNavigationBar!,
             ],
           ),
         ),

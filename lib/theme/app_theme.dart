@@ -4,6 +4,8 @@ import 'theme_extensions.dart';
 class AppTheme {
   AppTheme._();
 
+  static const double fabBottomInset = 88;
+
   // HarmonyOS-inspired light color scheme
   static const _lightColorScheme = ColorScheme(
     brightness: Brightness.light,

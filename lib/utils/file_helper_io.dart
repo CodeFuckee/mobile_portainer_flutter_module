@@ -48,6 +48,10 @@ class FileHelper {
     );
   }
 
+  static Future<void> triggerDownload(String name, Uint8List bytes) async {
+    throw UnsupportedError('triggerDownload is only supported on web');
+  }
+
   static Future<void> shareBytes(Uint8List bytes, String name, {String? text}) async {
     if (PlatformDetector.isOhos) {
       final tmpDir = await HarmonyosPlatform.getTemporaryDirectory();

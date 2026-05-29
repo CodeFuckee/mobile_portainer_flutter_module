@@ -61,6 +61,7 @@ class HomeScreenState extends State<HomeScreen> {
   WebSocketChannel? _eventChannel;
   Timer? _reconnectTimer;
   bool _isWsConnected = false;
+  bool _disposed = false;
   
   bool get _isCompactMode => widget.layoutMode == 'list';
 
@@ -72,6 +73,7 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _disposed = true;
     _reconnectTimer?.cancel();
     _searchController.dispose();
     _scrollController.dispose();
@@ -189,6 +191,7 @@ class HomeScreenState extends State<HomeScreen> {
 
       channel.stream.listen(
         (message) {
+          if (_disposed) return;
           debugPrint('WebSocket received: $message');
           if (mounted && !_isWsConnected) {
             setState(() {
@@ -199,7 +202,7 @@ class HomeScreenState extends State<HomeScreen> {
         },
         onError: (error) {
           debugPrint('WebSocket error: $error');
-          if (_eventChannel != channel) return;
+          if (_eventChannel != channel || _disposed) return;
 
           setState(() {
             _isWsConnected = false;
@@ -214,7 +217,7 @@ class HomeScreenState extends State<HomeScreen> {
         },
         onDone: () async {
           debugPrint('WebSocket closed');
-          if (_eventChannel != channel) return;
+          if (_eventChannel != channel || _disposed) return;
 
           setState(() {
             _isWsConnected = false;
