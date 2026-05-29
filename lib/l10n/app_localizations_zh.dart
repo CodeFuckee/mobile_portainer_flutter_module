@@ -146,6 +146,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sectionServers => '服务器列表';
 
   @override
+  String get sectionOther => '其他设置';
+
+  @override
   String get buttonAddServer => '添加服务器';
 
   @override

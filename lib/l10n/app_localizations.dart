@@ -365,6 +365,12 @@ abstract class AppLocalizations {
   /// **'Servers'**
   String get sectionServers;
 
+  /// No description provided for @sectionOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other Settings'**
+  String get sectionOther;
+
   /// No description provided for @buttonAddServer.
   ///
   /// In en, this message translates to:

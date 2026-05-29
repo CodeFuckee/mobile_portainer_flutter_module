@@ -44,6 +44,7 @@
   "optionUtcPlus1": "UTC+1 (Central Europe)",
   "msgOperationNotAllowed": "Operation not allowed for this container",
   "sectionServers": "Servers",
+  "sectionOther": "Other Settings",
   "buttonAddServer": "Add Server",
   "labelServerName": "Server Name",
   "msgServerAdded": "Server added",

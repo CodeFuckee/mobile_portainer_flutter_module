@@ -44,6 +44,7 @@
   "optionUtcPlus1": "UTC+1 (中欧)",
   "msgOperationNotAllowed": "不允许对该容器进行操作",
   "sectionServers": "服务器列表",
+  "sectionOther": "其他设置",
   "buttonAddServer": "添加服务器",
   "labelServerName": "服务器名称",
   "msgServerAdded": "已添加服务器",

@@ -146,6 +146,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sectionServers => 'Servers';
 
   @override
+  String get sectionOther => 'Other Settings';
+
+  @override
   String get buttonAddServer => 'Add Server';
 
   @override
