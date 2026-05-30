@@ -9,6 +9,9 @@ variables:
 flutter_analyze:
   image: ${FLUTTER_IMAGE}
   stage: analyze
+  tags:
+    - harmony
+    - flutter
   script:
     - flutter pub get
     - flutter analyze
@@ -17,6 +20,9 @@ flutter_analyze:
 flutter_build_web:
   image: ${FLUTTER_IMAGE}
   stage: build
+  tags:
+    - harmony
+    - flutter
   script:
     - flutter pub get
     - flutter build web
@@ -31,7 +37,8 @@ flutter_build_har:
   image: ${FLUTTER_IMAGE}
   stage: build
   tags:
-    - ohos
+    - harmony
+    - flutter
   script:
     - flutter pub get
     - flutter build har --release
@@ -40,6 +47,9 @@ flutter_build_har:
 selenium_tests:
   image: ${FLUTTER_IMAGE}
   stage: selenium
+  tags:
+    - harmony
+    - flutter
   before_script:
     - flutter pub get
     - flutter build web
