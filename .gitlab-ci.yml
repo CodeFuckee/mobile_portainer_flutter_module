@@ -4,7 +4,7 @@ stages:
   - selenium
 
 variables:
-  FLUTTER_IMAGE: cirrusci/flutter:stable
+  FLUTTER_IMAGE: docker.1ms/cirrusci/flutter:stable
 
 flutter_analyze:
   image: ${FLUTTER_IMAGE}
