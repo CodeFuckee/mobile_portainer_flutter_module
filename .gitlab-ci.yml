@@ -142,11 +142,10 @@ flutter_build_har:
     - flutter build har --release
 
 selenium_tests:
-  image: ${FLUTTER_IMAGE}
+  image: docker.1ms.run/selenium/standalone-chrome
   stage: selenium
   tags:
-    - harmony
-    - flutter
+    - linux
   before_script:
     - flutter pub get
     - flutter build web
