@@ -27,20 +27,23 @@ variables:
       # hvigor 不支持路径中有空格。设置 HVIGOR_USER_HOME 到无空格路径
       if (-not (Test-Path 'C:\hvigor_home')) { New-Item -ItemType Directory -Path 'C:\hvigor_home' -Force *>$null }
       $env:HVIGOR_USER_HOME = 'C:\hvigor_home'
-      # 创建 npm/node wrapper（无空格路径），通过 8.3 短路径转发到真实安装位置，绕过 D:\Program Files\nodejs 的空格问题
-      $npmPath = (Get-Command npm.cmd -ErrorAction SilentlyContinue).Source
-      if ($npmPath) {
-        $npmDir = Split-Path $npmPath -Parent
-        try { $shortDir = (New-Object -ComObject Scripting.FileSystemObject).GetFolder($npmDir).ShortPath } catch { $shortDir = $npmDir -replace 'Program Files', 'PROGRA~1' }
-        $wrapDir = 'C:\node_wrapper'
-        New-Item -ItemType Directory -Path $wrapDir -Force *>$null
-        "@echo off`r`n`"$shortDir\npm.cmd`" %*" | Out-File -FilePath "$wrapDir\npm.cmd" -Encoding ASCII
-        "@echo off`r`n`"$shortDir\npx.cmd`" %*" | Out-File -FilePath "$wrapDir\npx.cmd" -Encoding ASCII
-        "@echo off`r`n`"$shortDir\node.exe`" %*" | Out-File -FilePath "$wrapDir\node.cmd" -Encoding ASCII
-        # 替换 PATH 中带空格的 npm 目录为 wrapper 目录，避免 hvigor 解析到长路径
-        $env:Path = ($env:Path -replace [regex]::Escape($npmDir), $wrapDir)
-        Write-Host "Node wrappers created, short path: $shortDir"
+      # 下载 Portable Node.js 到 C:\nodejs（无空格），绕过 D:\Program Files\nodejs 的空格问题
+      if (-not (Test-Path 'C:\nodejs\npm.cmd')) {
+        Write-Host 'Downloading portable Node.js...'
+        $ProgressPreference = 'SilentlyContinue'
+        $nodeZip = "$env:TEMP\node-portable.zip"
+        $nodeExtract = "$env:TEMP\node-extract"
+        Remove-Item -Path $nodeExtract -Recurse -Force -ErrorAction SilentlyContinue
+        Invoke-WebRequest -Uri 'https://npmmirror.com/mirrors/node/v20.18.0/node-v20.18.0-win-x64.zip' -OutFile $nodeZip
+        Expand-Archive -Path $nodeZip -DestinationPath $nodeExtract -Force
+        $innerDir = Get-ChildItem -Path $nodeExtract -Directory | Select-Object -First 1
+        Remove-Item -Path 'C:\nodejs' -Recurse -Force -ErrorAction SilentlyContinue
+        Move-Item -Path $innerDir.FullName -Destination 'C:\nodejs'
+        Remove-Item $nodeZip -Force -ErrorAction SilentlyContinue
+        Remove-Item $nodeExtract -Recurse -Force -ErrorAction SilentlyContinue
+        Write-Host 'Portable Node.js installed to C:\nodejs'
       }
+      $env:Path = "C:\nodejs;$env:Path"
 
 flutter_analyze:
   extends: .shell_setup
