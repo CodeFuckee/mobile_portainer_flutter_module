@@ -11,7 +11,7 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
-from config import BASE_URL, IMPLICIT_WAIT, PAGE_LOAD_TIMEOUT, BROWSER, HEADLESS, TEST_USERNAME, TEST_PASSWORD
+from config import BASE_URL, MOCK_BACKEND_URL, IMPLICIT_WAIT, PAGE_LOAD_TIMEOUT, BROWSER, HEADLESS, TEST_USERNAME, TEST_PASSWORD
 
 # 底部导航标签名，供所有测试复用
 TAB_NAMES = ["Dashboard", "Containers", "Resources", "Settings"]
@@ -112,7 +112,10 @@ def base_url():
 
 @pytest.fixture(scope="session")
 def server_reachable(base_url):
-    return _is_server_reachable(base_url) and _try_http(base_url)
+    """检查前端和 mock 后端是否都可达。"""
+    frontend_ok = _is_server_reachable(base_url) and _try_http(base_url)
+    mock_ok = _try_http(f"{MOCK_BACKEND_URL}/info")
+    return frontend_ok and mock_ok
 
 
 @pytest.fixture(scope="function")

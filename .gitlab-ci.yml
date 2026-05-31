@@ -142,33 +142,26 @@ flutter_build_har:
     - flutter build har --release
 
 selenium_tests:
-  image: docker.1ms.run/selenium/standalone-chrome
   stage: selenium
   tags:
     - linux
   before_script:
     - flutter pub get
     - flutter build web
-    # 安装 Chrome 浏览器
-    - apt-get update -qq && apt-get install -y -qq wget gnupg ca-certificates
-    - wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg
-    - echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
-    - apt-get update -qq && apt-get install -y -qq google-chrome-stable
     # 安装 Python 测试依赖
     - cd selenium_tests
     - python3 -m venv venv
     - source venv/bin/activate
     - pip install -r requirements.txt
     - deactivate
-    - cd ..
+    - cd "$CI_PROJECT_DIR"
   script:
-    # 后台启动 Web 服务
-    - python3 -m http.server 8082 --directory build/web &
+    # 启动 mock 后端（同时提供 Flutter 静态文件 + Portainer API mock，单端口同源）
+    - cd selenium_tests && source venv/bin/activate && python mock_backend.py &
     - sleep 3
-    # 运行 Selenium 测试
-    - cd selenium_tests
+    - cd "$CI_PROJECT_DIR/selenium_tests"
     - source venv/bin/activate
-    - TEST_BASE_URL=http://localhost:8082 pytest tests/ -v --html=report.html --self-contained-html
+    - TEST_BASE_URL=http://localhost:9000 pytest tests/ -v --html=report.html --self-contained-html
     - deactivate
   artifacts:
     when: always

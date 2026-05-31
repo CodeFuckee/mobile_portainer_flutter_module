@@ -1,0 +1,198 @@
+#!/usr/bin/env python3
+"""Mock Portainer API 服务器。
+
+同时提供：
+1. Flutter Web 静态文件服务（从 ../build/web 目录）
+2. Portainer API mock 端点
+
+生产模式下 Flutter Web 的 LoginScreen._serverUrl 返回 Uri.base.origin，
+即前后端同源，所以必须用同一个端口。
+"""
+
+import json
+import os
+import sys
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+
+MOCK_API_KEY = "mock-api-key-for-testing"
+FLUTTER_BUILD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "build", "web")
+PORT = int(os.environ.get("MOCK_BACKEND_PORT", "9000"))
+
+SAMPLE_CONTAINERS = [
+    {
+        "id": "abc123def456",
+        "name": "nginx-proxy",
+        "image": "nginx:alpine",
+        "status": "running",
+        "ports": "80:80, 443:443",
+        "stack": "web",
+        "created": "2024-01-01T00:00:00Z",
+    },
+    {
+        "id": "def789ghi012",
+        "name": "redis-cache",
+        "image": "redis:7-alpine",
+        "status": "running",
+        "ports": "6379:6379",
+        "stack": "",
+        "created": "2024-01-02T00:00:00Z",
+    },
+    {
+        "id": "ghi345jkl678",
+        "name": "old-app",
+        "image": "myapp:1.0",
+        "status": "exited",
+        "ports": "",
+        "stack": "",
+        "created": "2024-01-03T00:00:00Z",
+    },
+    {
+        "id": "jkl901mno234",
+        "name": "postgres-db",
+        "image": "postgres:15",
+        "status": "running",
+        "ports": "5432:5432",
+        "stack": "database",
+        "created": "2024-01-04T00:00:00Z",
+    },
+]
+
+SAMPLE_IMAGES = [
+    {"id": "sha256:abc123", "name": "nginx:alpine", "size": "40MB", "created": "2024-01-01T00:00:00Z"},
+    {"id": "sha256:def456", "name": "redis:7-alpine", "size": "30MB", "created": "2024-01-02T00:00:00Z"},
+    {"id": "sha256:ghi789", "name": "postgres:15", "size": "200MB", "created": "2024-01-03T00:00:00Z"},
+]
+
+SAMPLE_VOLUMES = {
+    "Volumes": [
+        {"Name": "nginx_data", "Driver": "local", "Mountpoint": "/var/lib/docker/volumes/nginx_data"},
+        {"Name": "postgres_data", "Driver": "local", "Mountpoint": "/var/lib/docker/volumes/postgres_data"},
+    ]
+}
+
+SAMPLE_NETWORKS = [
+    {"Name": "bridge", "Id": "abc123", "Driver": "bridge", "Scope": "local"},
+    {"Name": "host", "Id": "def456", "Driver": "host", "Scope": "local"},
+]
+
+SAMPLE_STACKS = ["web", "database"]
+
+SAMPLE_INFO = {
+    "version": "2.19.0",
+    "platform": "linux",
+    "containers": 3,
+    "images": 5,
+    "volumes": 2,
+    "networks": 3,
+}
+
+SAMPLE_USAGE = {
+    "cpu": 35.5,
+    "memory": 62.3,
+    "disk": 45.1,
+}
+
+
+class MockHandler(SimpleHTTPRequestHandler):
+    """处理 API 请求 + 静态文件回退。"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=FLUTTER_BUILD_DIR, **kwargs)
+
+    def log_message(self, format, *args):
+        sys.stderr.write("[mock_backend] %s - %s\n" % (self.address_string(), format % args))
+
+    def _send_json(self, data, status=200):
+        body = json.dumps(data, ensure_ascii=False).encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _read_body(self):
+        length = int(self.headers.get("Content-Length", 0))
+        if length > 0:
+            return self.rfile.read(length)
+        return b""
+
+    def do_POST(self):
+        if self.path == "/admin/login":
+            user = self.headers.get("X-Admin-User", "")
+            password = self.headers.get("X-Admin-Pass", "")
+            if user.startswith("__invalid") or password.startswith("__invalid"):
+                self._send_json({"message": "Invalid credentials"}, 401)
+            else:
+                self._send_json({"key": MOCK_API_KEY})
+        elif self.path == "/api/auth":
+            self._send_json({"jwt": MOCK_API_KEY})
+        else:
+            self._send_json({"message": "not found"}, 404)
+
+    def do_GET(self):
+        path = self.path.split("?")[0]
+
+        if path == "/containers/summary":
+            self._send_json(SAMPLE_CONTAINERS)
+        elif path == "/images":
+            self._send_json(SAMPLE_IMAGES)
+        elif path == "/volumes":
+            self._send_json(SAMPLE_VOLUMES)
+        elif path == "/networks":
+            self._send_json(SAMPLE_NETWORKS)
+        elif path == "/stacks":
+            self._send_json(SAMPLE_STACKS)
+        elif path == "/info":
+            self._send_json(SAMPLE_INFO)
+        elif path == "/usage":
+            self._send_json(SAMPLE_USAGE)
+        elif path == "/admin/keys":
+            self._send_json([])
+        elif path.startswith("/containers/") and "/files" in path:
+            self._send_json([])
+        elif path.startswith("/containers/") and "/logs" in path:
+            self._send_json({"logs": "[mock] no logs available"})
+        elif path.startswith("/containers/") and "/download" in path:
+            self._send_json({}, 404)
+        elif path == "/git/version":
+            self._send_json({"version": "2.19.0"})
+        elif path == "/ports/available":
+            self._send_json({"ports": []})
+        elif path.startswith("/ws/"):
+            self._send_json({"message": "WebSocket not supported in mock"}, 400)
+        elif path == "/api/auth":
+            self._send_json({"message": "use POST"}, 405)
+        elif path == "/admin/keys":
+            self._send_json([])
+        else:
+            # 回退到静态文件服务
+            super().do_GET()
+
+    def do_DELETE(self):
+        self._send_json({}, 204)
+
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-API-Key, X-Admin-User, X-Admin-Pass")
+        self.end_headers()
+
+
+def main():
+    if not os.path.isdir(FLUTTER_BUILD_DIR):
+        print(f"[mock_backend] WARNING: Flutter build dir not found: {FLUTTER_BUILD_DIR}")
+        print("[mock_backend] Run 'flutter build web' first, or set MOCK_BACKEND_PORT and serve separately.")
+
+    server = HTTPServer(("0.0.0.0", PORT), MockHandler)
+    print(f"[mock_backend] Listening on http://0.0.0.0:{PORT}")
+    print(f"[mock_backend] Serving static files from: {FLUTTER_BUILD_DIR}")
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        server.shutdown()
+
+
+if __name__ == "__main__":
+    main()

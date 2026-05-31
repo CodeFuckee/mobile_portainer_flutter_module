@@ -1,6 +1,7 @@
 import os
 
-BASE_URL = os.environ.get("TEST_BASE_URL", "http://localhost:8082")
+BASE_URL = os.environ.get("TEST_BASE_URL", "http://localhost:9000")
+MOCK_BACKEND_URL = os.environ.get("MOCK_BACKEND_URL", "http://localhost:9000")
 IMPLICIT_WAIT = 10
 PAGE_LOAD_TIMEOUT = 30
 BROWSER = os.environ.get("TEST_BROWSER", "chrome")
