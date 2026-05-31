@@ -5,6 +5,9 @@ stages:
 
 variables:
   FLUTTER_IMAGE: docker.1ms/cirrusci/flutter:stable
+  # 禁止 GitLab Runner 的 git clean，因为 .ohos 构建产物路径超过 Windows MAX_PATH (260)
+  # 改用 before_script 中的 PowerShell 清理（能正确处理长路径）
+  GIT_CLEAN_FLAGS: none
   # 以下路径变量不在 YAML 中硬编码，优先从 Runner config.toml 的 environment 或
   # GitLab 项目 Settings → CI/CD → Variables 读取。before_script 中的 foreach
   # 会自动检测常见路径作为兜底。
@@ -15,6 +18,11 @@ variables:
 .shell_setup:
   before_script:
     - |
+      # 清理构建产物（替代 git clean，因 .ohos 长路径超过 Windows MAX_PATH 260 字符限制）
+      $dirsToClean = @("$CI_PROJECT_DIR\.dart_tool", "$CI_PROJECT_DIR\build", "$CI_PROJECT_DIR\.android", "$CI_PROJECT_DIR\.ios", "$CI_PROJECT_DIR\.ohos", "$CI_PROJECT_DIR\macos\Flutter\ephemeral")
+      foreach ($d in $dirsToClean) { if (Test-Path $d) { cmd /c "rmdir /s /q `"\\?\$d`"" 2>$null } }
+      $filesToClean = @("$CI_PROJECT_DIR\.flutter-plugins-dependencies")
+      foreach ($f in $filesToClean) { if (Test-Path $f) { Remove-Item -Path $f -Force -ErrorAction SilentlyContinue } }
       chcp.com 65001 2>$null
       [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
       $OutputEncoding = [System.Text.Encoding]::UTF8
