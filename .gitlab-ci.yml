@@ -16,6 +16,8 @@ flutter_analyze:
     - flutter pub get
     - flutter analyze
     - flutter test
+  before_script:
+    - chcp.com 65001
 
 flutter_build_web:
   image: ${FLUTTER_IMAGE}
@@ -26,6 +28,8 @@ flutter_build_web:
   script:
     - flutter pub get
     - flutter build web
+  before_script:
+    - chcp.com 65001
 
 # HarmonyOS HAR 构建需要 HarmonyOS SDK 和 DevEco Studio 工具链。
 # Runner 需安装以下环境：
@@ -42,7 +46,8 @@ flutter_build_har:
   script:
     - flutter pub get
     - flutter build har --release
-  allow_failure: true
+  before_script:
+    - chcp.com 65001
 
 selenium_tests:
   image: ${FLUTTER_IMAGE}
@@ -51,6 +56,7 @@ selenium_tests:
     - harmony
     - flutter
   before_script:
+    - chcp.com 65001
     - flutter pub get
     - flutter build web
     # 安装 Chrome 浏览器
