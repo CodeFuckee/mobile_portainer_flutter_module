@@ -24,6 +24,17 @@ variables:
       foreach ($p in @($env:FLUTTER_ROOT, 'C:\flutter', "$env:USERPROFILE\flutter", "$env:USERPROFILE\fvm\default")) { if ($p -and (Test-Path "$p\bin\flutter.bat")) { $env:Path = "$p\bin;$env:Path"; git config --global --add safe.directory $p; break } }
       # 设置 HarmonyOS/OpenHarmony SDK 路径，Flutter ohos 分支要求通过 config 或特定目录结构校验
       foreach ($p in @($env:OHOS_SDK_HOME, $env:OHOS_HOME, $env:HOS_SDK_HOME)) { if ($p -and (Test-Path $p)) { flutter config --ohos-sdk $p; break } }
+      # HVIGOR_USER_HOME 不能包含空格，hvigor wrapper 内部调 npm 会失败
+      if (-not (Test-Path 'C:\hvigor_home')) { New-Item -ItemType Directory -Path 'C:\hvigor_home' -Force *>$null }
+      $env:HVIGOR_USER_HOME = 'C:\hvigor_home'
+      # 用 8.3 短路径避开 D:\Program Files\nodejs 中的空格，确保 hvigor 能无空格调用 npm
+      $npmPath = (Get-Command npm.cmd -ErrorAction SilentlyContinue).Source
+      if ($npmPath) {
+        $npmDir = Split-Path $npmPath -Parent
+        # 获取短路径（8.3 格式），不含空格
+        $shortNpmDir = (New-Object -ComObject Scripting.FileSystemObject).GetFolder($npmDir).ShortPath
+        $env:Path = "$shortNpmDir;$env:Path"
+      }
 
 flutter_analyze:
   extends: .shell_setup
@@ -64,7 +75,6 @@ flutter_build_har:
   script:
     - flutter pub get
     - flutter build har --release
-  allow_failure: true
 
 selenium_tests:
   image: ${FLUTTER_IMAGE}
