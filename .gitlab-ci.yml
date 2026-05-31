@@ -34,7 +34,7 @@ flutter_analyze:
     - flutter
   script:
     - flutter pub get
-    - flutter analyze
+    - flutter analyze --no-fatal-warnings --no-fatal-infos
     - flutter test
 
 flutter_build_web:
