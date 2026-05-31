@@ -54,33 +54,46 @@ variables:
       # 显式设置 NODE_HOME，确保 hvigor 使用 D:\nodejs（无空格），同时配置 npm 国内镜像
       $env:NODE_HOME = 'D:\nodejs'
       $env:Path = "D:\nodejs;$env:Path"
-      # 使用 npm config set 持久化配置（确保 hvigor 子进程也能读取）
+      # 持久化 npm registry 配置（hvigor 子进程通过 .npmrc 继承）
       npm config set registry https://registry.npmmirror.com
-      npm config set prefix "$CI_PROJECT_DIR\.npm-global"
-      New-Item -ItemType Directory -Path "$CI_PROJECT_DIR\.npm-global" -Force *>$null
-      $env:Path = "$CI_PROJECT_DIR\.npm-global;$env:Path"
+      # 删除之前可能设置的 prefix 配置，避免干扰 hvigor 的 npm install pnpm 调用
+      npm config delete prefix 2>$null
+      # 清理 SYSTEM 账户的 npm 缓存，避免缓存损坏导致静默失败
+      npm cache clean --force 2>$null
       Write-Host "Node.js at D:\nodejs, npm registry: https://registry.npmmirror.com"
-      # hvigor 在 ~/.hvigor/wrapper/tools/ 下本地安装 pnpm（非全局），
-      # 由于 SYSTEM 账户 home 目录权限问题，npm 在 hvigor 子进程中可能静默失败。
-      # 提前在该目录执行 npm install pnpm，让 hvigor 跳过安装。
+      # hvigor 构建时会通过 npm 安装 pnpm@10.28.2，但作为子进程运行时可能因环境差异静默失败。
+      # 策略：在 hvigor 会查找的每个路径预装 pnpm@10.28.2，让 hvigor 发现已有 pnpm 而跳过安装。
+      #
+      # 1) 安装 pnpm 到 NODE_HOME (D:\nodejs)，使 pnpm.cmd 和 npm.cmd 在同一目录，
+      #    hvigor-wrapper.js 通常先在此目录查找 PNPM_TOOL
+      Write-Host "Installing pnpm@10.28.2 to NODE_HOME..."
+      Push-Location D:\nodejs
+      try {
+        npm install pnpm@10.28.2 --no-save --no-audit --no-fund 2>&1
+        if ($LASTEXITCODE -ne 0) { Write-Error "pnpm install to NODE_HOME failed"; exit 1 }
+        Write-Host "pnpm installed at D:\nodejs"
+      } finally {
+        Pop-Location
+      }
+      # 2) 安装 pnpm 到 HVIGOR_USER_HOME wrapper tools 目录
       Write-Host "Pre-installing pnpm for hvigor wrapper..."
       $hvigorToolsDir = "$env:HVIGOR_USER_HOME\.hvigor\wrapper\tools"
       New-Item -ItemType Directory -Path $hvigorToolsDir -Force -ErrorAction SilentlyContinue *>$null
       Push-Location $hvigorToolsDir
       try {
-        npm install pnpm --no-save --no-audit --no-fund 2>&1
+        npm install pnpm@10.28.2 --no-save --no-audit --no-fund 2>&1
         if ($LASTEXITCODE -ne 0) { Write-Error "pnpm pre-install failed"; exit 1 }
         Write-Host "pnpm pre-installed at: $hvigorToolsDir"
       } finally {
         Pop-Location
       }
-      # 同时也在 SYSTEM 默认 home 目录安装，防止 hvigor 不使用 HVIGOR_USER_HOME
+      # 3) 也在 SYSTEM 默认 home 目录安装，防止 hvigor 未使用 HVIGOR_USER_HOME
       if ($env:USERPROFILE -and ($env:USERPROFILE -ne $env:HVIGOR_USER_HOME)) {
         $systemHvigorToolsDir = "$env:USERPROFILE\.hvigor\wrapper\tools"
         New-Item -ItemType Directory -Path $systemHvigorToolsDir -Force -ErrorAction SilentlyContinue *>$null
         Push-Location $systemHvigorToolsDir
         try {
-          npm install pnpm --no-save --no-audit --no-fund 2>&1
+          npm install pnpm@10.28.2 --no-save --no-audit --no-fund 2>&1
           Write-Host "pnpm also installed at: $systemHvigorToolsDir"
         } finally {
           Pop-Location
