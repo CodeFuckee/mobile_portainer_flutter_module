@@ -54,30 +54,27 @@ variables:
       # 显式设置 NODE_HOME，确保 hvigor 使用 D:\nodejs（无空格），同时配置 npm 国内镜像
       $env:NODE_HOME = 'D:\nodejs'
       $env:Path = "D:\nodejs;$env:Path"
-      # 持久化 npm registry 配置（hvigor 子进程通过 .npmrc 继承）
+      # 通过环境变量设置 npm registry（hvigor 子进程继承 env 变量，无需依赖 .npmrc 文件）
+      $env:npm_config_registry = "https://registry.npmmirror.com"
+      # 同时持久化到 .npmrc 作为兜底
       npm config set registry https://registry.npmmirror.com
-      # 删除之前可能设置的 prefix 配置，避免干扰 hvigor 的 npm install pnpm 调用
-      npm config delete prefix 2>$null
-      # 清理 SYSTEM 账户的 npm 缓存，避免缓存损坏导致静默失败
+      # 清理 npm 缓存，避免 SYSTEM 账户缓存损坏导致 npm 子进程静默失败
       npm cache clean --force 2>$null
       Write-Host "Node.js at D:\nodejs, npm registry: https://registry.npmmirror.com"
-      # hvigor 构建时会通过 npm 安装 pnpm@10.28.2，但作为子进程运行时可能因环境差异静默失败。
-      # 策略：在 hvigor 会查找的每个路径预装 pnpm@10.28.2，让 hvigor 发现已有 pnpm 而跳过安装。
+      # hvigor 构建启动时会通过 npm install pnpm@10.28.2 安装 pnpm。
+      # 由于 hvigor 作为 Flutter 子进程运行时环境变量（PATH 被 _buildOhosEnvironment() 替换）
+      # 可能与 before_script 不同，导致 npm 调用静默失败（No stdout output）。
+      # 策略：在 hvigor 的 pnpm 安装目录预装精确版本，让 hvigor 发现已有匹配版本而跳过安装。
       #
-      # 1) 安装 pnpm 到 NODE_HOME (D:\nodejs)，使 pnpm.cmd 和 npm.cmd 在同一目录，
-      #    hvigor-wrapper.js 通常先在此目录查找 PNPM_TOOL
-      Write-Host "Installing pnpm@10.28.2 to NODE_HOME..."
-      Push-Location D:\nodejs
-      try {
-        npm install pnpm@10.28.2 --no-save --no-audit --no-fund 2>&1
-        if ($LASTEXITCODE -ne 0) { Write-Error "pnpm install to NODE_HOME failed"; exit 1 }
-        Write-Host "pnpm installed at D:\nodejs"
-      } finally {
-        Pop-Location
-      }
-      # 2) 安装 pnpm 到 HVIGOR_USER_HOME wrapper tools 目录
-      Write-Host "Pre-installing pnpm for hvigor wrapper..."
-      $hvigorToolsDir = "$env:HVIGOR_USER_HOME\.hvigor\wrapper\tools"
+      # 关键：getHvigorUserHomeCacheDir() 当 HVIGOR_USER_HOME 已设置时，直接将其作为
+      # 根目录（不再追加 .hvigor）。因此 tools 路径是 HVIGOR_USER_HOME/wrapper/tools，
+      # 而不是 HVIGOR_USER_HOME/.hvigor/wrapper/tools！
+      #
+      # 注意：千万不能在 D:\nodejs 内运行 npm install —— 那会损坏 Node.js 自带的
+      # npm 包（D:\nodejs\node_modules\npm\），导致 npm 彻底不可用！
+      Write-Host "Pre-installing pnpm@10.28.2 for hvigor wrapper..."
+      # HVIGOR_USER_HOME 被当作根目录直接使用，不追加 .hvigor
+      $hvigorToolsDir = "$env:HVIGOR_USER_HOME\wrapper\tools"
       New-Item -ItemType Directory -Path $hvigorToolsDir -Force -ErrorAction SilentlyContinue *>$null
       Push-Location $hvigorToolsDir
       try {
@@ -87,7 +84,7 @@ variables:
       } finally {
         Pop-Location
       }
-      # 3) 也在 SYSTEM 默认 home 目录安装，防止 hvigor 未使用 HVIGOR_USER_HOME
+      # 备选：SYSTEM 默认 home 目录（当 HVIGOR_USER_HOME 未设置时，hvigor 使用 ~/.hvigor）
       if ($env:USERPROFILE -and ($env:USERPROFILE -ne $env:HVIGOR_USER_HOME)) {
         $systemHvigorToolsDir = "$env:USERPROFILE\.hvigor\wrapper\tools"
         New-Item -ItemType Directory -Path $systemHvigorToolsDir -Force -ErrorAction SilentlyContinue *>$null
