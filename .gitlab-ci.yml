@@ -36,7 +36,7 @@ variables:
       if (-not (Test-Path 'C:\hvigor_home')) { New-Item -ItemType Directory -Path 'C:\hvigor_home' -Force *>$null }
       $env:HVIGOR_USER_HOME = 'C:\hvigor_home'
       # 下载 Portable Node.js 到 C:\nodejs（无空格），绕过 D:\Program Files\nodejs 的空格问题
-      if (-not (Test-Path 'C:\nodejs\npm.cmd')) {
+      if (-not (Test-Path 'D:\nodejs\npm.cmd')) {
         Write-Host 'Downloading portable Node.js...'
         $ProgressPreference = 'SilentlyContinue'
         $nodeZip = "$env:TEMP\node-portable.zip"
@@ -45,13 +45,21 @@ variables:
         Invoke-WebRequest -Uri 'https://npmmirror.com/mirrors/node/v20.18.0/node-v20.18.0-win-x64.zip' -OutFile $nodeZip
         Expand-Archive -Path $nodeZip -DestinationPath $nodeExtract -Force
         $innerDir = Get-ChildItem -Path $nodeExtract -Directory | Select-Object -First 1
-        Remove-Item -Path 'C:\nodejs' -Recurse -Force -ErrorAction SilentlyContinue
-        Move-Item -Path $innerDir.FullName -Destination 'C:\nodejs'
+        Remove-Item -Path 'D:\nodejs' -Recurse -Force -ErrorAction SilentlyContinue
+        Move-Item -Path $innerDir.FullName -Destination 'D:\nodejs'
         Remove-Item $nodeZip -Force -ErrorAction SilentlyContinue
         Remove-Item $nodeExtract -Recurse -Force -ErrorAction SilentlyContinue
-        Write-Host 'Portable Node.js installed to C:\nodejs'
+        Write-Host 'Portable Node.js installed to D:\nodejs'
       }
-      $env:Path = "C:\nodejs;$env:Path"
+      # 显式设置 NODE_HOME，确保 hvigor 使用 C:\nodejs（无空格），同时配置 npm 国内镜像
+      $env:NODE_HOME = 'D:\nodejs'
+      $env:Path = "D:\nodejs;$env:Path"
+      $env:NPM_CONFIG_REGISTRY = 'https://registry.npmmirror.com'
+      # 设置 npm 全局安装目录到项目内，避免 SYSTEM 账户权限问题
+      $env:NPM_CONFIG_PREFIX = "$CI_PROJECT_DIR\.npm-global"
+      # 将 npm 全局 bin 目录也加入 PATH，确保 hvigor 能找到全局安装的 pnpm
+      $env:Path = "$env:NPM_CONFIG_PREFIX;$env:Path"
+      Write-Host "Node.js at D:\nodejs, npm registry: $env:NPM_CONFIG_REGISTRY"
 
 flutter_analyze:
   extends: .shell_setup
