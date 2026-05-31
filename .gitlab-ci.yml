@@ -5,8 +5,11 @@ stages:
 
 variables:
   FLUTTER_IMAGE: docker.1ms/cirrusci/flutter:stable
-  # Windows shell executor: Flutter 安装根目录，请根据实际路径在 GitLab CI/CD Variables 中覆盖此值
-  FLUTTER_ROOT: "D:\\Path\\flutter"
+  # 以下路径变量不在 YAML 中硬编码，优先从 Runner config.toml 的 environment 或
+  # GitLab 项目 Settings → CI/CD → Variables 读取。before_script 中的 foreach
+  # 会自动检测常见路径作为兜底。
+  # FLUTTER_ROOT: Flutter SDK 根目录，例如 D:\Path\flutter
+  # HOS_SDK_HOME: HarmonyOS SDK 目录，例如 D:\Program Files\Huawei\DevEco Studio\sdk
 
 # Shell executor 公共配置：UTF-8 编码修复 + Flutter PATH 自动检测
 .shell_setup:
@@ -20,6 +23,15 @@ variables:
     # 需要添加到 Git safe.directory 避免 "dubious ownership" 错误
     - git config --global --add safe.directory "$CI_PROJECT_DIR"
     - foreach ($p in @($env:FLUTTER_ROOT, 'C:\flutter', "$env:USERPROFILE\flutter", "$env:USERPROFILE\fvm\default")) { if ($p -and (Test-Path "$p\bin\flutter.bat")) { $env:Path = "$p\bin;$env:Path"; git config --global --add safe.directory $p; break } }
+    # 设置 HarmonyOS SDK 路径（analyze 和 build_web 也需要此环境变量）
+    - Write-Host "=== 调试 HOS_SDK_HOME ==="
+    - Write-Host "当前 HOS_SDK_HOME: $env:HOS_SDK_HOME"
+    - Write-Host "当前 USERPROFILE: $env:USERPROFILE"
+    - Write-Host "当前用户名: $env:USERNAME"
+    - whoami
+    - foreach ($p in @($env:HOS_SDK_HOME, "$env:USERPROFILE\AppData\Local\Huawei\DevEco Studio\sdk", "C:\Program Files\Huawei\DevEco Studio\sdk")) { Write-Host "检查路径: $p"; if ($p -and (Test-Path $p)) { Write-Host "  → 找到!"; $env:HOS_SDK_HOME = $p; break } else { Write-Host "  → 不存在" } }
+    - Write-Host "最终 HOS_SDK_HOME: $env:HOS_SDK_HOME"
+    - Write-Host "=== 调试结束 ==="
 
 flutter_analyze:
   extends: .shell_setup
