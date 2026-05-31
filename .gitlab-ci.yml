@@ -22,16 +22,8 @@ variables:
       $env:FLUTTER_STORAGE_BASE_URL = "https://storage.flutter-io.cn"
       git config --global --add safe.directory "$CI_PROJECT_DIR"
       foreach ($p in @($env:FLUTTER_ROOT, 'C:\flutter', "$env:USERPROFILE\flutter", "$env:USERPROFILE\fvm\default")) { if ($p -and (Test-Path "$p\bin\flutter.bat")) { $env:Path = "$p\bin;$env:Path"; git config --global --add safe.directory $p; break } }
-      Write-Host "=== SDK env debug ==="
-      Write-Host "whoami:"; whoami
-      Write-Host "USERPROFILE=$env:USERPROFILE"
-      Write-Host "HOS_SDK_HOME=$env:HOS_SDK_HOME"
-      Write-Host "DEVECO_SDK_HOME=$env:DEVECO_SDK_HOME"
-      Write-Host "OHOS_SDK_HOME=$env:OHOS_SDK_HOME"
-      Write-Host "OHOS_HOME=$env:OHOS_HOME"
-      where.exe hdc.exe 2>&1; Write-Host "where hdc exit=$LASTEXITCODE"
-      if ($env:DEVECO_SDK_HOME) { Write-Host "DEVECO_SDK dir exists=$(Test-Path $env:DEVECO_SDK_HOME)"; if (Test-Path $env:DEVECO_SDK_HOME) { Get-ChildItem $env:DEVECO_SDK_HOME -Depth 0 | Select-Object Name, PSIsContainer } }
-      if ($env:HOS_SDK_HOME) { Write-Host "HOS_SDK dir exists=$(Test-Path $env:HOS_SDK_HOME)"; if (Test-Path $env:HOS_SDK_HOME) { Get-ChildItem $env:HOS_SDK_HOME -Depth 0 | Select-Object Name, PSIsContainer } }
+      # 设置 HarmonyOS/OpenHarmony SDK 路径，Flutter ohos 分支要求通过 config 或特定目录结构校验
+      foreach ($p in @($env:OHOS_SDK_HOME, $env:OHOS_HOME, $env:HOS_SDK_HOME)) { if ($p -and (Test-Path $p)) { flutter config --ohos-sdk $p; break } }
 
 flutter_analyze:
   extends: .shell_setup
@@ -41,7 +33,6 @@ flutter_analyze:
     - harmony
     - flutter
   script:
-    - Write-Host "script>> HOS_SDK_HOME=$env:HOS_SDK_HOME"; Write-Host "script>> FLUTTER_STORAGE_BASE_URL=$env:FLUTTER_STORAGE_BASE_URL"
     - flutter pub get
     - flutter analyze
     - flutter test
