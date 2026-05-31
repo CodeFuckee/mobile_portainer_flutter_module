@@ -35,9 +35,13 @@ variables:
       # hvigor 不支持路径中有空格。设置 HVIGOR_USER_HOME 到无空格路径
       if (-not (Test-Path 'C:\hvigor_home')) { New-Item -ItemType Directory -Path 'C:\hvigor_home' -Force *>$null }
       $env:HVIGOR_USER_HOME = 'C:\hvigor_home'
-      # 下载 Portable Node.js 到 C:\nodejs（无空格），绕过 D:\Program Files\nodejs 的空格问题
-      if (-not (Test-Path 'D:\nodejs\npm.cmd')) {
-        Write-Host 'Downloading portable Node.js...'
+      # 下载 Portable Node.js 到 D:\nodejs（无空格），绕过 D:\Program Files\nodejs 的空格问题。
+      # 仅检查 npm.cmd 存在还不够 —— 之前的构建运行 `npm install` 在 D:\nodejs
+      # 可能损坏了 node_modules\npm\ 内部文件（如 npm-prefix.js）。
+      # 直接检查关键文件是否存在来判断 npm 是否健康。
+      if (-not (Test-Path 'D:\nodejs\node_modules\npm\bin\npm-prefix.js')) {
+        Write-Host 'Node.js installation broken or missing, re-downloading...'
+        Remove-Item -Path 'D:\nodejs' -Recurse -Force -ErrorAction SilentlyContinue
         $ProgressPreference = 'SilentlyContinue'
         $nodeZip = "$env:TEMP\node-portable.zip"
         $nodeExtract = "$env:TEMP\node-extract"
