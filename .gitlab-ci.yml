@@ -5,8 +5,21 @@ stages:
 
 variables:
   FLUTTER_IMAGE: docker.1ms/cirrusci/flutter:stable
+  # Windows shell executor: Flutter 安装根目录，请根据实际路径在 GitLab CI/CD Variables 中覆盖此值
+  FLUTTER_ROOT: "D:\\Path\\flutter"
+
+# Shell executor 公共配置：UTF-8 编码修复 + Flutter PATH 自动检测
+.shell_setup:
+  before_script:
+    - chcp.com 65001 2>$null
+    - '[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; $OutputEncoding = [System.Text.Encoding]::UTF8'
+    # Runner 以 SYSTEM 账户运行，Flutter SDK 和项目仓库归属于用户账户，
+    # 需要添加到 Git safe.directory 避免 "dubious ownership" 错误
+    - git config --global --add safe.directory "$CI_PROJECT_DIR"
+    - foreach ($p in @($env:FLUTTER_ROOT, 'C:\flutter', "$env:USERPROFILE\flutter", "$env:USERPROFILE\fvm\default")) { if ($p -and (Test-Path "$p\bin\flutter.bat")) { $env:Path = "$p\bin;$env:Path"; git config --global --add safe.directory $p; break } }
 
 flutter_analyze:
+  extends: .shell_setup
   image: ${FLUTTER_IMAGE}
   stage: analyze
   tags:
@@ -16,10 +29,9 @@ flutter_analyze:
     - flutter pub get
     - flutter analyze
     - flutter test
-  before_script:
-    - chcp.com 65001
 
 flutter_build_web:
+  extends: .shell_setup
   image: ${FLUTTER_IMAGE}
   stage: build
   tags:
@@ -28,8 +40,6 @@ flutter_build_web:
   script:
     - flutter pub get
     - flutter build web
-  before_script:
-    - chcp.com 65001
 
 # HarmonyOS HAR 构建需要 HarmonyOS SDK 和 DevEco Studio 工具链。
 # Runner 需安装以下环境：
@@ -38,6 +48,7 @@ flutter_build_web:
 #   3. ohpm（HarmonyOS 包管理器）
 # 推荐为此作业配置独立的 shell executor runner 并打上 ohos 标签。
 flutter_build_har:
+  extends: .shell_setup
   image: ${FLUTTER_IMAGE}
   stage: build
   tags:
@@ -46,8 +57,7 @@ flutter_build_har:
   script:
     - flutter pub get
     - flutter build har --release
-  before_script:
-    - chcp.com 65001
+  allow_failure: true
 
 selenium_tests:
   image: ${FLUTTER_IMAGE}
@@ -56,7 +66,6 @@ selenium_tests:
     - harmony
     - flutter
   before_script:
-    - chcp.com 65001
     - flutter pub get
     - flutter build web
     # 安装 Chrome 浏览器
