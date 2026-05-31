@@ -57,9 +57,15 @@ variables:
       $env:NPM_CONFIG_REGISTRY = 'https://registry.npmmirror.com'
       # 设置 npm 全局安装目录到项目内，避免 SYSTEM 账户权限问题
       $env:NPM_CONFIG_PREFIX = "$CI_PROJECT_DIR\.npm-global"
+      New-Item -ItemType Directory -Path "$env:NPM_CONFIG_PREFIX" -Force *>$null
       # 将 npm 全局 bin 目录也加入 PATH，确保 hvigor 能找到全局安装的 pnpm
       $env:Path = "$env:NPM_CONFIG_PREFIX;$env:Path"
       Write-Host "Node.js at D:\nodejs, npm registry: $env:NPM_CONFIG_REGISTRY"
+      # 预装 pnpm，hvigor 构建 HAR 时需要
+      Write-Host "Installing pnpm globally..."
+      npm install -g pnpm
+      if ($LASTEXITCODE -ne 0) { Write-Error "pnpm installation failed"; exit 1 }
+      Write-Host "pnpm installed successfully"
 
 flutter_analyze:
   extends: .shell_setup
