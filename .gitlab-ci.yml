@@ -145,7 +145,15 @@ selenium_tests:
   stage: selenium
   tags:
     - linux
+  variables:
+    # Flutter SDK 路径（chenkaidi 家目录下，已授权 gitlab-runner 组读取）
+    FLUTTER_ROOT: /home/chenkaidi/flutter
   before_script:
+    # 将 Flutter 加入 PATH
+    - export PATH="$FLUTTER_ROOT/bin:$PATH"
+    # Git 安全检查：gitlab-runner 用户操作 chenkaidi 拥有的仓库
+    - git config --global --add safe.directory "$FLUTTER_ROOT"
+    - git config --global --add safe.directory "$CI_PROJECT_DIR"
     - flutter pub get
     - flutter build web
     # 安装 Python 测试依赖
