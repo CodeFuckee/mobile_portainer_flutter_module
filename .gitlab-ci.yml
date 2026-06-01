@@ -149,28 +149,9 @@ selenium_tests:
   stage: selenium
   tags:
     - linux
-  variables:
-    FLUTTER_ROOT: /home/chenkaidi/flutter
-    PUB_HOSTED_URL: "https://pub.flutter-io.cn"
-    FLUTTER_STORAGE_BASE_URL: "https://storage.flutter-io.cn"
-  needs:
-    - job: flutter_build_web
-      artifacts: true
-      optional: true
+  dependencies:
+    - flutter_build_web
   before_script:
-    - export PATH="$FLUTTER_ROOT/bin:$PATH"
-    - git config --global --add safe.directory "$FLUTTER_ROOT"
-    - git config --global --add safe.directory "$CI_PROJECT_DIR"
-    # 优先复用 flutter_build_web 的 artifacts；若不可用则本地构建
-    - |
-      if [ -d "build/web" ] && [ -f "build/web/index.html" ]; then
-        echo "使用 flutter_build_web 的构建产物"
-      else
-        echo "产物不可用，本地构建 Web..."
-        flutter pub get
-        flutter build web
-      fi
-    # 安装 Python 测试依赖
     - cd selenium_tests
     - python3 -m venv venv
     - source venv/bin/activate
