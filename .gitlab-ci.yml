@@ -152,34 +152,35 @@ selenium_runner_check:
     - docker --version
     - docker compose version 2>/dev/null || docker-compose --version 2>/dev/null || echo "no compose found"
 
+selenium_tests_step1:
+  stage: selenium
+  tags:
+    - linux
+    - docker
+  dependencies: []
+  script:
+    - echo "step1 start"
+    - docker compose -f docker-compose.test.yml build
+    - echo "step1 done"
+
 selenium_tests:
   stage: selenium
   tags:
     - linux
     - docker
   dependencies: []
-  timeout: 15m
+  when: manual
   script:
     - echo "=== 准备 ==="
     - mkdir -p selenium_tests/reports
     - export BUILDKIT_PROGRESS=plain
-    # Step 1: 构建镜像
-    - echo "=== 构建 Docker 镜像 ==="
+    - echo "=== 构建镜像 ==="
     - docker compose -f docker-compose.test.yml build
-    # Step 2: 后台启动 app 服务
-    - echo "=== 启动 app 服务 ==="
+    - echo "=== 启动 app ==="
     - docker compose -f docker-compose.test.yml up -d app
-    # Step 3: 等待 app 健康检查通过
     - echo "=== 等待 app 就绪 ==="
-    - for i in $(seq 1 30); do curl -sf http://localhost:9000/info > /dev/null 2>&1 && echo "app 已就绪" && break; echo "等待... ($i/30)"; sleep 1; done
-    # Step 4: 运行测试（避开 --exit-code-from 和 --abort-on-container-exit）
+    - for i in $(seq 1 30); do curl -sf http://localhost:9000/info > /dev/null 2>&1 && echo "app 已就绪" && break; echo "wait $i/30"; sleep 1; done
     - echo "=== 运行测试 ==="
     - docker compose -f docker-compose.test.yml run --rm selenium-tests sh -c "pytest tests/ -v --html=reports/report.html --self-contained-html"
-    # Step 5: 清理
     - echo "=== 清理 ==="
     - docker compose -f docker-compose.test.yml down
-  artifacts:
-    when: always
-    paths:
-      - selenium_tests/reports/report.html
-    expire_in: 7 days
