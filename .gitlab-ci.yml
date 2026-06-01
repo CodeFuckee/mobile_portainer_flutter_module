@@ -4,7 +4,6 @@ stages:
   - selenium
 
 variables:
-  FLUTTER_IMAGE: docker.1ms/cirrusci/flutter:stable
   # 禁止 GitLab Runner 的 git clean，因为 .ohos 构建产物路径超过 Windows MAX_PATH (260)
   # 改用 before_script 中的 PowerShell 清理（能正确处理长路径）
   GIT_CLEAN_FLAGS: none
@@ -103,7 +102,6 @@ variables:
 
 flutter_analyze:
   extends: .shell_setup
-  image: ${FLUTTER_IMAGE}
   stage: analyze
   tags:
     - harmony
@@ -115,7 +113,6 @@ flutter_analyze:
 
 flutter_build_web:
   extends: .shell_setup
-  image: ${FLUTTER_IMAGE}
   stage: build
   tags:
     - harmony
@@ -136,7 +133,6 @@ flutter_build_web:
 # 推荐为此作业配置独立的 shell executor runner 并打上 ohos 标签。
 flutter_build_har:
   extends: .shell_setup
-  image: ${FLUTTER_IMAGE}
   stage: build
   tags:
     - harmony
@@ -150,7 +146,6 @@ selenium_tests:
   tags:
     - linux
     - docker
-  # 构建、mock 后端、Selenium 测试全部在 Docker 内完成，无需依赖外部 artifacts
   script:
     # 提前创建报告目录，确保宿主机 mount 权限正确
     - mkdir -p selenium_tests/reports
