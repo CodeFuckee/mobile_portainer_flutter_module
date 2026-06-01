@@ -12,3 +12,15 @@ build/
 .metadata
 *.iml
 pubspec.lock
+selenium_tests/venv/
+selenium_tests/.pytest_cache/
+selenium_tests/__pycache__/
+selenium_tests/reports/
+selenium_tests/pytestdebug.log
+__pycache__/
+*.pyc
+.android/
+.ios/
+.ohos/
+macos/
+*.ipynb_checkpoints/

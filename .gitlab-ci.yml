@@ -153,5 +153,6 @@ selenium_tests:
     - echo "step1 compose config"
     - docker compose -f docker-compose.test.yml config
     - echo "step2 compose build"
-    - docker compose -f docker-compose.test.yml build
+    - export BUILDKIT_PROGRESS=plain
+    - docker compose -f docker-compose.test.yml build 2>&1
     - echo "step3 done"
