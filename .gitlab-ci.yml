@@ -152,6 +152,7 @@ selenium_tests:
   dependencies:
     - flutter_build_web
   before_script:
+    # 安装 Python 测试依赖
     - cd selenium_tests
     - python3 -m venv venv
     - source venv/bin/activate
