@@ -149,9 +149,13 @@ selenium_tests:
   stage: selenium
   tags:
     - linux
-  dependencies:
-    - flutter_build_web
   before_script:
+    # 将 Flutter 加入 PATH 并配置 Git 安全目录
+    - export PATH="/home/chenkaidi/flutter/bin:$PATH"
+    - git config --global --add safe.directory /home/chenkaidi/flutter
+    - git config --global --add safe.directory "$CI_PROJECT_DIR"
+    - flutter pub get
+    - flutter build web
     # 安装 Python 测试依赖
     - cd selenium_tests
     - python3 -m venv venv
