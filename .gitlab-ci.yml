@@ -141,6 +141,17 @@ flutter_build_har:
     - flutter pub get
     - flutter build har --release
 
+selenium_runner_check:
+  stage: selenium
+  tags:
+    - linux
+    - docker
+  dependencies: []
+  script:
+    - echo "runner OK"
+    - docker --version
+    - docker compose version 2>/dev/null || docker-compose --version 2>/dev/null || echo "no compose found"
+
 selenium_tests:
   stage: selenium
   tags:
