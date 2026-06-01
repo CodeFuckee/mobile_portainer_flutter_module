@@ -148,6 +148,8 @@ selenium_tests:
   variables:
     # Flutter SDK 路径（chenkaidi 家目录下，已授权 gitlab-runner 组读取）
     FLUTTER_ROOT: /home/chenkaidi/flutter
+    PUB_HOSTED_URL: "https://pub.flutter-io.cn"
+    FLUTTER_STORAGE_BASE_URL: "https://storage.flutter-io.cn"
   before_script:
     # 将 Flutter 加入 PATH
     - export PATH="$FLUTTER_ROOT/bin:$PATH"
