@@ -1,9 +1,8 @@
+import os
 import socket
 import time
 import urllib.request
 from urllib.parse import urlparse
-
-import time
 
 import pytest
 from selenium import webdriver
@@ -11,7 +10,7 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
-from config import BASE_URL, MOCK_BACKEND_URL, IMPLICIT_WAIT, PAGE_LOAD_TIMEOUT, BROWSER, HEADLESS, TEST_USERNAME, TEST_PASSWORD
+from config import BASE_URL, MOCK_BACKEND_URL, IMPLICIT_WAIT, PAGE_LOAD_TIMEOUT, BROWSER, HEADLESS, TEST_USERNAME, TEST_PASSWORD, CHROMIUM_BINARY, CHROMEDRIVER_PATH
 
 # 底部导航标签名，供所有测试复用
 TAB_NAMES = ["Dashboard", "Containers", "Resources", "Settings"]
@@ -81,18 +80,26 @@ def _wait_flutter_ready(driver, timeout: int = 60):
         pass  # 超时不算致命错误，继续执行测试
 
 
-def _create_chrome_driver():
+def _create_chrome_driver(base_url: str = ""):
     options = webdriver.ChromeOptions()
+    if CHROMIUM_BINARY:
+        options.binary_location = CHROMIUM_BINARY
     if HEADLESS:
         options.add_argument("--headless=new")
+    options.add_argument("--test-type")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--ignore-certificate-errors")
     options.add_argument("--incognito")
     options.add_argument("--enable-unsafe-swiftshader")
     options.add_argument("--window-size=1920,1080")
-    return webdriver.Chrome(
-        service=ChromeService(ChromeDriverManager().install()), options=options
-    )
+
+    if CHROMEDRIVER_PATH:
+        service = ChromeService(executable_path=CHROMEDRIVER_PATH)
+    else:
+        service = ChromeService(ChromeDriverManager().install())
+
+    return webdriver.Chrome(service=service, options=options)
 
 
 def _create_firefox_driver():
@@ -126,7 +133,7 @@ def driver(base_url, server_reachable):
     if BROWSER == "firefox":
         d = _create_firefox_driver()
     else:
-        d = _create_chrome_driver()
+        d = _create_chrome_driver(base_url)
     d.implicitly_wait(IMPLICIT_WAIT)
     d.set_page_load_timeout(PAGE_LOAD_TIMEOUT)
     try:

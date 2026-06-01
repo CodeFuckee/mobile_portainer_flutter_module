@@ -149,26 +149,14 @@ selenium_tests:
   stage: selenium
   tags:
     - linux
-  dependencies:
-    - flutter_build_web
-  before_script:
-    # 安装 Python 测试依赖
-    - cd selenium_tests
-    - python3 -m venv venv
-    - source venv/bin/activate
-    - pip install -r requirements.txt
-    - deactivate
-    - cd "$CI_PROJECT_DIR"
+    - docker
+  # 构建、mock 后端、Selenium 测试全部在 Docker 内完成，无需依赖外部 artifacts
   script:
-    # 启动 mock 后端（同时提供 Flutter 静态文件 + Portainer API mock，单端口同源）
-    - cd selenium_tests && source venv/bin/activate && python mock_backend.py &
-    - sleep 3
-    - cd "$CI_PROJECT_DIR/selenium_tests"
-    - source venv/bin/activate
-    - TEST_BASE_URL=http://localhost:9000 pytest tests/ -v --html=report.html --self-contained-html
-    - deactivate
+    # 提前创建报告目录，确保宿主机 mount 权限正确
+    - mkdir -p selenium_tests/reports
+    - docker compose -f docker-compose.test.yml up --build --abort-on-container-exit
   artifacts:
     when: always
     paths:
-      - selenium_tests/report.html
+      - selenium_tests/reports/report.html
     expire_in: 7 days

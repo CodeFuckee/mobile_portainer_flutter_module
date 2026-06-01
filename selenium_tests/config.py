@@ -11,6 +11,10 @@ TEST_USERNAME = os.environ.get("TEST_USERNAME", "admin")
 TEST_PASSWORD = os.environ.get("TEST_PASSWORD", "password")
 DEBUG = os.environ.get("TEST_DEBUG", "false").lower() == "true"
 
+# Docker / CI 环境下使用系统安装的 Chromium 和 ChromeDriver
+CHROMIUM_BINARY = os.environ.get("CHROMIUM_BINARY", "")
+CHROMEDRIVER_PATH = os.environ.get("CHROMEDRIVER_PATH", "")
+
 
 def debug_sleep(seconds: float = 1.5):
     """调试模式下暂停指定秒数，便于观察操作过程。非调试模式立即返回。"""

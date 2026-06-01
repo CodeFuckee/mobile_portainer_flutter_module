@@ -1,0 +1,52 @@
+services:
+  # ============================================================
+  # App 服务：提供 Flutter Web 静态文件 + mock Portainer API
+  # ============================================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.selenium
+      target: app-server
+    ports:
+      - "9000:9000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:9000/info', timeout=3)"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  # ============================================================
+  # Selenium 测试服务：共享 app 网络，通过 localhost 访问
+  # （Chromium 对 localhost 不做 HTTPS 自动升级，避免 ERR_SSL_PROTOCOL_ERROR）
+  # ============================================================
+  selenium-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.selenium
+      target: test-runner
+    network_mode: "service:app"
+    depends_on:
+      - app
+    environment:
+      - TEST_BASE_URL=http://localhost:9000
+      - MOCK_BACKEND_URL=http://localhost:9000
+      - TEST_BROWSER=chrome
+      - TEST_HEADLESS=true
+      - CHROMIUM_BINARY=/usr/bin/chromium
+      - CHROMEDRIVER_PATH=/usr/bin/chromedriver
+    volumes:
+      - ./selenium_tests/reports:/app/reports
+    command: >
+      sh -c "
+        echo '[wait] 等待 mock backend 就绪...' &&
+        for i in \$(seq 1 30); do
+          if curl -sf http://localhost:9000/info > /dev/null 2>&1; then
+            echo '[wait] mock backend 已就绪' &&
+            break
+          fi &&
+          sleep 1
+        done &&
+        echo '[test] 开始运行测试...' &&
+        pytest tests/ -v --html=reports/report.html --self-contained-html
+      "
