@@ -141,46 +141,27 @@ flutter_build_har:
     - flutter pub get
     - flutter build har --release
 
-selenium_runner_check:
+selenium_diag:
   stage: selenium
   tags:
     - linux
     - docker
   dependencies: []
   script:
-    - echo "runner OK"
+    - echo "diag 1: docker version"
     - docker --version
-    - docker compose version 2>/dev/null || docker-compose --version 2>/dev/null || echo "no compose found"
-
-selenium_tests_step1:
-  stage: selenium
-  tags:
-    - linux
-    - docker
-  dependencies: []
-  script:
-    - echo "step1 start"
+    - echo "diag 2: ls compose file"
+    - ls -la docker-compose.test.yml Dockerfile.selenium selenium_tests/
+    - echo "diag 3: compose config"
+    - docker compose -f docker-compose.test.yml config
+    - echo "diag 4: compose build"
     - docker compose -f docker-compose.test.yml build
-    - echo "step1 done"
-
-selenium_tests:
-  stage: selenium
-  tags:
-    - linux
-    - docker
-  dependencies: []
-  when: manual
-  script:
-    - echo "=== 准备 ==="
-    - mkdir -p selenium_tests/reports
-    - export BUILDKIT_PROGRESS=plain
-    - echo "=== 构建镜像 ==="
-    - docker compose -f docker-compose.test.yml build
-    - echo "=== 启动 app ==="
+    - echo "diag 5: compose up -d app"
     - docker compose -f docker-compose.test.yml up -d app
-    - echo "=== 等待 app 就绪 ==="
-    - for i in $(seq 1 30); do curl -sf http://localhost:9000/info > /dev/null 2>&1 && echo "app 已就绪" && break; echo "wait $i/30"; sleep 1; done
-    - echo "=== 运行测试 ==="
+    - echo "diag 6: wait app"
+    - for i in $(seq 1 30); do curl -sf http://localhost:9000/info > /dev/null 2>&1 && echo "app ready" && break; echo "wait $i/30"; sleep 1; done
+    - echo "diag 7: run tests"
     - docker compose -f docker-compose.test.yml run --rm selenium-tests sh -c "pytest tests/ -v --html=reports/report.html --self-contained-html"
-    - echo "=== 清理 ==="
+    - echo "diag 8: down"
     - docker compose -f docker-compose.test.yml down
+    - echo "diag all done"
