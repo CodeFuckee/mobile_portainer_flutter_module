@@ -146,6 +146,7 @@ selenium_tests:
   tags:
     - linux
     - docker
+  dependencies: []
   script:
     # 提前创建报告目录，确保宿主机 mount 权限正确
     - mkdir -p selenium_tests/reports
