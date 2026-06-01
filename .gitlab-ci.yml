@@ -153,7 +153,10 @@ selenium_tests:
     - echo "step1 compose config"
     - docker compose -f docker-compose.test.yml config
     - echo "step2 pull flutter image"
-    - timeout 120 docker pull ghcr.io/cirruslabs/flutter:3.35.7 2>&1 || echo "PULL FAILED"
+    - docker pull ghcr.io/cirruslabs/flutter:3.35.7 2>&1 || echo "PULL FAILED"
     - echo "step3 pull python image"
-    - timeout 120 docker pull docker.1ms.run/python:3.11-slim 2>&1 || echo "PULL FAILED"
-    - echo "step4 done"
+    - docker pull docker.1ms.run/python:3.11-slim 2>&1 || echo "PULL FAILED"
+    - echo "step4 compose build"
+    - export BUILDKIT_PROGRESS=plain
+    - docker compose -f docker-compose.test.yml build 2>&1
+    - echo "step5 done"
