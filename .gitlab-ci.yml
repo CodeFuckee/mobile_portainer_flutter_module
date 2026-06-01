@@ -160,29 +160,24 @@ selenium_tests:
   dependencies: []
   timeout: 15m
   script:
-    - |
-      echo "=== 环境诊断 ==="
-      docker --version || { echo "[ERROR] docker 不可用"; exit 1; }
-      if docker compose version 2>/dev/null; then
-        COMPOSE_CMD="docker compose"
-        echo "[INFO] 使用 docker compose (v2)"
-      elif docker-compose --version 2>/dev/null; then
-        COMPOSE_CMD="docker-compose"
-        echo "[INFO] 使用 docker-compose (v1)"
-      else
-        echo "[FATAL] 未找到 docker compose 或 docker-compose"
-        exit 1
-      fi
-      echo "=== 环境诊断完成 ==="
-
-      mkdir -p selenium_tests/reports
-
-      export BUILDKIT_PROGRESS=plain
-      echo "=== 构建 Docker 镜像 ==="
-      $COMPOSE_CMD -f docker-compose.test.yml build
-
-      echo "=== 运行 Selenium 测试 ==="
-      $COMPOSE_CMD -f docker-compose.test.yml up --exit-code-from selenium-tests
+    - echo "=== 准备 ==="
+    - mkdir -p selenium_tests/reports
+    - export BUILDKIT_PROGRESS=plain
+    # Step 1: 构建镜像
+    - echo "=== 构建 Docker 镜像 ==="
+    - docker compose -f docker-compose.test.yml build
+    # Step 2: 后台启动 app 服务
+    - echo "=== 启动 app 服务 ==="
+    - docker compose -f docker-compose.test.yml up -d app
+    # Step 3: 等待 app 健康检查通过
+    - echo "=== 等待 app 就绪 ==="
+    - for i in $(seq 1 30); do curl -sf http://localhost:9000/info > /dev/null 2>&1 && echo "app 已就绪" && break; echo "等待... ($i/30)"; sleep 1; done
+    # Step 4: 运行测试（避开 --exit-code-from 和 --abort-on-container-exit）
+    - echo "=== 运行测试 ==="
+    - docker compose -f docker-compose.test.yml run --rm selenium-tests sh -c "pytest tests/ -v --html=reports/report.html --self-contained-html"
+    # Step 5: 清理
+    - echo "=== 清理 ==="
+    - docker compose -f docker-compose.test.yml down
   artifacts:
     when: always
     paths:
