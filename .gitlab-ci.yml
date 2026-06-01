@@ -148,26 +148,30 @@ selenium_tests:
     - docker
   dependencies: []
   timeout: 15m
-  before_script:
-    - echo "=== 环境诊断 ==="
-    - docker --version || echo "[ERROR] docker 不可用"
-    - docker compose version 2>/dev/null && echo "[INFO] 使用 docker compose (v2)" && COMPOSE_CMD="docker compose" || true
-    - if [ -z "$COMPOSE_CMD" ]; then docker-compose --version 2>/dev/null && echo "[INFO] 使用 docker-compose (v1)" && COMPOSE_CMD="docker-compose" || true; fi
-    - if [ -z "$COMPOSE_CMD" ]; then echo "[FATAL] 未找到 docker compose 或 docker-compose"; exit 1; fi
-    - echo "[INFO] Compose 命令: $COMPOSE_CMD"
-    - echo "=== 环境诊断完成 ==="
   script:
-    # 提前创建报告目录，确保宿主机 mount 权限正确
-    - mkdir -p selenium_tests/reports
-    # 启用 BuildKit 纯文本输出（CI 日志可读，v1 忽略此变量）
-    - export BUILDKIT_PROGRESS=plain
-    # 先构建镜像（分离构建和运行，便于定位是构建失败还是测试失败）
-    - echo "=== 构建 Docker 镜像 ==="
-    - $COMPOSE_CMD -f docker-compose.test.yml build
-    # 运行测试，使用 --exit-code-from 确保返回测试进程的退出码
-    # （兼容 v1 和 v2，v2 中该选项隐含 --abort-on-container-exit 行为）
-    - echo "=== 运行 Selenium 测试 ==="
-    - $COMPOSE_CMD -f docker-compose.test.yml up --exit-code-from selenium-tests
+    - |
+      echo "=== 环境诊断 ==="
+      docker --version || { echo "[ERROR] docker 不可用"; exit 1; }
+      if docker compose version 2>/dev/null; then
+        COMPOSE_CMD="docker compose"
+        echo "[INFO] 使用 docker compose (v2)"
+      elif docker-compose --version 2>/dev/null; then
+        COMPOSE_CMD="docker-compose"
+        echo "[INFO] 使用 docker-compose (v1)"
+      else
+        echo "[FATAL] 未找到 docker compose 或 docker-compose"
+        exit 1
+      fi
+      echo "=== 环境诊断完成 ==="
+
+      mkdir -p selenium_tests/reports
+
+      export BUILDKIT_PROGRESS=plain
+      echo "=== 构建 Docker 镜像 ==="
+      $COMPOSE_CMD -f docker-compose.test.yml build
+
+      echo "=== 运行 Selenium 测试 ==="
+      $COMPOSE_CMD -f docker-compose.test.yml up --exit-code-from selenium-tests
   artifacts:
     when: always
     paths:
