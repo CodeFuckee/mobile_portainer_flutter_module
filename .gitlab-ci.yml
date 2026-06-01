@@ -152,4 +152,6 @@ selenium_tests:
     - docker --version
     - echo "step1 compose config"
     - docker compose -f docker-compose.test.yml config
-    - echo "step2 done"
+    - echo "step2 compose build"
+    - docker compose -f docker-compose.test.yml build
+    - echo "step3 done"
