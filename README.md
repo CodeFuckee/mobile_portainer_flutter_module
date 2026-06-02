@@ -1,5 +1,5 @@
 <div style="text-align: center;">
-  <img src="https://raw.githubusercontent.com/CodeFuckee/mobile_portainer_flutter/refs/heads/main/icon.png" />
+  <img src="icon.png" />
 </div>
 
 # Mobile Portainer Flutter
