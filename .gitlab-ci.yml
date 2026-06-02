@@ -185,19 +185,24 @@ deploy_to_synology:
       $DOCKER build -f $DOCKERFILE -t ${DEPLOY_CONTAINER_NAME}:latest .
 
       echo "=== 7. 启动 API 容器 ==="
-      $DOCKER run -d \
-        --name ${DEPLOY_API_CONTAINER_NAME} \
-        --restart unless-stopped \
-        --network $DEPLOY_NETWORK \
-        -e ADMIN_USER=${ADMIN_USER:-admin} \
-        -e ADMIN_PASSWORD=${ADMIN_PASSWORD:-password} \
-        -e IGNORED_EVENTS=${IGNORED_EVENTS:-exec_create,exec_start,exec_die} \
-        -e HOST_FILESYSTEM_ROOT=/hostfs \
-        -v /var/run/docker.sock:/var/run/docker.sock \
-        -v $CI_PROJECT_DIR/data:/app/data \
-        -v /:/hostfs:ro \
-        -v /proc:/hostfs/proc:ro \
-        ${DEPLOY_API_IMAGE}
+      if $DOCKER images -q ${DEPLOY_API_IMAGE} >/dev/null 2>&1; then
+        echo "API 镜像存在，启动容器..."
+        $DOCKER run -d \
+          --name ${DEPLOY_API_CONTAINER_NAME} \
+          --restart unless-stopped \
+          --network $DEPLOY_NETWORK \
+          -e ADMIN_USER=${ADMIN_USER:-admin} \
+          -e ADMIN_PASSWORD=${ADMIN_PASSWORD:-password} \
+          -e IGNORED_EVENTS=${IGNORED_EVENTS:-exec_create,exec_start,exec_die} \
+          -e HOST_FILESYSTEM_ROOT=/hostfs \
+          -v /var/run/docker.sock:/var/run/docker.sock \
+          -v $CI_PROJECT_DIR/data:/app/data \
+          -v /:/hostfs:ro \
+          -v /proc:/hostfs/proc:ro \
+          ${DEPLOY_API_IMAGE}
+      else
+        echo "警告：API 镜像 ${DEPLOY_API_IMAGE} 不存在，跳过 API 容器启动"
+      fi
 
       echo "=== 8. 启动 Web 容器 ==="
       $DOCKER run -d \
