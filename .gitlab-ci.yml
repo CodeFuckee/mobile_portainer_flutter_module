@@ -150,11 +150,32 @@ deploy_to_synology:
     - DOCKER="docker"
     - $DOCKER --version
   script:
-    - echo "Building Docker image from web artifacts..."
-    - $DOCKER build -f Dockerfile.deploy -t ${DEPLOY_CONTAINER_NAME}:latest .
-    - echo "Stopping old container (if exists)..."
-    - $DOCKER stop ${DEPLOY_CONTAINER_NAME} 2>/dev/null || true
-    - $DOCKER rm ${DEPLOY_CONTAINER_NAME} 2>/dev/null || true
-    - echo "Starting new container on port ${DEPLOY_PORT}..."
-    - $DOCKER run -d --name ${DEPLOY_CONTAINER_NAME} --restart unless-stopped --network mobile_portainer_default -p ${DEPLOY_PORT}:80 ${DEPLOY_CONTAINER_NAME}:latest
-    - echo "Deploy complete! App is running at http://<synology-ip>:${DEPLOY_PORT}"
+    - |
+      echo "=== 1. 清理旧容器 ==="
+      $DOCKER stop ${DEPLOY_CONTAINER_NAME} 2>/dev/null || true
+      $DOCKER rm ${DEPLOY_CONTAINER_NAME} 2>/dev/null || true
+
+      echo "=== 2. 检查端口 $DEPLOY_PORT 占用 ==="
+      PORT_PID=$($DOCKER ps --filter "publish=$DEPLOY_PORT" --format '{{.ID}}' 2>/dev/null)
+      if [ -n "$PORT_PID" ]; then
+        echo "端口 $DEPLOY_PORT 被容器 $PORT_PID 占用，正在清理..."
+        $DOCKER stop $PORT_PID 2>/dev/null || true
+        $DOCKER rm $PORT_PID 2>/dev/null || true
+      else
+        echo "端口 $DEPLOY_PORT 未被占用"
+      fi
+
+      echo "=== 3. 清理旧镜像 ==="
+      OLD_IMAGE_ID=$($DOCKER images -q ${DEPLOY_CONTAINER_NAME}:latest 2>/dev/null)
+      if [ -n "$OLD_IMAGE_ID" ]; then
+        echo "删除旧镜像 $OLD_IMAGE_ID ..."
+        $DOCKER rmi -f $OLD_IMAGE_ID 2>/dev/null || true
+      fi
+
+      echo "=== 4. 构建新镜像 ==="
+      $DOCKER build -f Dockerfile.deploy -t ${DEPLOY_CONTAINER_NAME}:latest .
+
+      echo "=== 5. 启动新容器 ==="
+      $DOCKER run -d --name ${DEPLOY_CONTAINER_NAME} --restart unless-stopped --network mobile_portainer_default -p ${DEPLOY_PORT}:80 ${DEPLOY_CONTAINER_NAME}:latest
+
+      echo "=== 部署完成！应用运行在 http://<synology-ip>:${DEPLOY_PORT} ==="
