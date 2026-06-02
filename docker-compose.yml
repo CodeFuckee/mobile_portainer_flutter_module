@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   api:
-    image: mobile_portainer_api:latest
+    image: mobile_portainer-api:latest
     environment:
       - ADMIN_USER=${ADMIN_USER:-admin}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:-password}
