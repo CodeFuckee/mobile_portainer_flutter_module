@@ -72,6 +72,7 @@ variables:
     - |
       git config --global --add safe.directory "$CI_PROJECT_DIR"
       echo "CI env: PUB_HOSTED_URL = $PUB_HOSTED_URL"
+      bash scripts/ci_setup_flutter.sh || pwsh -File scripts/ci_setup_flutter.ps1 || powershell -File scripts/ci_setup_flutter.ps1 || echo "Flutter auto-detect skipped"
 
 flutter_analyze:
   extends: .setup
