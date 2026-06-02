@@ -58,8 +58,7 @@ flutter_analyze:
   tags:
     - harmony
     - flutter
-  rules:
-    - if: '$CI_RUNNER_EXECUTABLE_ARCH =~ /^(linux|darwin)/'
+    - unix
   script:
     - flutter pub get
     - flutter analyze --no-fatal-warnings --no-fatal-infos
@@ -71,8 +70,7 @@ flutter_analyze_windows:
   tags:
     - harmony
     - flutter
-  rules:
-    - if: '$CI_RUNNER_EXECUTABLE_ARCH =~ /^windows/'
+    - windows
   script:
     - flutter pub get
     - flutter analyze --no-fatal-warnings --no-fatal-infos
@@ -87,8 +85,7 @@ flutter_build_web:
   tags:
     - harmony
     - flutter
-  rules:
-    - if: '$CI_RUNNER_EXECUTABLE_ARCH =~ /^(linux|darwin)/'
+    - unix
   script:
     - flutter pub get
     - flutter build web
@@ -103,8 +100,7 @@ flutter_build_web_windows:
   tags:
     - harmony
     - flutter
-  rules:
-    - if: '$CI_RUNNER_EXECUTABLE_ARCH =~ /^windows/'
+    - windows
   script:
     - flutter pub get
     - flutter build web
@@ -122,8 +118,7 @@ flutter_build_har:
   tags:
     - harmony
     - flutter
-  rules:
-    - if: '$CI_RUNNER_EXECUTABLE_ARCH =~ /^(linux|darwin)/'
+    - unix
   script:
     - bash scripts/ci_build_har.sh
 
@@ -133,8 +128,7 @@ flutter_build_har_windows:
   tags:
     - harmony
     - flutter
-  rules:
-    - if: '$CI_RUNNER_EXECUTABLE_ARCH =~ /^windows/'
+    - windows
   script:
     - powershell -File scripts/ci_build_har.ps1
 
