@@ -69,8 +69,9 @@ variables:
 # 平台相关的复杂设置（如 Windows 上的 hvigor/Node.js/pnpm）放在 scripts/ 目录中。
 .setup:
   before_script:
-    - git config --global --add safe.directory "$CI_PROJECT_DIR"
-    - echo "CI env: PUB_HOSTED_URL = $PUB_HOSTED_URL"
+    - |
+      git config --global --add safe.directory "$CI_PROJECT_DIR"
+      echo "CI env: PUB_HOSTED_URL = $PUB_HOSTED_URL"
 
 flutter_analyze:
   extends: .setup
