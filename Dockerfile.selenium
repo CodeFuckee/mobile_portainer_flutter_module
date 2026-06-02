@@ -1,30 +1,13 @@
 # ============================================================
-# Stage 1: 编译 Flutter Web
-# ============================================================
-FROM ghcr.io/cirruslabs/flutter:3.35.7 AS flutter-builder
-
-WORKDIR /app
-
-ENV PUB_HOSTED_URL=https://pub.flutter-io.cn \
-    FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn
-
-COPY pubspec.yaml ./
-RUN flutter pub get
-
-COPY lib/ ./lib/
-COPY web/ ./web/
-RUN flutter build web --base-href / --release
-
-# ============================================================
-# Stage 2: App 服务器（mock backend + Flutter 静态文件）
+# Stage 1: App 服务器（mock backend + 预构建的 Flutter 静态文件）
+# Flutter Web 构建由 CI 的 flutter_build_web 阶段完成，
+# 通过 artifacts 传入 build/web/，无需 Flutter SDK 镜像。
 # ============================================================
 FROM docker.1ms.run/python:3.11-slim AS app-server
 
 WORKDIR /app
 
-# 复制 Flutter Web 构建产物
-COPY --from=flutter-builder /app/build/web ./build/web
-# 复制 mock backend，保持目录结构以匹配 FLUTTER_BUILD_DIR 路径计算
+COPY build/web ./build/web
 COPY selenium_tests/mock_backend.py ./selenium_tests/mock_backend.py
 
 EXPOSE 9000
@@ -35,27 +18,22 @@ HEALTHCHECK --interval=3s --timeout=3s --retries=10 --start-period=5s \
 CMD ["python", "selenium_tests/mock_backend.py"]
 
 # ============================================================
-# Stage 3: Selenium 测试运行器（Python + Chrome）
+# Stage 2: Selenium 测试运行器（Python + Chrome）
 # ============================================================
 FROM docker.1ms.run/python:3.11-slim AS test-runner
 
 WORKDIR /app
 
-# 替换为国内 Debian 镜像，避免网络不稳定
 RUN sed -i 's|http://deb.debian.org|http://mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/debian.sources
 
-# 安装 Chromium 浏览器 + ChromeDriver（从 Debian 源，避免访问 dl.google.com）
 RUN apt-get update && apt-get install -y --no-install-recommends \
     chromium chromium-driver \
     && rm -rf /var/lib/apt/lists/*
 
-# 复制测试代码和依赖声明
 COPY selenium_tests/ ./
 
-# 安装 Python 测试依赖（使用清华 PyPI 镜像）
 RUN pip install --no-cache-dir -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
 
-# webdriver-manager 会在此目录下载 ChromeDriver
 ENV WDM_PROGRESS_BAR=0
 
 CMD ["pytest", "tests/", "-v", "--html=report.html", "--self-contained-html"]

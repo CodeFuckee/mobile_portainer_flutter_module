@@ -146,30 +146,29 @@ selenium_tests:
   tags:
     - linux
     - docker
-  dependencies: []
+  dependencies:
+    - flutter_build_web
   script:
     - echo "step0 start"
     - docker --version
-    - echo "step1 compose config"
-    - docker compose -f docker-compose.test.yml config
-    - echo "step2 pull flutter image"
-    - docker pull ghcr.io/cirruslabs/flutter:3.35.7 2>&1
-    - echo "step3 pull python image"
+    - echo "step1 verify web build"
+    - ls -la build/web/index.html
+    - echo "step2 pull python image"
     - docker pull docker.1ms.run/python:3.11-slim 2>&1
-    - echo "step4 build app image"
+    - echo "step3 build app image"
     - docker build -f Dockerfile.selenium --target app-server -t selenium_app --progress=plain . 2>&1
-    - echo "step5 build test image"
+    - echo "step4 build test image"
     - docker build -f Dockerfile.selenium --target test-runner -t selenium_tests --progress=plain . 2>&1
-    - echo "step6 up app"
+    - echo "step5 up app"
     - docker run -d --name selenium_app -p 9000:9000 selenium_app
-    - echo "step7 wait"
+    - echo "step6 wait"
     - for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30; do curl -sf http://localhost:9000/info > /dev/null 2>&1 && echo "app ready" && break; echo "wait $i"; sleep 1; done
-    - echo "step8 run tests"
+    - echo "step7 run tests"
     - mkdir -p selenium_tests/reports
     - docker run --rm --network container:selenium_app -v $CI_PROJECT_DIR/selenium_tests/reports:/app/reports -e TEST_BASE_URL=http://localhost:9000 -e MOCK_BACKEND_URL=http://localhost:9000 -e TEST_BROWSER=chrome -e TEST_HEADLESS=true -e CHROMIUM_BINARY=/usr/bin/chromium -e CHROMEDRIVER_PATH=/usr/bin/chromedriver selenium_tests sh -c "pytest tests/ -v --html=reports/report.html --self-contained-html"
-    - echo "step9 cleanup"
+    - echo "step8 cleanup"
     - docker stop selenium_app && docker rm selenium_app
-    - echo "step10 done"
+    - echo "step9 done"
   artifacts:
     when: always
     paths:
