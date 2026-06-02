@@ -101,8 +101,9 @@ selenium_tests:
   tags:
     - linux
     - docker
-  dependencies:
-    - flutter_build_web
+  needs:
+    - job: flutter_build_web
+      artifacts: true
   script:
     - echo "step0 start"
     - docker --version
@@ -140,8 +141,10 @@ deploy_to_synology:
     - docker
     - nas
     - deploy
-  dependencies:
-    - flutter_build_web
+  needs:
+    - job: flutter_build_web
+      artifacts: true
+    - job: selenium_tests
   script:
     - echo "Building Docker image from web artifacts..."
     - docker build -f Dockerfile.deploy -t ${DEPLOY_CONTAINER_NAME}:latest .
