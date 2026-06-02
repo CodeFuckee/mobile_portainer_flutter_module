@@ -34,7 +34,10 @@ variables:
   # 部署变量
   # ================================================================
   DEPLOY_CONTAINER_NAME: 'mobile-portainer-web'
+  DEPLOY_API_CONTAINER_NAME: 'mobile-portainer-api'
+  DEPLOY_API_IMAGE: 'mobile_portainer_api:latest'
   DEPLOY_PORT: '8080'
+  DEPLOY_NETWORK: 'mobile_portainer_default'
 
 # ================================================================
 # 公共配置 —— 命令同时兼容 bash 和 PowerShell 5.1
@@ -148,14 +151,15 @@ deploy_to_synology:
     - job: selenium_tests
   before_script:
     - DOCKER="docker"
-    - COMPOSE="$DOCKER compose"
+    - DOCKERFILE="Dockerfile.web.cn"
     - $DOCKER --version
-    - export WEB_PORT=${DEPLOY_PORT}
   script:
     - |
-      echo "=== 1. 清理旧 web 容器 ==="
-      $COMPOSE -f docker-compose-cn.yml stop web 2>/dev/null || true
-      $COMPOSE -f docker-compose-cn.yml rm -f web 2>/dev/null || true
+      echo "=== 1. 清理旧容器 ==="
+      $DOCKER stop ${DEPLOY_CONTAINER_NAME} 2>/dev/null || true
+      $DOCKER rm ${DEPLOY_CONTAINER_NAME} 2>/dev/null || true
+      $DOCKER stop ${DEPLOY_API_CONTAINER_NAME} 2>/dev/null || true
+      $DOCKER rm ${DEPLOY_API_CONTAINER_NAME} 2>/dev/null || true
 
       echo "=== 2. 检查端口 $DEPLOY_PORT 占用 ==="
       PORT_PID=$($DOCKER ps --filter "publish=$DEPLOY_PORT" --format '{{.ID}}' 2>/dev/null)
@@ -167,14 +171,43 @@ deploy_to_synology:
         echo "端口 $DEPLOY_PORT 未被占用"
       fi
 
-      echo "=== 3. 清理旧镜像 ==="
-      OLD_IMAGE_ID=$($DOCKER images -q ${DEPLOY_CONTAINER_NAME}:latest 2>/dev/null)
-      if [ -n "$OLD_IMAGE_ID" ]; then
-        echo "删除旧镜像 ${DEPLOY_CONTAINER_NAME}:latest ($OLD_IMAGE_ID) ..."
-        $DOCKER rmi -f $OLD_IMAGE_ID 2>/dev/null || true
+      echo "=== 3. 确保网络 $DEPLOY_NETWORK 存在 ==="
+      $DOCKER network inspect $DEPLOY_NETWORK >/dev/null 2>&1 || $DOCKER network create $DEPLOY_NETWORK
+
+      echo "=== 4. 清理旧镜像 ==="
+      OLD_WEB_IMAGE=$($DOCKER images -q ${DEPLOY_CONTAINER_NAME}:latest 2>/dev/null)
+      if [ -n "$OLD_WEB_IMAGE" ]; then
+        echo "删除旧镜像 ${DEPLOY_CONTAINER_NAME}:latest ($OLD_WEB_IMAGE) ..."
+        $DOCKER rmi -f $OLD_WEB_IMAGE 2>/dev/null || true
       fi
 
-      echo "=== 4. 构建并启动 web 服务 ==="
-      $COMPOSE -f docker-compose-cn.yml up -d --build web
+      echo "=== 5. 拉取 API 镜像 ==="
+      $DOCKER pull ${DEPLOY_API_IMAGE}
+
+      echo "=== 6. 构建 Web 镜像 ==="
+      $DOCKER build -f $DOCKERFILE -t ${DEPLOY_CONTAINER_NAME}:latest .
+
+      echo "=== 7. 启动 API 容器 ==="
+      $DOCKER run -d \
+        --name ${DEPLOY_API_CONTAINER_NAME} \
+        --restart unless-stopped \
+        --network $DEPLOY_NETWORK \
+        -e ADMIN_USER=${ADMIN_USER:-admin} \
+        -e ADMIN_PASSWORD=${ADMIN_PASSWORD:-password} \
+        -e IGNORED_EVENTS=${IGNORED_EVENTS:-exec_create,exec_start,exec_die} \
+        -e HOST_FILESYSTEM_ROOT=/hostfs \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        -v $CI_PROJECT_DIR/data:/app/data \
+        -v /:/hostfs:ro \
+        -v /proc:/hostfs/proc:ro \
+        ${DEPLOY_API_IMAGE}
+
+      echo "=== 8. 启动 Web 容器 ==="
+      $DOCKER run -d \
+        --name ${DEPLOY_CONTAINER_NAME} \
+        --restart unless-stopped \
+        --network $DEPLOY_NETWORK \
+        -p ${DEPLOY_PORT}:80 \
+        ${DEPLOY_CONTAINER_NAME}:latest
 
       echo "=== 部署完成！应用运行在 http://<synology-ip>:${DEPLOY_PORT} ==="
