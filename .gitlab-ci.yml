@@ -4,98 +4,91 @@ stages:
   - selenium
 
 variables:
-  # 禁止 GitLab Runner 的 git clean，因为 .ohos 构建产物路径超过 Windows MAX_PATH (260)
-  # 改用 before_script 中的 PowerShell 清理（能正确处理长路径）
   GIT_CLEAN_FLAGS: none
 
   # ================================================================
   # 路径变量 —— 可在 GitLab UI / Runner config.toml 中覆盖默认值。
-  # 这些路径不能包含空格（hvigor 和 npm 的限制）。
   # ================================================================
-
-  # HVIGOR_USER_HOME: hvigor 构建工具的工作目录，不能有空格。
   HVIGOR_USER_HOME: 'C:\hvigor_home'
-
-  # NODEJS_HOME: 可移植 Node.js 安装目录，不能有空格。
   NODEJS_HOME: 'D:\nodejs'
-
-  # FLUTTER_ROOT: Flutter SDK 根目录（可选）。未设置时 before_script 会
-  # 自动搜索常见路径（C:\flutter、%USERPROFILE%\flutter 等）。
-  # 示例： D:\Path\flutter
-  # FLUTTER_ROOT: ''
-
-  # HOS_SDK_HOME / OHOS_SDK_HOME / OHOS_HOME: HarmonyOS SDK 目录（可选）。
-  # before_script 会依次检测这三个变量，找到第一个存在的路径即使用。
-  # 示例： D:\Program Files\Huawei\DevEco Studio\sdk
-  # HOS_SDK_HOME: ''
-
-  # ================================================================
-  # Node.js 版本和下载源
-  # ================================================================
-
-  # NODEJS_VERSION: 自动下载的 Node.js 版本号（含 v 前缀）
-  NODEJS_VERSION: 'v20.18.0'
-
-  # NODEJS_DOWNLOAD_URL: Node.js 发行版下载镜像基址，最后构造为：
-  #   ${NODEJS_DOWNLOAD_URL}/${NODEJS_VERSION}/node-${NODEJS_VERSION}-win-x64.zip
-  NODEJS_DOWNLOAD_URL: 'https://npmmirror.com/mirrors/node'
+  # FLUTTER_ROOT: Flutter SDK 根目录（可选）
+  # HOS_SDK_HOME: HarmonyOS SDK 目录（可选）
 
   # ================================================================
   # 镜像 / 注册表地址
   # ================================================================
-
-  # PUB_HOSTED_URL: Dart/Flutter pub 镜像
+  NODEJS_VERSION: 'v20.18.0'
+  NODEJS_DOWNLOAD_URL: 'https://npmmirror.com/mirrors/node'
   PUB_HOSTED_URL: 'https://pub.flutter-io.cn'
-
-  # FLUTTER_STORAGE_BASE_URL: Flutter 存储镜像（包含引擎、gradle 等）
   FLUTTER_STORAGE_BASE_URL: 'https://storage.flutter-io.cn'
-
-  # NPM_REGISTRY_URL: npm 镜像注册表
   NPM_REGISTRY_URL: 'https://registry.npmmirror.com'
 
   # ================================================================
   # 行为开关
   # ================================================================
-
-  # HVIGOR_USER_HOME_AUTO_CREATE: 当 HVIGOR_USER_HOME 目录不存在时，
-  #   是否自动创建。设为 'false' 则跳过创建（适用于预配置的 Runner）。
   HVIGOR_USER_HOME_AUTO_CREATE: 'true'
-
-  # NODEJS_AUTO_INSTALL: 当 NODEJS_HOME 不可用时，是否自动下载安装
-  #   Node.js。设为 'false' 则跳过下载（适用于预配置的 Runner）。
   NODEJS_AUTO_INSTALL: 'true'
 
-# 跨平台公共配置 —— 命令同时兼容 bash 和 PowerShell。
-# 平台相关的复杂设置（如 Windows 上的 hvigor/Node.js/pnpm）放在 scripts/ 目录中。
-.setup:
+# ================================================================
+# macOS / Linux 配置（bash）
+# ================================================================
+.setup_unix:
   before_script:
     - |
       git config --global --add safe.directory "$CI_PROJECT_DIR"
       echo "CI env: PUB_HOSTED_URL = $PUB_HOSTED_URL"
-      # macOS/Linux: 将常见 Flutter 路径加入 PATH
-      # export 在 PowerShell 中会失败，|| cd . 作为无害回退
-      export PATH="$HOME/flutter/bin:$HOME/fvm/default/bin:/usr/local/flutter/bin:$PATH" || cd .
-      # Windows PowerShell: 将常见 Flutter 路径加入 PATH
-      # bash 中 $env: 语法无效，|| cd . 作为无害回退
-      $env:Path = "$env:USERPROFILE\flutter\bin;$env:USERPROFILE\fvm\default\bin;$env:Path" || cd .
+      export PATH="$HOME/flutter/bin:$HOME/fvm/default/bin:/usr/local/flutter/bin:$PATH"
 
+# ================================================================
+# Windows 配置（PowerShell 5.1 兼容，不使用 || / &&）
+# ================================================================
+.setup_windows:
+  before_script:
+    - |
+      git config --global --add safe.directory "$CI_PROJECT_DIR"
+      Write-Host "CI env: PUB_HOSTED_URL = $env:PUB_HOSTED_URL"
+      $env:Path = "$env:USERPROFILE\flutter\bin;$env:USERPROFILE\fvm\default\bin;$env:Path"
+
+# ================================================================
+# flutter_analyze
+# ================================================================
 flutter_analyze:
-  extends: .setup
+  extends: .setup_unix
   stage: analyze
   tags:
     - harmony
     - flutter
+  rules:
+    - if: '$CI_RUNNER_EXECUTABLE_ARCH =~ /^(linux|darwin)/'
   script:
     - flutter pub get
     - flutter analyze --no-fatal-warnings --no-fatal-infos
     - flutter test
 
+flutter_analyze_windows:
+  extends: .setup_windows
+  stage: analyze
+  tags:
+    - harmony
+    - flutter
+  rules:
+    - if: '$CI_RUNNER_EXECUTABLE_ARCH =~ /^windows/'
+  script:
+    - flutter pub get
+    - flutter analyze --no-fatal-warnings --no-fatal-infos
+    - flutter test
+
+# ================================================================
+# flutter_build_web
+# ================================================================
 flutter_build_web:
-  extends: .setup
+  extends: .setup_unix
   stage: build
   tags:
     - harmony
     - flutter
+  rules:
+    - if: '$CI_RUNNER_EXECUTABLE_ARCH =~ /^(linux|darwin)/'
   script:
     - flutter pub get
     - flutter build web
@@ -104,21 +97,50 @@ flutter_build_web:
       - build/web
     expire_in: 1 day
 
-# HarmonyOS HAR 构建需要 HarmonyOS SDK 和 DevEco Studio 工具链。
-# Runner 需安装以下环境：
-#   1. HarmonyOS SDK（通过 DevEco Studio 或命令行安装）
-#   2. Node.js >= 18（hvigor 构建工具依赖）
-#   3. ohpm（HarmonyOS 包管理器）
-# 推荐为此作业配置独立的 shell executor runner 并打上 ohos 标签。
-flutter_build_har:
-  extends: .setup
+flutter_build_web_windows:
+  extends: .setup_windows
   stage: build
   tags:
     - harmony
     - flutter
+  rules:
+    - if: '$CI_RUNNER_EXECUTABLE_ARCH =~ /^windows/'
   script:
-    - bash scripts/ci_build_har.sh || pwsh -File scripts/ci_build_har.ps1 || powershell -File scripts/ci_build_har.ps1
+    - flutter pub get
+    - flutter build web
+  artifacts:
+    paths:
+      - build/web
+    expire_in: 1 day
 
+# ================================================================
+# flutter_build_har（需要 HarmonyOS SDK + hvigor + Node.js + pnpm）
+# ================================================================
+flutter_build_har:
+  extends: .setup_unix
+  stage: build
+  tags:
+    - harmony
+    - flutter
+  rules:
+    - if: '$CI_RUNNER_EXECUTABLE_ARCH =~ /^(linux|darwin)/'
+  script:
+    - bash scripts/ci_build_har.sh
+
+flutter_build_har_windows:
+  extends: .setup_windows
+  stage: build
+  tags:
+    - harmony
+    - flutter
+  rules:
+    - if: '$CI_RUNNER_EXECUTABLE_ARCH =~ /^windows/'
+  script:
+    - powershell -File scripts/ci_build_har.ps1
+
+# ================================================================
+# selenium_tests
+# ================================================================
 selenium_tests:
   stage: selenium
   tags:
