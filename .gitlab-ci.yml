@@ -181,9 +181,6 @@ deploy_to_synology:
         $DOCKER rmi -f $OLD_WEB_IMAGE 2>/dev/null || true
       fi
 
-      echo "=== 5. 拉取 API 镜像 ==="
-      $DOCKER pull ${DEPLOY_API_IMAGE}
-
       echo "=== 6. 构建 Web 镜像 ==="
       $DOCKER build -f $DOCKERFILE -t ${DEPLOY_CONTAINER_NAME}:latest .
 
