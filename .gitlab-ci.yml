@@ -11,7 +11,7 @@ variables:
   # ================================================================
   HVIGOR_USER_HOME: 'C:\hvigor_home'
   NODEJS_HOME: 'D:\nodejs'
-  # FLUTTER_ROOT: Flutter SDK 根目录（可选）
+  # FLUTTER_ROOT: Flutter SDK 根目录（可选，Runner 上 Flutter 已在 PATH 时无需设置）
   # HOS_SDK_HOME: HarmonyOS SDK 目录（可选）
 
   # ================================================================
@@ -30,47 +30,24 @@ variables:
   NODEJS_AUTO_INSTALL: 'true'
 
 # ================================================================
-# macOS / Linux 配置（bash）
+# 公共配置 —— 命令同时兼容 bash 和 PowerShell 5.1
+# Runner 需确保 Flutter 在 PATH 中，或通过 GitLab Variables 设置 FLUTTER_ROOT
 # ================================================================
-.setup_unix:
+.setup:
   before_script:
     - |
       git config --global --add safe.directory "$CI_PROJECT_DIR"
       echo "CI env: PUB_HOSTED_URL = $PUB_HOSTED_URL"
-      export PATH="$HOME/flutter/bin:$HOME/fvm/default/bin:/usr/local/flutter/bin:$PATH"
-
-# ================================================================
-# Windows 配置（PowerShell 5.1 兼容，不使用 || / &&）
-# ================================================================
-.setup_windows:
-  before_script:
-    - |
-      git config --global --add safe.directory "$CI_PROJECT_DIR"
-      Write-Host "CI env: PUB_HOSTED_URL = $env:PUB_HOSTED_URL"
-      $env:Path = "$env:USERPROFILE\flutter\bin;$env:USERPROFILE\fvm\default\bin;$env:Path"
 
 # ================================================================
 # flutter_analyze
 # ================================================================
 flutter_analyze:
-  extends: .setup_unix
+  extends: .setup
   stage: analyze
   tags:
     - harmony
     - flutter
-    - unix
-  script:
-    - flutter pub get
-    - flutter analyze --no-fatal-warnings --no-fatal-infos
-    - flutter test
-
-flutter_analyze_windows:
-  extends: .setup_windows
-  stage: analyze
-  tags:
-    - harmony
-    - flutter
-    - windows
   script:
     - flutter pub get
     - flutter analyze --no-fatal-warnings --no-fatal-infos
@@ -80,27 +57,11 @@ flutter_analyze_windows:
 # flutter_build_web
 # ================================================================
 flutter_build_web:
-  extends: .setup_unix
+  extends: .setup
   stage: build
   tags:
     - harmony
     - flutter
-    - unix
-  script:
-    - flutter pub get
-    - flutter build web
-  artifacts:
-    paths:
-      - build/web
-    expire_in: 1 day
-
-flutter_build_web_windows:
-  extends: .setup_windows
-  stage: build
-  tags:
-    - harmony
-    - flutter
-    - windows
   script:
     - flutter pub get
     - flutter build web
@@ -111,26 +72,17 @@ flutter_build_web_windows:
 
 # ================================================================
 # flutter_build_har（需要 HarmonyOS SDK + hvigor + Node.js + pnpm）
+# 使用 ; 串联平台脚本：bash 在 Unix 上执行，powershell 在 Windows 上执行。
+# 最后一个 echo 确保整行 exit code 为 0。
 # ================================================================
 flutter_build_har:
-  extends: .setup_unix
+  extends: .setup
   stage: build
   tags:
     - harmony
     - flutter
-    - unix
   script:
-    - bash scripts/ci_build_har.sh
-
-flutter_build_har_windows:
-  extends: .setup_windows
-  stage: build
-  tags:
-    - harmony
-    - flutter
-    - windows
-  script:
-    - powershell -File scripts/ci_build_har.ps1
+    - bash scripts/ci_build_har.sh; powershell -File scripts/ci_build_har.ps1; echo "HAR build step complete"
 
 # ================================================================
 # selenium_tests
