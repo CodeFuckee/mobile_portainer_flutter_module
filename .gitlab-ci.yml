@@ -38,6 +38,7 @@ variables:
     - |
       git config --global --add safe.directory "$CI_PROJECT_DIR"
       echo "CI env: PUB_HOSTED_URL = $PUB_HOSTED_URL"
+      export PATH="$HOME/flutter/bin:$HOME/fvm/default/bin:/usr/local/flutter/bin:$PATH"; $env:Path = "$env:USERPROFILE\flutter\bin;$env:USERPROFILE\fvm\default\bin;$env:Path"; echo "PATH setup done"
 
 # ================================================================
 # flutter_analyze
