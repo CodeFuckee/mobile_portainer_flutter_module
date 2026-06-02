@@ -147,7 +147,7 @@ deploy_to_synology:
       artifacts: true
     - job: selenium_tests
   before_script:
-    - DOCKER="sudo docker"
+    - DOCKER="docker"
     - $DOCKER --version
   script:
     - echo "Building Docker image from web artifacts..."
