@@ -101,6 +101,7 @@ selenium_tests:
   tags:
     - linux
     - docker
+    - selenium
   needs:
     - job: flutter_build_web
       artifacts: true
