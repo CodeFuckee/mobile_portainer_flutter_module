@@ -196,7 +196,7 @@ deploy_to_synology:
           -e IGNORED_EVENTS=${IGNORED_EVENTS:-exec_create,exec_start,exec_die} \
           -e HOST_FILESYSTEM_ROOT=/hostfs \
           -v /var/run/docker.sock:/var/run/docker.sock \
-          -v $CI_PROJECT_DIR/data:/app/data \
+          -v /volume2/docker/mobile_portainer/data:/app/data \
           -v /:/hostfs:ro \
           -v /proc:/hostfs/proc:ro \
           ${DEPLOY_API_IMAGE}
