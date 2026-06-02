@@ -191,6 +191,7 @@ deploy_to_synology:
           --name ${DEPLOY_API_CONTAINER_NAME} \
           --restart unless-stopped \
           --network $DEPLOY_NETWORK \
+          --network-alias mobile_portainer-api \
           -e ADMIN_USER=${ADMIN_USER:-admin} \
           -e ADMIN_PASSWORD=${ADMIN_PASSWORD:-password} \
           -e IGNORED_EVENTS=${IGNORED_EVENTS:-exec_create,exec_start,exec_die} \
