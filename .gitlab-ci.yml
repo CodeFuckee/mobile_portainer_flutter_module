@@ -65,8 +65,9 @@ variables:
   #   Node.js。设为 'false' 则跳过下载（适用于预配置的 Runner）。
   NODEJS_AUTO_INSTALL: 'true'
 
-# Shell executor 公共配置：UTF-8 编码修复 + Flutter PATH 自动检测
-.shell_setup:
+# Shell executor 公共配置（Windows）：UTF-8 编码修复 + Flutter/HarmonyOS PATH 自动检测
+# 包含 hvigor、Node.js、pnpm 的完整环境配置。仅用于 Windows runner 上的 flutter_build_har。
+.setup_windows:
   before_script:
     - |
       # 清理构建产物（替代 git clean，因 .ohos 长路径超过 Windows MAX_PATH 260 字符限制）
@@ -180,8 +181,16 @@ variables:
         }
       }
 
+# Shell executor 公共配置（macOS / Linux）：轻量级设置，仅包含 Flutter 镜像和 git 配置。
+# 用于 Mac/Linux runner 上的 flutter_analyze 和 flutter_build_web。
+.setup_unix:
+  before_script:
+    - git config --global --add safe.directory "$CI_PROJECT_DIR"
+    - echo "PUB_HOSTED_URL = $PUB_HOSTED_URL"
+    - echo "FLUTTER_STORAGE_BASE_URL = $FLUTTER_STORAGE_BASE_URL"
+
 flutter_analyze:
-  extends: .shell_setup
+  extends: .setup_unix
   stage: analyze
   tags:
     - harmony
@@ -192,7 +201,7 @@ flutter_analyze:
     - flutter test
 
 flutter_build_web:
-  extends: .shell_setup
+  extends: .setup_unix
   stage: build
   tags:
     - harmony
@@ -212,7 +221,7 @@ flutter_build_web:
 #   3. ohpm（HarmonyOS 包管理器）
 # 推荐为此作业配置独立的 shell executor runner 并打上 ohos 标签。
 flutter_build_har:
-  extends: .shell_setup
+  extends: .setup_windows
   stage: build
   tags:
     - harmony
