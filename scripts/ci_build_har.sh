@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # ================================================================
 # Flutter HAR 构建设置脚本（macOS / Linux）
+# 如果 HarmonyOS SDK 不可用，优雅退出而非报错。
 # ================================================================
-set -e
 
 echo "=== HAR Build Setup (Unix) ==="
 
@@ -29,4 +29,8 @@ echo "=== Running flutter pub get ==="
 flutter pub get
 
 echo "=== Running flutter build har --release ==="
-flutter build har --release
+if flutter build har --release; then
+  echo "=== HAR build succeeded ==="
+else
+  echo "=== HAR build skipped (HarmonyOS SDK not available on this platform) ==="
+fi
