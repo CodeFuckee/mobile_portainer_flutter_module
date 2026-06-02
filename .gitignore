@@ -47,3 +47,4 @@ app.*.symbols
 # Obfuscation related
 app.*.map.json
 flutter_*.log
+builds/*

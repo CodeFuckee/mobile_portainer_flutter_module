@@ -7,11 +7,63 @@ variables:
   # 禁止 GitLab Runner 的 git clean，因为 .ohos 构建产物路径超过 Windows MAX_PATH (260)
   # 改用 before_script 中的 PowerShell 清理（能正确处理长路径）
   GIT_CLEAN_FLAGS: none
-  # 以下路径变量不在 YAML 中硬编码，优先从 Runner config.toml 的 environment 或
-  # GitLab 项目 Settings → CI/CD → Variables 读取。before_script 中的 foreach
-  # 会自动检测常见路径作为兜底。
-  # FLUTTER_ROOT: Flutter SDK 根目录，例如 D:\Path\flutter
-  # HOS_SDK_HOME: HarmonyOS SDK 目录，例如 D:\Program Files\Huawei\DevEco Studio\sdk
+
+  # ================================================================
+  # 路径变量 —— 可在 GitLab UI / Runner config.toml 中覆盖默认值。
+  # 这些路径不能包含空格（hvigor 和 npm 的限制）。
+  # ================================================================
+
+  # HVIGOR_USER_HOME: hvigor 构建工具的工作目录，不能有空格。
+  HVIGOR_USER_HOME: 'C:\hvigor_home'
+
+  # NODEJS_HOME: 可移植 Node.js 安装目录，不能有空格。
+  NODEJS_HOME: 'D:\nodejs'
+
+  # FLUTTER_ROOT: Flutter SDK 根目录（可选）。未设置时 before_script 会
+  # 自动搜索常见路径（C:\flutter、%USERPROFILE%\flutter 等）。
+  # 示例： D:\Path\flutter
+  # FLUTTER_ROOT: ''
+
+  # HOS_SDK_HOME / OHOS_SDK_HOME / OHOS_HOME: HarmonyOS SDK 目录（可选）。
+  # before_script 会依次检测这三个变量，找到第一个存在的路径即使用。
+  # 示例： D:\Program Files\Huawei\DevEco Studio\sdk
+  # HOS_SDK_HOME: ''
+
+  # ================================================================
+  # Node.js 版本和下载源
+  # ================================================================
+
+  # NODEJS_VERSION: 自动下载的 Node.js 版本号（含 v 前缀）
+  NODEJS_VERSION: 'v20.18.0'
+
+  # NODEJS_DOWNLOAD_URL: Node.js 发行版下载镜像基址，最后构造为：
+  #   ${NODEJS_DOWNLOAD_URL}/${NODEJS_VERSION}/node-${NODEJS_VERSION}-win-x64.zip
+  NODEJS_DOWNLOAD_URL: 'https://npmmirror.com/mirrors/node'
+
+  # ================================================================
+  # 镜像 / 注册表地址
+  # ================================================================
+
+  # PUB_HOSTED_URL: Dart/Flutter pub 镜像
+  PUB_HOSTED_URL: 'https://pub.flutter-io.cn'
+
+  # FLUTTER_STORAGE_BASE_URL: Flutter 存储镜像（包含引擎、gradle 等）
+  FLUTTER_STORAGE_BASE_URL: 'https://storage.flutter-io.cn'
+
+  # NPM_REGISTRY_URL: npm 镜像注册表
+  NPM_REGISTRY_URL: 'https://registry.npmmirror.com'
+
+  # ================================================================
+  # 行为开关
+  # ================================================================
+
+  # HVIGOR_USER_HOME_AUTO_CREATE: 当 HVIGOR_USER_HOME 目录不存在时，
+  #   是否自动创建。设为 'false' 则跳过创建（适用于预配置的 Runner）。
+  HVIGOR_USER_HOME_AUTO_CREATE: 'true'
+
+  # NODEJS_AUTO_INSTALL: 当 NODEJS_HOME 不可用时，是否自动下载安装
+  #   Node.js。设为 'false' 则跳过下载（适用于预配置的 Runner）。
+  NODEJS_AUTO_INSTALL: 'true'
 
 # Shell executor 公共配置：UTF-8 编码修复 + Flutter PATH 自动检测
 .shell_setup:
@@ -25,45 +77,73 @@ variables:
       chcp.com 65001 2>$null
       [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
       $OutputEncoding = [System.Text.Encoding]::UTF8
-      $env:PUB_HOSTED_URL = "https://pub.flutter-io.cn"
-      $env:FLUTTER_STORAGE_BASE_URL = "https://storage.flutter-io.cn"
+      # 镜像变量已在 variables: 中定义，此处仅做校验日志
+      Write-Host "PUB_HOSTED_URL = $env:PUB_HOSTED_URL"
+      Write-Host "FLUTTER_STORAGE_BASE_URL = $env:FLUTTER_STORAGE_BASE_URL"
       git config --global --add safe.directory "$CI_PROJECT_DIR"
       foreach ($p in @($env:FLUTTER_ROOT, 'C:\flutter', "$env:USERPROFILE\flutter", "$env:USERPROFILE\fvm\default")) { if ($p -and (Test-Path "$p\bin\flutter.bat")) { $env:Path = "$p\bin;$env:Path"; git config --global --add safe.directory $p; break } }
       # 设置 HarmonyOS/OpenHarmony SDK 路径，Flutter ohos 分支要求通过 config 或特定目录结构校验
       foreach ($p in @($env:OHOS_SDK_HOME, $env:OHOS_HOME, $env:HOS_SDK_HOME)) { if ($p -and (Test-Path $p)) { flutter config --ohos-sdk $p; break } }
-      # hvigor 不支持路径中有空格。设置 HVIGOR_USER_HOME 到无空格路径
-      if (-not (Test-Path 'C:\hvigor_home')) { New-Item -ItemType Directory -Path 'C:\hvigor_home' -Force *>$null }
-      $env:HVIGOR_USER_HOME = 'C:\hvigor_home'
-      # 下载 Portable Node.js 到 D:\nodejs（无空格），绕过 D:\Program Files\nodejs 的空格问题。
-      # 仅检查 npm.cmd 存在还不够 —— 之前的构建运行 `npm install` 在 D:\nodejs
-      # 可能损坏了 node_modules\npm\ 内部文件（如 npm-prefix.js）。
-      # 直接检查关键文件是否存在来判断 npm 是否健康。
-      if (-not (Test-Path 'D:\nodejs\node_modules\npm\bin\npm-prefix.js')) {
-        Write-Host 'Node.js installation broken or missing, re-downloading...'
-        Remove-Item -Path 'D:\nodejs' -Recurse -Force -ErrorAction SilentlyContinue
+      # HVIGOR_USER_HOME 来自 variables:（默认 C:\hvigor_home），
+      # 可在 GitLab UI / Runner config.toml 中覆盖。路径不能有空格。
+      if ($env:HVIGOR_USER_HOME -match '\s') {
+        Write-Error "HVIGOR_USER_HOME contains spaces, which breaks hvigor: $env:HVIGOR_USER_HOME"
+        exit 1
+      }
+      if ($env:HVIGOR_USER_HOME_AUTO_CREATE -eq 'true') {
+        if (-not (Test-Path $env:HVIGOR_USER_HOME)) {
+          New-Item -ItemType Directory -Path $env:HVIGOR_USER_HOME -Force *>$null
+          Write-Host "Created HVIGOR_USER_HOME: $env:HVIGOR_USER_HOME"
+        }
+      } else {
+        Write-Host "HVIGOR_USER_HOME auto-create disabled, expecting pre-existing: $env:HVIGOR_USER_HOME"
+      }
+      Write-Host "HVIGOR_USER_HOME = $env:HVIGOR_USER_HOME"
+      # NODEJS_HOME 来自 variables:（默认 D:\nodejs），可在 GitLab UI / Runner config.toml 中覆盖
+      $nodejsDir = $env:NODEJS_HOME
+      if ($nodejsDir -match '\s') {
+        Write-Error "NODEJS_HOME contains spaces, which breaks npm: $nodejsDir"
+        exit 1
+      }
+      $npmHealthCheckFile = "$nodejsDir\node_modules\npm\bin\npm-prefix.js"
+      if (-not (Test-Path $npmHealthCheckFile)) {
+        if ($env:NODEJS_AUTO_INSTALL -eq 'false') {
+          Write-Error "NODEJS_HOME not found at $nodejsDir and NODEJS_AUTO_INSTALL is false. Please pre-install Node.js or set NODEJS_AUTO_INSTALL=true."
+          exit 1
+        }
+        Write-Host "Node.js installation missing or broken at $nodejsDir, re-downloading..."
+        Remove-Item -Path $nodejsDir -Recurse -Force -ErrorAction SilentlyContinue
         $ProgressPreference = 'SilentlyContinue'
+        $nodeDownloadUrl = "$env:NODEJS_DOWNLOAD_URL/$env:NODEJS_VERSION/node-$env:NODEJS_VERSION-win-x64.zip"
         $nodeZip = "$env:TEMP\node-portable.zip"
         $nodeExtract = "$env:TEMP\node-extract"
         Remove-Item -Path $nodeExtract -Recurse -Force -ErrorAction SilentlyContinue
-        Invoke-WebRequest -Uri 'https://npmmirror.com/mirrors/node/v20.18.0/node-v20.18.0-win-x64.zip' -OutFile $nodeZip
+        Write-Host "Downloading Node.js from: $nodeDownloadUrl"
+        Invoke-WebRequest -Uri $nodeDownloadUrl -OutFile $nodeZip
         Expand-Archive -Path $nodeZip -DestinationPath $nodeExtract -Force
         $innerDir = Get-ChildItem -Path $nodeExtract -Directory | Select-Object -First 1
-        Remove-Item -Path 'D:\nodejs' -Recurse -Force -ErrorAction SilentlyContinue
-        Move-Item -Path $innerDir.FullName -Destination 'D:\nodejs'
+        Remove-Item -Path $nodejsDir -Recurse -Force -ErrorAction SilentlyContinue
+        Move-Item -Path $innerDir.FullName -Destination $nodejsDir
         Remove-Item $nodeZip -Force -ErrorAction SilentlyContinue
         Remove-Item $nodeExtract -Recurse -Force -ErrorAction SilentlyContinue
-        Write-Host 'Portable Node.js installed to D:\nodejs'
+        Write-Host "Portable Node.js installed to $nodejsDir"
       }
-      # 显式设置 NODE_HOME，确保 hvigor 使用 D:\nodejs（无空格），同时配置 npm 国内镜像
-      $env:NODE_HOME = 'D:\nodejs'
-      $env:Path = "D:\nodejs;$env:Path"
-      # 通过环境变量设置 npm registry（hvigor 子进程继承 env 变量，无需依赖 .npmrc 文件）
-      $env:npm_config_registry = "https://registry.npmmirror.com"
+      # 显式设置 NODE_HOME，确保 hvigor 使用无空格路径
+      $env:NODE_HOME = $env:NODEJS_HOME
+      $env:Path = "$env:NODEJS_HOME;$env:Path"
+      Write-Host "NODE_HOME = $env:NODE_HOME"
+      # 使用 NPM_REGISTRY_URL 变量（默认 https://registry.npmmirror.com）
+      if ([string]::IsNullOrEmpty($env:NPM_REGISTRY_URL)) {
+        Write-Error "NPM_REGISTRY_URL is not set"
+        exit 1
+      }
+      $env:npm_config_registry = $env:NPM_REGISTRY_URL
       # 同时持久化到 .npmrc 作为兜底
-      npm config set registry https://registry.npmmirror.com
+      npm config set registry $env:NPM_REGISTRY_URL
+      Write-Host "npm registry set to $env:NPM_REGISTRY_URL"
       # 清理 npm 缓存，避免 SYSTEM 账户缓存损坏导致 npm 子进程静默失败
       npm cache clean --force 2>$null
-      Write-Host "Node.js at D:\nodejs, npm registry: https://registry.npmmirror.com"
+      Write-Host "Node.js at $env:NODEJS_HOME, npm registry: $env:NPM_REGISTRY_URL"
       # hvigor 构建启动时会通过 npm install pnpm@10.28.2 安装 pnpm。
       # 由于 hvigor 作为 Flutter 子进程运行时环境变量（PATH 被 _buildOhosEnvironment() 替换）
       # 可能与 before_script 不同，导致 npm 调用静默失败（No stdout output）。
