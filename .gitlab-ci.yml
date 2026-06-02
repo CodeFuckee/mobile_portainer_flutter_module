@@ -72,7 +72,12 @@ variables:
     - |
       git config --global --add safe.directory "$CI_PROJECT_DIR"
       echo "CI env: PUB_HOSTED_URL = $PUB_HOSTED_URL"
-      bash scripts/ci_setup_flutter.sh || pwsh -File scripts/ci_setup_flutter.ps1 || powershell -File scripts/ci_setup_flutter.ps1 || echo "Flutter auto-detect skipped"
+      # macOS/Linux: 将常见 Flutter 路径加入 PATH
+      # export 在 PowerShell 中会失败，|| cd . 作为无害回退
+      export PATH="$HOME/flutter/bin:$HOME/fvm/default/bin:/usr/local/flutter/bin:$PATH" || cd .
+      # Windows PowerShell: 将常见 Flutter 路径加入 PATH
+      # bash 中 $env: 语法无效，|| cd . 作为无害回退
+      $env:Path = "$env:USERPROFILE\flutter\bin;$env:USERPROFILE\fvm\default\bin;$env:Path" || cd .
 
 flutter_analyze:
   extends: .setup
