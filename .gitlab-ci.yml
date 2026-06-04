@@ -13,7 +13,7 @@ variables:
   HVIGOR_USER_HOME: 'C:\hvigor_home'
   NODEJS_HOME: 'D:\nodejs'
   # FLUTTER_ROOT: Flutter SDK 根目录（可选，Runner 上 Flutter 已在 PATH 时无需设置）
-  # HOS_SDK_HOME: HarmonyOS SDK 目录（可选）
+  HOS_SDK_HOME: '/home/ckd/hos-sdk'
 
   # ================================================================
   # 镜像 / 注册表地址
