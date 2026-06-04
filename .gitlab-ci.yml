@@ -97,6 +97,23 @@ flutter_build_har:
     - bash scripts/ci_build_har.sh; powershell -File scripts/ci_build_har.ps1; echo "HAR build step complete"
 
 # ================================================================
+# flutter_build_apk —— Android Debug APK
+# ================================================================
+flutter_build_apk:
+  extends: .setup
+  stage: build
+  tags:
+    - flutter
+    - android
+  script:
+    - flutter pub get
+    - flutter build apk --release
+  artifacts:
+    paths:
+      - build/host/outputs/apk/release/app-release.apk
+    expire_in: 1 day
+
+# ================================================================
 # selenium_tests
 # ================================================================
 selenium_tests:
