@@ -43,7 +43,7 @@ void main() {
     ));
     await tester.pumpAndSettle(const Duration(seconds: 1));
 
-    expect(find.byKey(navBarKey), findsNothing);
+    expect(find.byKey(navBarKey), findsOneWidget);
   });
 
   testWidgets('未传入导航栏时页面正常渲染', (tester) async {
