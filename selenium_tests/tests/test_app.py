@@ -21,6 +21,9 @@ class TestAppLoad:
 class TestLogin:
     def test_text_input_visible(self, driver):
         page = LoginPage(driver)
+        # Flutter 的 input.flt-text-editing 是焦点后才创建的隐藏元素，
+        # 先触发焦点让它出现
+        page._focus_first_textfield()
         el = page.wait_visible(*page.USERNAME_INPUT)
         assert el.is_displayed(), "文本输入框应可见"
 
