@@ -47,17 +47,6 @@ variables:
   before_script:
     - |
       set +e
-      echo "=== DIAGNOSTICS ==="
-      echo "HOME=$HOME"
-      echo "HOS_SDK_HOME=$HOS_SDK_HOME"
-      echo "HOS SDK dir exists:"
-      ls -la "$HOS_SDK_HOME/" 2>&1 || echo "(dir not readable)"
-      ls -la "$HOS_SDK_HOME/hmscore" 2>&1 || echo "(hmscore not readable)"
-      ls -la "$HOS_SDK_HOME/openharmony" 2>&1 || echo "(openharmony not readable)"
-      echo "--- whoami/id ---"
-      whoami
-      id
-      echo "=== END DIAGNOSTICS ==="
       git config --global --add safe.directory "$CI_PROJECT_DIR"
       echo "CI env: PUB_HOSTED_URL = $PUB_HOSTED_URL"
       export HOS_SDK_HOME="${HOS_SDK_HOME:-/home/ckd/hos-sdk}"
