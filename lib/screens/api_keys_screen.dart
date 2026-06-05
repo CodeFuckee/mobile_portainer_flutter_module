@@ -16,6 +16,7 @@ class _ApiKeysScreenState extends State<ApiKeysScreen> {
   List<Map<String, dynamic>> _keys = [];
   bool _isLoading = true;
   String? _error;
+  final Set<int> _visibleKeys = {};
 
   @override
   void initState() {
@@ -176,6 +177,11 @@ class _ApiKeysScreenState extends State<ApiKeysScreen> {
     }
   }
 
+  String _maskApiKey(String key) {
+    if (key.length <= 8) return '*' * key.length;
+    return '${key.substring(0, 4)}****${key.substring(key.length - 4)}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
@@ -249,6 +255,8 @@ class _ApiKeysScreenState extends State<ApiKeysScreen> {
     final name = key['name']?.toString() ?? key['id']?.toString() ?? 'Key';
     final createdAt = _formatDate(key['created_at']?.toString());
     final expiresAt = key['expires_at']?.toString();
+    final keyHash = '$name-$createdAt-${keyValue.length}'.hashCode;
+    final isVisible = _visibleKeys.contains(keyHash);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -265,6 +273,19 @@ class _ApiKeysScreenState extends State<ApiKeysScreen> {
                     style: Theme.of(context).textTheme.titleMedium,
                     overflow: TextOverflow.ellipsis,
                   ),
+                ),
+                IconButton(
+                  icon: Icon(isVisible ? Icons.visibility_off : Icons.visibility, size: 20),
+                  onPressed: () {
+                    setState(() {
+                      if (isVisible) {
+                        _visibleKeys.remove(keyHash);
+                      } else {
+                        _visibleKeys.add(keyHash);
+                      }
+                    });
+                  },
+                  tooltip: isVisible ? t.actionHide : t.actionShow,
                 ),
                 IconButton(
                   icon: const Icon(Icons.copy, size: 20),
@@ -291,7 +312,7 @@ class _ApiKeysScreenState extends State<ApiKeysScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      keyValue,
+                      isVisible ? keyValue : _maskApiKey(keyValue),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         fontFamily: 'monospace',
                       ),

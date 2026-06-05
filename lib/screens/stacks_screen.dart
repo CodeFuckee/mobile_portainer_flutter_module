@@ -183,16 +183,7 @@ class StacksScreenState extends State<StacksScreen> {
                         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(12),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => StackContainersScreen(
-                                  stackName: stackName,
-                                ),
-                              ),
-                            );
-                          },
+                          onTap: () => _onStackTap(stackName),
                           child: Padding(
                             padding: const EdgeInsets.all(12.0),
                             child: Column(

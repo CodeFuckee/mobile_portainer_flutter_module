@@ -76,57 +76,7 @@ class _ResourcesScreenState extends State<ResourcesScreen>
     final t = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final isWide = screenWidth / screenHeight > 18 / 16;
-
-    if (isWide) {
-      return _buildMasterDetail(t, colorScheme, screenWidth);
-    }
-
-    return Column(
-      children: [
-        Container(
-          color: colorScheme.surface,
-          child: TabBar(
-            controller: _tabController,
-            isScrollable: true,
-            tabAlignment: TabAlignment.start,
-            dividerColor: Colors.transparent,
-            tabs: _tabs.map((tab) {
-              return Tab(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(tab.icon, size: 18),
-                    const SizedBox(width: 6),
-                    Text(_titleFor(t, tab)),
-                  ],
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-        Expanded(
-          child: Stack(
-            children: [
-              TabBarView(
-                controller: _tabController,
-                children: _tabs.map((tab) => tab.child).toList(),
-              ),
-              if (_tabController.index == 0)
-                Positioned(
-                  right: 16,
-                  bottom: AppTheme.fabBottomInset,
-                  child: FloatingActionButton(
-                    onPressed: () => _showPullImageDialog(context),
-                    child: const Icon(Icons.add),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ],
-    );
+    return _buildMasterDetail(t, colorScheme, screenWidth);
   }
 
   Widget _buildMasterDetail(AppLocalizations t, ColorScheme colorScheme, double totalWidth) {

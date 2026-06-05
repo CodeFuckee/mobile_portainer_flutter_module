@@ -68,7 +68,17 @@ Supported platforms: **Android · iOS · macOS · Web · OpenHarmony**
 ### Web UI
 
 <div align="center">
-  <img src="images/web_desktop.png" width="100%" alt="Web Dashboard" />
+  <img src="images/web_login.png" width="100%" alt="Web 登录" />
+  <img src="images/web_dashboard_desktop.png" width="100%" alt="Web 仪表盘" />
+  <img src="images/web_containers_desktop.png" width="100%" alt="Web 容器" />
+  <img src="images/web_containers_detail_desktop.png" width="100%" alt="Web 容器详情" />
+  <img src="images/web_containers_log_desktop.png" width="100%" alt="Web 容器日志" />
+  <img src="images/web_images_detail_desktop.png" width="100%" alt="Web 镜像详情" />
+  <img src="images/web_networks_detail_desktop.png" width="100%" alt="Web 网络详情" />
+  <img src="images/web_stacks_detail_desktop.png" width="100%" alt="Web 应用栈详情" />
+  <img src="images/web_volumes_detail_desktop.png" width="100%" alt="Web 卷详情" />
+  <img src="images/web_ports_detail_desktop.png" width="100%" alt="Web 可用端口" />
+  <img src="images/web_settings_desktop.png" width="100%" alt="Web 设置" />
 </div>
 
 ### Mobile UI

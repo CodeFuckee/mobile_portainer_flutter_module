@@ -54,6 +54,8 @@
   "msgServerSwitched": "已切换到 {name}",
   "actionEdit": "编辑",
   "actionCopy": "复制",
+  "actionShow": "显示",
+  "actionHide": "隐藏",
   "actionDelete": "删除",
   "actionDeleteAll": "全部删除",
   "msgConfirmDeleteAllContainers": "确定要删除该应用栈下的所有容器吗？此操作无法撤销。",

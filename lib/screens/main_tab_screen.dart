@@ -118,10 +118,8 @@ class _MainTabScreenState extends State<MainTabScreen> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final isWide = screenWidth / screenHeight > 18 / 16;
 
-    if (isWide && _selectedIndex == 1) {
+    if (_selectedIndex == 1) {
       return _buildContainersMasterDetail(t, screenWidth);
     }
 
@@ -152,7 +150,7 @@ class _MainTabScreenState extends State<MainTabScreen> {
           layoutMode: _containerLayoutMode,
         ),
         ResourcesScreen(
-          bottomNavBar: isWide ? bottomNavBar : null,
+          bottomNavBar: bottomNavBar,
         ),
         SettingsScreen(
           key: _settingsKey,
@@ -178,7 +176,7 @@ class _MainTabScreenState extends State<MainTabScreen> {
       body: Stack(
         children: [
           body,
-          if (!isWide || _selectedIndex != 2)
+          if (_selectedIndex != 2)
             Positioned(
               left: 0,
               right: 0,

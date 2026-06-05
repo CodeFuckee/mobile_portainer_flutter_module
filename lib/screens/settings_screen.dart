@@ -41,6 +41,7 @@ class SettingsScreenState extends State<SettingsScreen> {
   List<Map<String, dynamic>> _apiKeys = [];
   bool _isLoadingKeys = true;
   String? _apiKeyError;
+  final Set<int> _visibleApiKeys = {};
 
   @override
   void initState() {
@@ -623,6 +624,11 @@ class SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  String _maskApiKey(String key) {
+    if (key.length <= 8) return '*' * key.length;
+    return '${key.substring(0, 4)}****${key.substring(key.length - 4)}';
+  }
+
   // --- UI Build Methods ---
 
   @override
@@ -1020,6 +1026,8 @@ class SettingsScreenState extends State<SettingsScreen> {
     final name = key['name']?.toString() ?? key['id']?.toString() ?? 'Key';
     final createdAt = _formatDate(key['created_at']?.toString());
     final expiresAt = key['expires_at']?.toString();
+    final keyHash = '$name-$createdAt-${keyValue.length}'.hashCode;
+    final isVisible = _visibleApiKeys.contains(keyHash);
 
     return Column(
       children: [
@@ -1041,6 +1049,20 @@ class SettingsScreenState extends State<SettingsScreen> {
                           Text('${t.labelCreatedAt}: $createdAt', style: textTheme.bodySmall),
                       ],
                     ),
+                  ),
+                  IconButton(
+                    icon: Icon(isVisible ? Icons.visibility_off_rounded : Icons.visibility_rounded, size: 18),
+                    onPressed: () {
+                      setState(() {
+                        if (isVisible) {
+                          _visibleApiKeys.remove(keyHash);
+                        } else {
+                          _visibleApiKeys.add(keyHash);
+                        }
+                      });
+                    },
+                    tooltip: isVisible ? t.actionHide : t.actionShow,
+                    visualDensity: VisualDensity.compact,
                   ),
                   IconButton(
                     icon: const Icon(Icons.copy_rounded, size: 18),
@@ -1070,7 +1092,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        keyValue,
+                        isVisible ? keyValue : _maskApiKey(keyValue),
                         style: textTheme.bodySmall?.copyWith(fontFamily: 'monospace'),
                         overflow: TextOverflow.ellipsis,
                       ),

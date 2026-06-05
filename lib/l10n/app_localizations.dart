@@ -425,6 +425,18 @@ abstract class AppLocalizations {
   /// **'Copy'**
   String get actionCopy;
 
+  /// No description provided for @actionShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Show'**
+  String get actionShow;
+
+  /// No description provided for @actionHide.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide'**
+  String get actionHide;
+
   /// No description provided for @actionDelete.
   ///
   /// In en, this message translates to:

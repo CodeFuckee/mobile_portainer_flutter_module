@@ -54,6 +54,8 @@
   "msgServerSwitched": "Switched to {name}",
   "actionEdit": "Edit",
   "actionCopy": "Copy",
+  "actionShow": "Show",
+  "actionHide": "Hide",
   "actionDelete": "Delete",
   "actionDeleteAll": "Delete All",
   "msgConfirmDeleteAllContainers": "Are you sure you want to delete all containers in this stack? This action cannot be undone.",

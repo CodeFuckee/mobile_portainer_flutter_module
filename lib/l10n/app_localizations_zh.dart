@@ -178,6 +178,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get actionCopy => '复制';
 
   @override
+  String get actionShow => '显示';
+
+  @override
+  String get actionHide => '隐藏';
+
+  @override
   String get actionDelete => '删除';
 
   @override

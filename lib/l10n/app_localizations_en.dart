@@ -178,6 +178,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionCopy => 'Copy';
 
   @override
+  String get actionShow => 'Show';
+
+  @override
+  String get actionHide => 'Hide';
+
+  @override
   String get actionDelete => 'Delete';
 
   @override
