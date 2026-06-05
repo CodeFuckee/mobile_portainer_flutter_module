@@ -12,7 +12,8 @@ class LoginPage(BasePage):
     """Flutter CanvasKit 登录页 — 通过键盘交互操作。"""
 
     TEXT_EDITING_INPUT = (By.CSS_SELECTOR, "input.flt-text-editing")
-    USERNAME_INPUT = TEXT_EDITING_INPUT
+    USERNAME_SEMANTICS = (By.XPATH, '//flt-semantics[contains(@role,"text")]')
+    USERNAME_INPUT = USERNAME_SEMANTICS
     LOGIN_BUTTON = (By.XPATH, '//flt-semantics[contains(text(),"Login") or contains(text(),"登录")]')
 
     def _focus_first_textfield(self):
