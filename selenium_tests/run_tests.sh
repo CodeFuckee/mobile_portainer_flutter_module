@@ -109,6 +109,95 @@ fi
 
 echo "[setup] 依赖 OK"
 
+# ---- ChromeDriver 版本检查 ----
+_check_chromedriver_version() {
+    # 仅检查 chrome 浏览器
+    if [ "$BROWSER" != "chrome" ]; then
+        return 0
+    fi
+
+    # 定位 chromedriver 路径
+    local chromedriver=""
+    if [ -n "$CHROMEDRIVER_PATH" ]; then
+        chromedriver="$CHROMEDRIVER_PATH"
+    elif command -v chromedriver &>/dev/null; then
+        chromedriver="$(command -v chromedriver)"
+    else
+        # 尝试从 webdriver-manager 缓存查找
+        chromedriver=$(python -c "
+import os, glob
+cache = os.path.expanduser('~/.wdm/drivers/chromedriver')
+if os.path.isdir(cache):
+    files = glob.glob(os.path.join(cache, '**', 'chromedriver'), recursive=True)
+    if files:
+        print(files[0])
+" 2>/dev/null)
+    fi
+
+    if [ -z "$chromedriver" ] || [ ! -x "$chromedriver" ]; then
+        echo "[chromedriver] 未找到 chromedriver，将由 webdriver-manager 自动下载"
+        return 0
+    fi
+
+    # 获取 chromedriver 版本
+    local cd_version
+    cd_version=$("$chromedriver" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+    if [ -z "$cd_version" ]; then
+        echo "[chromedriver] 警告: 无法获取 chromedriver 版本"
+        return 0
+    fi
+    local cd_major="${cd_version%%.*}"
+
+    # 定位 Chrome/Chromium 浏览器
+    local chrome_bin=""
+    if [ -n "$CHROMIUM_BINARY" ] && [ -x "$CHROMIUM_BINARY" ]; then
+        chrome_bin="$CHROMIUM_BINARY"
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        chrome_bin="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    elif command -v google-chrome &>/dev/null; then
+        chrome_bin="$(command -v google-chrome)"
+    elif command -v chromium-browser &>/dev/null; then
+        chrome_bin="$(command -v chromium-browser)"
+    elif command -v chromium &>/dev/null; then
+        chrome_bin="$(command -v chromium)"
+    fi
+
+    if [ -z "$chrome_bin" ] || [ ! -x "$chrome_bin" ]; then
+        echo "[chromedriver] 警告: 未找到 Chrome/Chromium 浏览器，跳过版本检查"
+        return 0
+    fi
+
+    # 获取 Chrome 版本
+    local chrome_version
+    chrome_version=$("$chrome_bin" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+    if [ -z "$chrome_version" ]; then
+        echo "[chromedriver] 警告: 无法获取 Chrome 版本"
+        return 0
+    fi
+    local chrome_major="${chrome_version%%.*}"
+
+    echo "[chromedriver] Chrome 浏览器:   $chrome_version (主版本: $chrome_major)"
+    echo "[chromedriver] ChromeDriver:    $cd_version (主版本: $cd_major)"
+
+    if [ "$cd_major" != "$chrome_major" ]; then
+        echo ""
+        echo "❌ ChromeDriver 版本不匹配！"
+        echo "   Chrome 主版本:        $chrome_major"
+        echo "   ChromeDriver 主版本:   $cd_major"
+        echo ""
+        echo "   修复方法："
+        echo "   1. 删除缓存，让 webdriver-manager 自动下载匹配版本："
+        echo "      rm -rf ~/.wdm/drivers/chromedriver"
+        echo "   2. 或手动指定 CHROMEDRIVER_PATH 环境变量："
+        echo "      CHROMEDRIVER_PATH=/path/to/chromedriver ./run_tests.sh"
+        exit 1
+    fi
+
+    echo "[chromedriver] ✓ 版本匹配"
+}
+
+_check_chromedriver_version
+
 # ---- 清理可能残留的 webdriver-manager 锁文件 ----
 rm -f "$HOME/.wdm/.wdm-lock-"* 2>/dev/null || true
 
@@ -149,6 +238,9 @@ else
 fi
 
 # ---- 运行测试 ----
+# 避免本地代理干扰 ChromeDriver ↔ Chrome 通信
+export NO_PROXY="localhost,127.0.0.1,::1"
+export no_proxy="$NO_PROXY"
 export TEST_BASE_URL="$BASE_URL"
 export TEST_BROWSER="$BROWSER"
 export TEST_HEADLESS="$HEADLESS"

@@ -1,10 +1,16 @@
 """冒烟测试 — 不依赖目标服务器的框架验证"""
 
 import os
+import sys
+
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
+
+# 确保 selenium_tests 目录在 sys.path 中，以便导入 conftest
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from conftest import _get_chrome_version, _find_cached_chromedriver  # noqa: E402
 
 
 _SYSTEM_CHROMEDRIVER = os.environ.get("CHROMEDRIVER_PATH", "")
@@ -13,9 +19,20 @@ _CHROMIUM_BINARY = os.environ.get("CHROMIUM_BINARY", "")
 
 @pytest.fixture(scope="session")
 def chromedriver_path():
-    """会话级别：获取 ChromeDriver 路径。Docker 环境使用系统安装的 chromedriver。"""
+    """会话级别：获取 ChromeDriver 路径。
+    优先从缓存加载匹配版本（避免网络请求），Docker 环境使用系统安装的 chromedriver。
+    """
     if _SYSTEM_CHROMEDRIVER:
         return _SYSTEM_CHROMEDRIVER
+
+    chrome_info = _get_chrome_version()
+    if chrome_info:
+        cached = _find_cached_chromedriver(chrome_info[1])
+        if cached:
+            print(f"[chromedriver] 使用缓存: {cached}")
+            return cached
+
+    print("[chromedriver] 缓存未命中，由 webdriver-manager 下载...")
     return ChromeDriverManager().install()
 
 

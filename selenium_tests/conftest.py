@@ -80,6 +80,74 @@ def _wait_flutter_ready(driver, timeout: int = 60):
         pass  # 超时不算致命错误，继续执行测试
 
 
+def _get_chrome_version() -> tuple[str, str] | None:
+    """获取 Chrome/Chromium 浏览器版本号。
+    Returns (full_version, major_version) 或 None。
+    """
+    import subprocess
+    import shutil
+
+    candidates = []
+    if CHROMIUM_BINARY:
+        candidates.append(CHROMIUM_BINARY)
+    else:
+        # macOS
+        candidates.append(
+            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        )
+        # Linux
+        for name in ("google-chrome", "chromium-browser", "chromium"):
+            path = shutil.which(name)
+            if path:
+                candidates.append(path)
+
+    for bin_path in candidates:
+        if not os.path.isfile(bin_path):
+            continue
+        try:
+            out = subprocess.check_output(
+                [bin_path, "--version"], stderr=subprocess.STDOUT, timeout=5
+            ).decode()
+            import re
+            m = re.search(r"(\d+\.\d+\.\d+\.\d+)", out)
+            if m:
+                full = m.group(1)
+                major = full.split(".")[0]
+                return (full, major)
+        except Exception:
+            continue
+    return None
+
+
+def _find_cached_chromedriver(chrome_major: str) -> str | None:
+    """在 webdriver-manager 缓存中查找匹配 Chrome 主版本的 chromedriver。
+    Returns chromedriver 路径或 None。
+    """
+    import glob as _glob
+
+    cache = os.path.expanduser("~/.wdm/drivers/chromedriver")
+    if not os.path.isdir(cache):
+        return None
+
+    candidates = []
+    for f in _glob.glob(
+        os.path.join(cache, "**", "chromedriver"), recursive=True
+    ):
+        # 文件名如: .../148.0.7778.181/chromedriver-mac-arm64/chromedriver
+        parts = f.split(os.sep)
+        for part in parts:
+            if part.startswith(chrome_major + "."):
+                candidates.append((part, f))
+                break
+
+    if not candidates:
+        return None
+
+    # 取版本号最高的
+    candidates.sort(key=lambda x: [int(n) for n in x[0].split(".")], reverse=True)
+    return candidates[0][1]
+
+
 def _create_chrome_driver(base_url: str = ""):
     options = webdriver.ChromeOptions()
     if CHROMIUM_BINARY:
@@ -97,7 +165,17 @@ def _create_chrome_driver(base_url: str = ""):
     if CHROMEDRIVER_PATH:
         service = ChromeService(executable_path=CHROMEDRIVER_PATH)
     else:
-        service = ChromeService(ChromeDriverManager().install())
+        # 优先从缓存加载匹配版本，避免网络请求
+        cached = None
+        chrome_info = _get_chrome_version()
+        if chrome_info:
+            cached = _find_cached_chromedriver(chrome_info[1])
+        if cached:
+            print(f"[chromedriver] 使用缓存: {cached}")
+            service = ChromeService(executable_path=cached)
+        else:
+            print("[chromedriver] 缓存未命中，由 webdriver-manager 下载...")
+            service = ChromeService(ChromeDriverManager().install())
 
     return webdriver.Chrome(service=service, options=options)
 
