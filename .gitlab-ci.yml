@@ -134,9 +134,9 @@ selenium_tests:
     - echo "step2 pull python image"
     - docker pull docker.1ms.run/python:3.11-slim 2>&1
     - echo "step3 build app image"
-    - docker build -f Dockerfile.selenium --target app-server -t selenium_app . 2>&1
+    - docker build -f Dockerfile.selenium.cn --target app-server -t selenium_app . 2>&1
     - echo "step4 build test image"
-    - docker build -f Dockerfile.selenium --target test-runner -t selenium_tests . 2>&1
+    - docker build -f Dockerfile.selenium.cn --target test-runner -t selenium_tests . 2>&1
     - echo "step5 up app"
     - docker rm -f selenium_app 2>/dev/null || true
     - docker run -d --name selenium_app -p 9000:9000 selenium_app

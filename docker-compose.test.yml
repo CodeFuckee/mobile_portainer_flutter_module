@@ -5,7 +5,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile.selenium
+      dockerfile: Dockerfile.selenium.cn
       target: app-server
     ports:
       - "9000:9000"
@@ -23,7 +23,7 @@ services:
   selenium-tests:
     build:
       context: .
-      dockerfile: Dockerfile.selenium
+      dockerfile: Dockerfile.selenium.cn
       target: test-runner
     network_mode: "service:app"
     depends_on:

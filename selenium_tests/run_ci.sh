@@ -8,7 +8,7 @@ docker --version
 docker compose version
 
 echo "[2/7] verify files"
-ls -la docker-compose.test.yml Dockerfile.selenium
+ls -la docker-compose.test.yml Dockerfile.selenium.cn
 
 echo "[3/7] compose config"
 docker compose -f docker-compose.test.yml config

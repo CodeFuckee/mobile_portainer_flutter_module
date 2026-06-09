@@ -3,7 +3,7 @@
 # Flutter Web 构建由 CI 的 flutter_build_web 阶段完成，
 # 通过 artifacts 传入 build/web/，无需 Flutter SDK 镜像。
 # ============================================================
-FROM python:3.11-slim AS app-server
+FROM docker.1ms.run/python:3.11-slim AS app-server
 
 WORKDIR /app
 
@@ -20,7 +20,7 @@ CMD ["python", "selenium_tests/mock_backend.py"]
 # ============================================================
 # Stage 2: Selenium 测试运行器（Python + Chrome）
 # ============================================================
-FROM python:3.11-slim AS test-runner
+FROM docker.1ms.run/python:3.11-slim AS test-runner
 
 WORKDIR /app
 
