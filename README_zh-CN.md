@@ -1,8 +1,29 @@
-<div style="text-align: center;">
-  <img src="icon.png" />
-</div>
+<div align="center">
+  <img src="icon.png" alt="Logo" width="120" />
+  <h1>Mobile Portainer Flutter</h1>
 
-# Mobile Portainer Flutter
+  <p>
+    <a href="https://github.com/CodeFuckee/mobile_portainer_flutter_module/blob/main/LICENSE">
+      <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" />
+    </a>
+    <a href="https://github.com/CodeFuckee/mobile_portainer_flutter_module/actions">
+      <img src="https://img.shields.io/github/actions/workflow/status/CodeFuckee/mobile_portainer_flutter_module/ci.yml?branch=main" alt="CI Status" />
+    </a>
+    <a href="https://github.com/CodeFuckee/mobile_portainer_flutter_module/stargazers">
+      <img src="https://img.shields.io/github/stars/CodeFuckee/mobile_portainer_flutter_module?style=social" alt="Stars" />
+    </a>
+    <a href="https://github.com/CodeFuckee/mobile_portainer_flutter_module/network/members">
+      <img src="https://img.shields.io/github/forks/CodeFuckee/mobile_portainer_flutter_module?style=social" alt="Forks" />
+    </a>
+  </p>
+
+  <p>
+    <img src="https://img.shields.io/badge/平台-Android%20%7C%20iOS%20%7C%20macOS%20%7C%20Web%20%7C%20OpenHarmony-brightgreen" alt="Platforms" />
+    <img src="https://img.shields.io/badge/Flutter-3.35.8-02569B?logo=flutter" alt="Flutter" />
+    <img src="https://img.shields.io/badge/Dart-3.9.2-0175C2?logo=dart" alt="Dart" />
+    <img src="https://img.shields.io/badge/Made%20with-%E2%9D%A4%EF%B8%8F-red" alt="Made with love" />
+  </p>
+</div>
 
 [English](README.md) | [中文](README_zh-CN.md)
 
@@ -11,6 +32,16 @@
 这是一个 Flutter **module**（add-to-app 模式），设计用于嵌入原生宿主应用，同时支持通过 Docker 独立部署 Web 版本。
 
 支持平台：**Android · iOS · macOS · Web · OpenHarmony（鸿蒙）**
+
+## 📈 Star 增长趋势
+
+<a href="https://www.star-history.com/#CodeFuckee/mobile_portainer_flutter_module&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=CodeFuckee/mobile_portainer_flutter_module&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=CodeFuckee/mobile_portainer_flutter_module&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=CodeFuckee/mobile_portainer_flutter_module&type=Date" />
+  </picture>
+</a>
 
 ## ✨ 主要功能
 

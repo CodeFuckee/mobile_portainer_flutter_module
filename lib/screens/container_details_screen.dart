@@ -9,7 +9,6 @@ import '../theme/theme_extensions.dart';
 import '../widgets/section_title.dart';
 import '../widgets/info_card.dart';
 import '../widgets/info_row.dart';
-import '../widgets/error_view.dart';
 import '../widgets/loading_view.dart';
 import '../widgets/action_sheet.dart';
 import 'container_logs_screen.dart';
