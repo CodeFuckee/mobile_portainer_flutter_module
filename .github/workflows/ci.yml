@@ -138,10 +138,12 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-13
+          - os: macos-14
             arch: x64
+            build_cmd: arch -x86_64 flutter build macos --release
           - os: macos-15
             arch: arm64
+            build_cmd: flutter build macos --release
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -160,7 +162,7 @@ jobs:
         run: flutter gen-l10n
 
       - name: Build macOS
-        run: flutter build macos --release
+        run: ${{ matrix.build_cmd }}
 
       - name: Package DMG
         run: |
@@ -183,10 +185,141 @@ jobs:
           retention-days: 7
 
   # ================================================================
+  # Stage 3: Windows 桌面端构建（x64 + ARM64）
+  # ================================================================
+  build-windows:
+    needs: selenium
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            arch: x64
+          - os: windows-11-arm
+            arch: arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate l10n
+        run: flutter gen-l10n
+
+      - name: Build Windows
+        run: flutter build windows --release
+
+      - name: Package Windows
+        shell: pwsh
+        run: |
+          $src = "build/windows/${{ matrix.arch }}/runner/Release/*"
+          Compress-Archive -Path $src -DestinationPath "mobile_portainer_flutter_module-windows-${{ matrix.arch }}.zip"
+
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-${{ matrix.arch }}
+          path: mobile_portainer_flutter_module-windows-${{ matrix.arch }}.zip
+          retention-days: 7
+
+  # ================================================================
+  # Stage 3: Linux 桌面端构建（x64 + ARM64）
+  # ================================================================
+  build-linux:
+    needs: selenium
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: x64
+          - os: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: Install Linux build deps
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate l10n
+        run: flutter gen-l10n
+
+      - name: Build Linux
+        run: flutter build linux --release
+
+      - name: Package Linux
+        run: |
+          cd "build/linux/${{ matrix.arch }}/release/bundle"
+          tar -czf "../../../../../mobile_portainer_flutter_module-linux-${{ matrix.arch }}.tar.gz" .
+
+      - name: Upload Linux build
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-${{ matrix.arch }}
+          path: mobile_portainer_flutter_module-linux-${{ matrix.arch }}.tar.gz
+          retention-days: 7
+
+  # ================================================================
+  # Stage 3: iOS 构建
+  # ================================================================
+  build-ios:
+    needs: selenium
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate l10n
+        run: flutter gen-l10n
+
+      - name: Build iOS (no codesign)
+        run: flutter build ios --release --no-codesign
+
+      - name: Package iOS
+        run: |
+          cd build/ios/Release-iphoneos
+          zip -r "../../mobile_portainer_flutter_module-ios.zip" Runner.app
+
+      - name: Upload iOS build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-app
+          path: build/ios/mobile_portainer_flutter_module-ios.zip
+          retention-days: 7
+
+  # ================================================================
   # Stage 4: Docker 构建 + 推送（所有测试和构建通过后）
   # ================================================================
   docker:
-    needs: [build-web, selenium, build-apk, build-macos]
+    needs: [build-web, selenium, build-apk, build-macos, build-windows, build-linux, build-ios]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:

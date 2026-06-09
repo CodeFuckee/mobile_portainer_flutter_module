@@ -182,6 +182,111 @@ flutter_build_apk:
     expire_in: 1 day
 
 # ================================================================
+# flutter_build_windows_x64
+# ================================================================
+flutter_build_windows_x64:
+  extends: .setup
+  stage: build
+  needs:
+    - job: selenium_tests
+  tags:
+    - windows
+    - flutter
+  script:
+    - flutter pub get
+    - flutter gen-l10n
+    - flutter build windows --release
+    - powershell Compress-Archive -Path "build/windows/x64/runner/Release/*" -DestinationPath "mobile_portainer_flutter_module-windows-x64.zip"
+  artifacts:
+    paths:
+      - mobile_portainer_flutter_module-windows-x64.zip
+    expire_in: 7 days
+
+# ================================================================
+# flutter_build_windows_arm64
+# ================================================================
+flutter_build_windows_arm64:
+  extends: .setup
+  stage: build
+  needs:
+    - job: selenium_tests
+  tags:
+    - windows-arm64
+    - flutter
+  script:
+    - flutter pub get
+    - flutter gen-l10n
+    - flutter build windows --release
+    - powershell Compress-Archive -Path "build/windows/arm64/runner/Release/*" -DestinationPath "mobile_portainer_flutter_module-windows-arm64.zip"
+  artifacts:
+    paths:
+      - mobile_portainer_flutter_module-windows-arm64.zip
+    expire_in: 7 days
+
+# ================================================================
+# flutter_build_linux_x64
+# ================================================================
+flutter_build_linux_x64:
+  extends: .setup
+  stage: build
+  needs:
+    - job: selenium_tests
+  tags:
+    - linux
+    - flutter
+  script:
+    - flutter pub get
+    - flutter gen-l10n
+    - flutter build linux --release
+    - cd build/linux/x64/release/bundle && tar -czf ../../../../../mobile_portainer_flutter_module-linux-x64.tar.gz .
+  artifacts:
+    paths:
+      - mobile_portainer_flutter_module-linux-x64.tar.gz
+    expire_in: 7 days
+
+# ================================================================
+# flutter_build_linux_arm64
+# ================================================================
+flutter_build_linux_arm64:
+  extends: .setup
+  stage: build
+  needs:
+    - job: selenium_tests
+  tags:
+    - linux-arm64
+    - flutter
+  script:
+    - flutter pub get
+    - flutter gen-l10n
+    - flutter build linux --release
+    - cd build/linux/arm64/release/bundle && tar -czf ../../../../../mobile_portainer_flutter_module-linux-arm64.tar.gz .
+  artifacts:
+    paths:
+      - mobile_portainer_flutter_module-linux-arm64.tar.gz
+    expire_in: 7 days
+
+# ================================================================
+# flutter_build_ios
+# ================================================================
+flutter_build_ios:
+  extends: .setup
+  stage: build
+  needs:
+    - job: selenium_tests
+  tags:
+    - macos-arm
+    - flutter
+  script:
+    - flutter pub get
+    - flutter gen-l10n
+    - flutter build ios --release --no-codesign
+    - cd build/ios/Release-iphoneos && zip -r ../../mobile_portainer_flutter_module-ios.zip Runner.app
+  artifacts:
+    paths:
+      - build/ios/mobile_portainer_flutter_module-ios.zip
+    expire_in: 7 days
+
+# ================================================================
 # selenium_tests
 # ================================================================
 selenium_tests:
@@ -240,6 +345,11 @@ deploy_to_synology:
     - job: flutter_build_macos_intel
     - job: flutter_build_macos_arm
     - job: flutter_build_har
+    - job: flutter_build_windows_x64
+    - job: flutter_build_windows_arm64
+    - job: flutter_build_linux_x64
+    - job: flutter_build_linux_arm64
+    - job: flutter_build_ios
   before_script:
     - DOCKER="docker"
     - DOCKERFILE="Dockerfile.web.cn"
