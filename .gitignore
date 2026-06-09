@@ -521,3 +521,5 @@ report.html
 .build_test_cache
 integration_test/data/img2prompt.png
 .android/gradle/wrapper/gradle-wrapper.jar
+
+.hermes/
