@@ -1,7 +1,8 @@
 stages:
-  - analyze
+  - check
+  - pretest
+  - test
   - build
-  - selenium
   - deploy
 
 variables:
@@ -57,7 +58,7 @@ variables:
 # ================================================================
 flutter_analyze:
   extends: .setup
-  stage: analyze
+  stage: check
   tags:
     - harmony
     - flutter
@@ -67,11 +68,11 @@ flutter_analyze:
     - flutter test
 
 # ================================================================
-# flutter_build_web
+# flutter_build_web（pretest：为 Selenium 和部署提供 web 构建产物）
 # ================================================================
 flutter_build_web:
   extends: .setup
-  stage: build
+  stage: pretest
   tags:
     - harmony
     - flutter
@@ -91,6 +92,8 @@ flutter_build_web:
 flutter_build_har:
   extends: .setup
   stage: build
+  needs:
+    - job: selenium_tests
   tags:
     - harmony
     - flutter
@@ -119,6 +122,8 @@ flutter_build_har:
 flutter_build_macos_intel:
   extends: .setup
   stage: build
+  needs:
+    - job: selenium_tests
   tags:
     - macos-intel
     - flutter
@@ -140,6 +145,8 @@ flutter_build_macos_intel:
 flutter_build_macos_arm:
   extends: .setup
   stage: build
+  needs:
+    - job: selenium_tests
   tags:
     - macos-arm
     - flutter
@@ -161,6 +168,8 @@ flutter_build_macos_arm:
 flutter_build_apk:
   extends: .setup
   stage: build
+  needs:
+    - job: selenium_tests
   tags:
     - flutter
     - android
@@ -176,7 +185,7 @@ flutter_build_apk:
 # selenium_tests
 # ================================================================
 selenium_tests:
-  stage: selenium
+  stage: test
   tags:
     - linux
     - docker
@@ -184,6 +193,7 @@ selenium_tests:
   needs:
     - job: flutter_build_web
       artifacts: true
+    - job: flutter_analyze
   script:
     - echo "step0 start"
     - docker --version
@@ -226,6 +236,10 @@ deploy_to_synology:
     - job: flutter_build_web
       artifacts: true
     - job: selenium_tests
+    - job: flutter_build_apk
+    - job: flutter_build_macos_intel
+    - job: flutter_build_macos_arm
+    - job: flutter_build_har
   before_script:
     - DOCKER="docker"
     - DOCKERFILE="Dockerfile.web.cn"

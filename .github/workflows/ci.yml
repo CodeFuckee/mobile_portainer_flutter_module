@@ -48,7 +48,7 @@ jobs:
         run: flutter test || echo "No tests found or tests skipped"
 
   # ================================================================
-  # Stage 2: Web 构建 + 上传产物
+  # Stage 2: Web 构建（供 Selenium 测试和 Docker 部署使用）
   # ================================================================
   build-web:
     needs: analyze
@@ -80,10 +80,10 @@ jobs:
           retention-days: 1
 
   # ================================================================
-  # Stage 2: Android APK 构建（对齐 GitLab flutter_build_apk）
+  # Stage 3: Android APK 构建（测试通过后才构建）
   # ================================================================
   build-apk:
-    needs: analyze
+    needs: selenium
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -131,10 +131,10 @@ jobs:
           retention-days: 7
 
   # ================================================================
-  # Stage 2: macOS 桌面端 DMG（Intel x64 + Apple Silicon arm64）
+  # Stage 3: macOS 桌面端 DMG（测试通过后才构建）
   # ================================================================
   build-macos:
-    needs: analyze
+    needs: selenium
     strategy:
       matrix:
         include:
@@ -183,10 +183,10 @@ jobs:
           retention-days: 7
 
   # ================================================================
-  # Stage 3: Docker 构建 + 推送（GHCR + DockerHub）
+  # Stage 4: Docker 构建 + 推送（所有测试和构建通过后）
   # ================================================================
   docker:
-    needs: build-web
+    needs: [build-web, selenium, build-apk, build-macos]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
@@ -270,7 +270,7 @@ jobs:
           cache-from: type=gha
 
   # ================================================================
-  # Stage 3: Selenium E2E 测试（对齐 GitLab selenium_tests）
+  # Stage 2: Selenium E2E 测试
   # ================================================================
   selenium:
     needs: build-web
