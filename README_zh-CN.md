@@ -7,7 +7,10 @@
       <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" />
     </a>
     <a href="https://github.com/CodeFuckee/mobile_portainer_flutter_module/actions">
-      <img src="https://img.shields.io/github/actions/workflow/status/CodeFuckee/mobile_portainer_flutter_module/ci.yml?branch=main" alt="CI Status" />
+      <img src="https://img.shields.io/github/actions/workflow/status/CodeFuckee/mobile_portainer_flutter_module/ci.yml?branch=main" alt="CI/CD" />
+    </a>
+    <a href="https://hub.docker.com/r/codefuckee/mobile-portainer-web">
+      <img src="https://img.shields.io/docker/pulls/codefuckee/mobile-portainer-web?logo=docker" alt="Docker Pulls" />
     </a>
     <a href="https://github.com/CodeFuckee/mobile_portainer_flutter_module/stargazers">
       <img src="https://img.shields.io/github/stars/CodeFuckee/mobile_portainer_flutter_module?style=social" alt="Stars" />
@@ -164,18 +167,89 @@
    flutter run
    ```
 
-### Web 部署（Docker）
+### Docker（推荐）
+
+每次推送到 `main` 分支，预构建的 Docker 镜像会自动发布到 **Docker Hub** 和 **GitHub Container Registry**。
+
+#### 方式一：Docker Hub
+
+```bash
+docker pull codefuckee/mobile-portainer-web:latest
+docker run -d \
+  --name mobile-portainer-web \
+  -p 8080:80 \
+  codefuckee/mobile-portainer-web:latest
+```
+
+#### 方式二：GitHub Container Registry
+
+```bash
+docker pull ghcr.io/codefuckee/mobile-portainer-web:latest
+docker run -d \
+  --name mobile-portainer-web \
+  -p 8080:80 \
+  ghcr.io/codefuckee/mobile-portainer-web:latest
+```
+
+#### 方式三：Docker Compose（含后端）
+
+创建 `docker-compose.yml`：
+
+```yaml
+version: '3.8'
+
+services:
+  api:
+    image: codefuckee/mobile-portainer-api:latest
+    container_name: mobile-portainer-api
+    restart: unless-stopped
+    environment:
+      - ADMIN_USER=admin
+      - ADMIN_PASSWORD=password
+      - IGNORED_EVENTS=exec_create,exec_start,exec_die
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data:/app/data
+      - /proc:/hostfs/proc:ro
+    networks:
+      - portainer
+
+  web:
+    image: codefuckee/mobile-portainer-web:latest
+    container_name: mobile-portainer-web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+    networks:
+      - portainer
+
+networks:
+  portainer:
+    driver: bridge
+```
+
+然后运行：
+
+```bash
+docker compose up -d
+```
+
+访问 `http://localhost:8080`，使用后端管理员账号登录。
+
+> **提示**：Web 前端通过 Nginx 将 API 请求代理到后端（参见 [nginx.conf](nginx.conf)）。后端容器必须在同一 Docker 网络中可通过主机名 `mobile_portainer-api` 访问。
+
+### 从源码构建
 
 ```bash
 # 构建 Web 应用
 flutter build web --release
 
-# 构建并运行 Docker 镜像
+# 本地构建并运行 Docker 镜像
 docker build -f Dockerfile.web -t mobile-portainer-web .
 docker run -d -p 8080:80 mobile-portainer-web
 ```
-
-然后访问 `http://localhost:8080`，使用后端管理员账号登录。
 
 ## ⚙️ 配置指南
 

@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD
 
 on:
   push:
@@ -11,8 +11,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  FLUTTER_VERSION: '3.35.8'
+  DEPLOY_CONTAINER_NAME: 'mobile-portainer-web'
+
 jobs:
-  analyze-and-build:
+  # ================================================================
+  # Stage 1: 静态分析 + 单元测试
+  # ================================================================
+  analyze:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,7 +27,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.8'
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: 'stable'
           cache: true
 
@@ -33,29 +40,189 @@ jobs:
       - name: Run tests
         run: flutter test
 
+  # ================================================================
+  # Stage 2: Web 构建 + 上传产物
+  # ================================================================
+  build-web:
+    needs: analyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
       - name: Build Web
         run: flutter build web --release
 
-      - name: Upload web build artifact
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Upload web build
         uses: actions/upload-artifact@v4
         with:
           name: web-build
           path: build/web/
+          retention-days: 1
 
-  web-deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: analyze-and-build
+  # ================================================================
+  # Stage 2: Android APK 构建（对齐 GitLab flutter_build_apk）
+  # ================================================================
+  build-apk:
+    needs: analyze
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build APK (release)
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: build/host/outputs/apk/release/app-release.apk
+          retention-days: 7
+
+  # ================================================================
+  # Stage 3: Docker 构建 + 推送（GHCR + DockerHub）
+  # ================================================================
+  docker:
+    needs: build-web
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
       - name: Download web build
         uses: actions/download-artifact@v4
         with:
           name: web-build
           path: build/web/
-      - name: Build and Push Docker image
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/${{ env.DEPLOY_CONTAINER_NAME }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DEPLOY_CONTAINER_NAME }}
+          tags: |
+            type=sha,prefix=
+            type=ref,event=branch
+            type=raw,value=latest
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile.web
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ================================================================
+  # Stage 3: Selenium E2E 测试（对齐 GitLab selenium_tests）
+  # ================================================================
+  selenium:
+    needs: build-web
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download web build
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build
+          path: build/web/
+
+      - name: Verify web build
+        run: ls -la build/web/index.html
+
+      - name: Pull Python image
+        run: docker pull python:3.11-slim
+
+      - name: Build app server image
+        run: docker build -f Dockerfile.selenium --target app-server -t selenium_app .
+
+      - name: Build test runner image
+        run: docker build -f Dockerfile.selenium --target test-runner -t selenium_tests .
+
+      - name: Start app server
         run: |
-          docker build -f Dockerfile.web -t ghcr.io/${{ github.repository_owner }}/mobile-portainer-web:latest .
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-          docker push ghcr.io/${{ github.repository_owner }}/mobile-portainer-web:latest
+          docker rm -f selenium_app 2>/dev/null || true
+          docker run -d --name selenium_app -p 9000:9000 selenium_app
+
+      - name: Wait for app
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:9000/info > /dev/null 2>&1 && echo "app ready" && exit 0
+            echo "wait $i"
+            sleep 1
+          done
+          echo "app failed to start" && exit 1
+
+      - name: Run Selenium tests
+        run: |
+          mkdir -p selenium_tests/reports
+          docker run --rm \
+            --network container:selenium_app \
+            -v ${{ github.workspace }}/selenium_tests/reports:/app/reports \
+            -e TEST_BASE_URL=http://localhost:9000 \
+            -e MOCK_BACKEND_URL=http://localhost:9000 \
+            -e TEST_BROWSER=chrome \
+            -e TEST_HEADLESS=true \
+            -e CHROMIUM_BINARY=/usr/bin/chromium \
+            -e CHROMEDRIVER_PATH=/usr/bin/chromedriver \
+            selenium_tests sh -c "pytest tests/ -v --html=reports/report.html --self-contained-html"
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selenium-report
+          path: selenium_tests/reports/report.html
+          retention-days: 7
+
+      - name: Cleanup
+        if: always()
+        run: docker stop selenium_app && docker rm selenium_app

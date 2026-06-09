@@ -7,7 +7,10 @@
       <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" />
     </a>
     <a href="https://github.com/CodeFuckee/mobile_portainer_flutter_module/actions">
-      <img src="https://img.shields.io/github/actions/workflow/status/CodeFuckee/mobile_portainer_flutter_module/ci.yml?branch=main" alt="CI Status" />
+      <img src="https://img.shields.io/github/actions/workflow/status/CodeFuckee/mobile_portainer_flutter_module/ci.yml?branch=main" alt="CI/CD" />
+    </a>
+    <a href="https://hub.docker.com/r/codefuckee/mobile-portainer-web">
+      <img src="https://img.shields.io/docker/pulls/codefuckee/mobile-portainer-web?logo=docker" alt="Docker Pulls" />
     </a>
     <a href="https://github.com/CodeFuckee/mobile_portainer_flutter_module/stargazers">
       <img src="https://img.shields.io/github/stars/CodeFuckee/mobile_portainer_flutter_module?style=social" alt="Stars" />
@@ -164,18 +167,89 @@ The backend provides:
    flutter run
    ```
 
-### Web Deployment (Docker)
+### Docker (Recommended)
+
+Pre-built Docker images are published to **Docker Hub** and **GitHub Container Registry** on every push to `main`.
+
+#### Option 1: Docker Hub
+
+```bash
+docker pull codefuckee/mobile-portainer-web:latest
+docker run -d \
+  --name mobile-portainer-web \
+  -p 8080:80 \
+  codefuckee/mobile-portainer-web:latest
+```
+
+#### Option 2: GitHub Container Registry
+
+```bash
+docker pull ghcr.io/codefuckee/mobile-portainer-web:latest
+docker run -d \
+  --name mobile-portainer-web \
+  -p 8080:80 \
+  ghcr.io/codefuckee/mobile-portainer-web:latest
+```
+
+#### Option 3: Docker Compose (with Backend)
+
+Create a `docker-compose.yml`:
+
+```yaml
+version: '3.8'
+
+services:
+  api:
+    image: codefuckee/mobile-portainer-api:latest
+    container_name: mobile-portainer-api
+    restart: unless-stopped
+    environment:
+      - ADMIN_USER=admin
+      - ADMIN_PASSWORD=password
+      - IGNORED_EVENTS=exec_create,exec_start,exec_die
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data:/app/data
+      - /proc:/hostfs/proc:ro
+    networks:
+      - portainer
+
+  web:
+    image: codefuckee/mobile-portainer-web:latest
+    container_name: mobile-portainer-web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+    networks:
+      - portainer
+
+networks:
+  portainer:
+    driver: bridge
+```
+
+Then run:
+
+```bash
+docker compose up -d
+```
+
+Visit `http://localhost:8080` and log in with your backend admin credentials.
+
+> **Note**: The web frontend proxies API requests to the backend via Nginx (see [nginx.conf](nginx.conf)). The backend container must be reachable at hostname `mobile_portainer-api` within the same Docker network.
+
+### Build from Source
 
 ```bash
 # Build the web app
 flutter build web --release
 
-# Build and run Docker image
+# Build and run Docker image locally
 docker build -f Dockerfile.web -t mobile-portainer-web .
 docker run -d -p 8080:80 mobile-portainer-web
 ```
-
-Then visit `http://localhost:8080` and log in with your backend admin credentials.
 
 ## ⚙️ Configuration
 
