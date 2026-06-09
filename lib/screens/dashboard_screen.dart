@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'package:mobile_portainer_flutter_module/services/docker_service.dart';
+import 'package:mobile_portainer_flutter_module/utils/api_error_handler.dart';
 import 'package:mobile_portainer_flutter_module/models/server_usage.dart';
 import 'package:intl/intl.dart';
 import '../theme/theme_extensions.dart';
@@ -266,6 +267,7 @@ class DashboardScreenState extends State<DashboardScreen> {
           server.isUsingCache = true;
           server.error = null;
         } else {
+          ApiErrorHandler.show(context, e);
           server.error = e.toString();
           server.isLoading = false;
         }

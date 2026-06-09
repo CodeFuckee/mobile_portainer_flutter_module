@@ -98,6 +98,64 @@ flutter_build_har:
     - bash scripts/ci_build_har.sh; powershell -File scripts/ci_build_har.ps1; echo "HAR build step complete"
 
 # ================================================================
+# macOS DMG 打包脚本（Intel / ARM 共用）
+# ================================================================
+.macos_dmg_package: &macos_dmg_package
+  - |
+    APP_PATH="build/macos/Build/Products/Release/mobile_portainer_flutter_module.app"
+    DMG_NAME="mobile_portainer_flutter_module-${MAC_ARCH}.dmg"
+    mkdir -p dmg_staging
+    cp -R "${APP_PATH}" dmg_staging/
+    ln -s /Applications dmg_staging/Applications
+    hdiutil create -volname "Mobile Portainer" \
+      -srcfolder dmg_staging \
+      -ov -format UDZO "${DMG_NAME}"
+    rm -rf dmg_staging
+    echo "DMG: ${DMG_NAME} ($(du -sh "${DMG_NAME}" | cut -f1))"
+
+# ================================================================
+# flutter_build_macos_intel —— macOS Intel (x86_64) DMG
+# ================================================================
+flutter_build_macos_intel:
+  extends: .setup
+  stage: build
+  tags:
+    - macos-intel
+    - flutter
+  variables:
+    MAC_ARCH: "x64"
+  script:
+    - flutter pub get
+    - flutter gen-l10n
+    - flutter build macos --release
+    - *macos_dmg_package
+  artifacts:
+    paths:
+      - mobile_portainer_flutter_module-x64.dmg
+    expire_in: 7 days
+
+# ================================================================
+# flutter_build_macos_arm —— macOS Apple Silicon (arm64) DMG
+# ================================================================
+flutter_build_macos_arm:
+  extends: .setup
+  stage: build
+  tags:
+    - macos-arm
+    - flutter
+  variables:
+    MAC_ARCH: "arm64"
+  script:
+    - flutter pub get
+    - flutter gen-l10n
+    - flutter build macos --release
+    - *macos_dmg_package
+  artifacts:
+    paths:
+      - mobile_portainer_flutter_module-arm64.dmg
+    expire_in: 7 days
+
+# ================================================================
 # flutter_build_apk —— Android Debug APK
 # ================================================================
 flutter_build_apk:

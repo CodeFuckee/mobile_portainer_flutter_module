@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import '../services/docker_service.dart';
+import 'package:mobile_portainer_flutter_module/utils/api_error_handler.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import '../theme/theme_extensions.dart';
@@ -83,6 +84,7 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
+          ApiErrorHandler.show(context, e);
           _error = e.toString();
           _isLoading = false;
         });

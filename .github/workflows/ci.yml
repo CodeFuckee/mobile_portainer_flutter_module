@@ -131,6 +131,58 @@ jobs:
           retention-days: 7
 
   # ================================================================
+  # Stage 2: macOS 桌面端 DMG（Intel x64 + Apple Silicon arm64）
+  # ================================================================
+  build-macos:
+    needs: analyze
+    strategy:
+      matrix:
+        include:
+          - os: macos-13
+            arch: x64
+          - os: macos-15
+            arch: arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate l10n
+        run: flutter gen-l10n
+
+      - name: Build macOS
+        run: flutter build macos --release
+
+      - name: Package DMG
+        run: |
+          APP_PATH="build/macos/Build/Products/Release/mobile_portainer_flutter_module.app"
+          DMG_NAME="mobile_portainer_flutter_module-${{ matrix.arch }}.dmg"
+          mkdir -p dmg_staging
+          cp -R "${APP_PATH}" dmg_staging/
+          ln -s /Applications dmg_staging/Applications
+          hdiutil create -volname "Mobile Portainer" \
+            -srcfolder dmg_staging \
+            -ov -format UDZO "${DMG_NAME}"
+          rm -rf dmg_staging
+          echo "DMG: ${DMG_NAME} ($(du -sh "${DMG_NAME}" | cut -f1))"
+
+      - name: Upload DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-dmg-${{ matrix.arch }}
+          path: mobile_portainer_flutter_module-${{ matrix.arch }}.dmg
+          retention-days: 7
+
+  # ================================================================
   # Stage 3: Docker 构建 + 推送（GHCR + DockerHub）
   # ================================================================
   docker:

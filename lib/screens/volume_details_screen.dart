@@ -6,6 +6,7 @@ import '../utils/notify_utils.dart';
 import '../widgets/section_title.dart';
 import '../widgets/info_row.dart';
 import '../widgets/error_view.dart';
+import 'package:mobile_portainer_flutter_module/utils/api_error_handler.dart';
 import '../widgets/loading_view.dart';
 
 import 'container_details_screen.dart';
@@ -54,6 +55,7 @@ class _VolumeDetailsScreenState extends State<VolumeDetailsScreen> {
       });
     } catch (e) {
       setState(() {
+        ApiErrorHandler.show(context, e);
         _error = e.toString();
         _isLoading = false;
       });

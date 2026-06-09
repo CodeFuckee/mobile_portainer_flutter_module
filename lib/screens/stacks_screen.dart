@@ -4,6 +4,7 @@ import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import '../services/docker_service.dart';
 import '../widgets/app_search_bar.dart';
 import '../widgets/error_view.dart';
+import 'package:mobile_portainer_flutter_module/utils/api_error_handler.dart';
 import '../widgets/empty_view.dart';
 import '../widgets/loading_view.dart';
 import '../widgets/layout_toggle.dart';
@@ -93,6 +94,7 @@ class StacksScreenState extends State<StacksScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
+        ApiErrorHandler.show(context, e);
         _error = e.toString();
         _isLoading = false;
         _allStacks = [];

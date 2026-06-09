@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_portainer_flutter_module/screens/qr_scan_screen.dart';
 import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
+import 'package:mobile_portainer_flutter_module/utils/api_error_handler.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
@@ -484,6 +485,7 @@ class SettingsScreenState extends State<SettingsScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
+        ApiErrorHandler.show(context, e);
         _apiKeyError = e.toString();
         _isLoadingKeys = false;
       });

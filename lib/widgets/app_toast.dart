@@ -13,9 +13,17 @@ class AppToast {
       List.generate(3, (_) => _ToastSlot());
 
   static void show(BuildContext context, String message, ToastType type) {
+    // Remove any existing toast of the same type, but guard against
+    // entries whose _overlay has been detached (e.g. displaced by slot
+    // reclamation).  The `.mounted` check alone isn't always enough in
+    // test/synthetic environments.
     final existing = _byType[type];
     if (existing != null && existing.mounted) {
-      existing.remove();
+      try {
+        existing.remove();
+      } catch (_) {
+        // entry was already detached — just clear the stale references.
+      }
       for (final slot in _slots) {
         if (slot.entry == existing) slot.entry = null;
       }
@@ -25,13 +33,22 @@ class AppToast {
     _ToastSlot? slot;
     for (final s in _slots) {
       if (s.entry == null || !s.entry!.mounted) {
-        s.entry?.remove();
+        // Only call remove() if the entry is actually mounted;
+        // otherwise clear the stale reference.
+        if (s.entry?.mounted == true) {
+          s.entry!.remove();
+        }
+        s.entry = null;
         slot = s;
         break;
       }
     }
     slot ??= _slots.first;
-    slot.entry?.remove();
+    // Defensive: only remove if still mounted, then clear the slot.
+    if (slot.entry?.mounted == true) {
+      slot.entry!.remove();
+    }
+    slot.entry = null;
     final targetSlot = slot;
 
     final overlay = Overlay.of(context);

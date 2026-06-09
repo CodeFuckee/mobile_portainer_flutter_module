@@ -3,6 +3,7 @@ import 'package:mobile_portainer_flutter_module/services/platform/preferences_se
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import '../services/docker_service.dart';
 import '../widgets/error_view.dart';
+import 'package:mobile_portainer_flutter_module/utils/api_error_handler.dart';
 import '../widgets/loading_view.dart';
 
 class PortsScreen extends StatefulWidget {
@@ -65,7 +66,8 @@ class _PortsScreenState extends State<PortsScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = e.toString();
+          ApiErrorHandler.show(context, e);
+        _error = e.toString();
           _isLoading = false;
         });
       }

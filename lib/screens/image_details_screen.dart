@@ -7,6 +7,7 @@ import '../widgets/section_title.dart';
 import '../widgets/info_card.dart';
 import '../widgets/info_row.dart';
 import '../widgets/error_view.dart';
+import 'package:mobile_portainer_flutter_module/utils/api_error_handler.dart';
 import '../widgets/loading_view.dart';
 
 class ImageDetailsScreen extends StatefulWidget {
@@ -69,6 +70,7 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
+          ApiErrorHandler.show(context, e);
           _error = e.toString();
           _isLoading = false;
         });

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import '../services/auth_service.dart';
 import '../utils/notify_utils.dart';
+import 'package:mobile_portainer_flutter_module/utils/api_error_handler.dart';
 import '../widgets/loading_view.dart';
 
 class ApiKeysScreen extends StatefulWidget {
@@ -40,6 +41,7 @@ class _ApiKeysScreenState extends State<ApiKeysScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
+        ApiErrorHandler.show(context, e);
         _error = e.toString();
         _isLoading = false;
       });

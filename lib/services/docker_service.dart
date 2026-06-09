@@ -34,6 +34,29 @@ class DockerService {
     return h;
   }
 
+  /// Extract a user-friendly error message from the backend response body.
+  /// Fallback: a generic description with the HTTP status code.
+  String _extractErrorMessage(String responseBody, String fallback, int statusCode) {
+    try {
+      final decoded = json.decode(responseBody);
+      if (decoded is Map<String, dynamic>) {
+        // Common backend error field names
+        for (final key in ['detail', 'message', 'error', 'msg']) {
+          final val = decoded[key];
+          if (val != null && val.toString().isNotEmpty) {
+            return val.toString();
+          }
+        }
+      }
+    } catch (_) {
+      // Body is not valid JSON — use it directly if short enough
+      if (responseBody.length < 200) {
+        return responseBody.trim();
+      }
+    }
+    return '$fallback ($statusCode)';
+  }
+
   Future<List<DockerContainer>> getContainers() async {
     // 确保 baseUrl 没有尾随斜杠
     final cleanBaseUrl = baseUrl.endsWith('/') 
@@ -51,10 +74,11 @@ class DockerService {
         final List<dynamic> jsonList = json.decode(response.body);
         return jsonList.map((json) => DockerContainer.fromJson(json)).toList();
       } else {
-        throw Exception('Failed to load containers: ${response.statusCode}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -75,10 +99,11 @@ class DockerService {
         final List<dynamic> jsonList = json.decode(response.body);
         return jsonList.map((json) => DockerImage.fromJson(json)).toList();
       } else {
-        throw Exception('Failed to load images: ${response.statusCode}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -98,10 +123,11 @@ class DockerService {
         final List<dynamic> jsonList = json.decode(response.body);
         return jsonList.map((json) => DockerNetwork.fromJson(json)).toList();
       } else {
-        throw Exception('Failed to load networks: ${response.statusCode}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -120,10 +146,11 @@ class DockerService {
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Failed to load network details: ${response.statusCode}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -151,10 +178,11 @@ class DockerService {
         }
         return list.map((json) => DockerVolume.fromJson(json)).toList();
       } else {
-        throw Exception('Failed to load volumes: ${response.statusCode}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -173,10 +201,11 @@ class DockerService {
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Failed to load volume details: ${response.statusCode}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -202,10 +231,11 @@ class DockerService {
              throw Exception(body['message']);
           }
         } catch (_) {}
-        throw Exception('Failed to delete volume: ${response.statusCode}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -225,10 +255,11 @@ class DockerService {
         final jsonData = json.decode(response.body);
         return ServerUsage.fromJson(jsonData);
       } else {
-        throw Exception('Failed to load usage: ${response.statusCode}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -247,10 +278,11 @@ class DockerService {
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Failed to load image details: ${response.statusCode}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -274,10 +306,11 @@ class DockerService {
         }
         return {'status': 'success'};
       } else {
-        throw Exception('Failed to delete image: ${response.statusCode} ${response.body}');
+        final msg = _extractErrorMessage(response.body, 'Failed to delete volume', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -300,10 +333,11 @@ class DockerService {
         final Map<String, dynamic> jsonMap = json.decode(response.body);
         return jsonMap;
       } else {
-        throw Exception('Failed to pull image: ${response.statusCode} ${response.body}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load usage', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -322,10 +356,11 @@ class DockerService {
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Failed to load container details: ${response.statusCode}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -342,10 +377,11 @@ class DockerService {
       final response = await _client.post(url, headers: headers);
 
       if (response.statusCode != 204 && response.statusCode != 200) {
-         throw Exception('Failed to $action container: ${response.statusCode} ${response.body}');
+         final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                 throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
   
@@ -365,10 +401,11 @@ class DockerService {
         final List<dynamic> jsonList = json.decode(response.body);
         return jsonList.map((json) => ContainerFile.fromJson(json)).toList();
       } else {
-        throw Exception('Failed to load container files: ${response.statusCode}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -388,10 +425,11 @@ class DockerService {
         final Map<String, dynamic> jsonMap = json.decode(response.body);
         return jsonMap['content']?.toString() ?? '';
       } else {
-        throw Exception('Failed to load file content: ${response.statusCode}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -410,10 +448,11 @@ class DockerService {
       if (response.statusCode == 200) {
         return response.bodyBytes;
       } else {
-        throw Exception('Failed to download file: ${response.statusCode}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -432,10 +471,11 @@ class DockerService {
       final response = await _client.put(url, headers: headers, body: body);
 
       if (response.statusCode != 200 && response.statusCode != 204) {
-        throw Exception('Failed to update file: ${response.statusCode} ${response.body}');
+        final msg = _extractErrorMessage(response.body, 'Failed to download file', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -469,10 +509,11 @@ class DockerService {
              throw Exception(errorBody['detail']);
            }
         } catch (_) {}
-        throw Exception('Failed to run container: ${response.statusCode} ${response.body}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -491,10 +532,11 @@ class DockerService {
       final response = await _client.delete(url, headers: headers);
 
       if (response.statusCode != 204 && response.statusCode != 200) {
-          throw Exception('Failed to remove container: ${response.statusCode} ${response.body}');
+          final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                  throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -520,10 +562,11 @@ class DockerService {
           return '';
         }).where((s) => s.isNotEmpty).toList();
       } else {
-        throw Exception('Failed to load stacks: ${response.statusCode}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -543,10 +586,11 @@ class DockerService {
         final List<dynamic> jsonList = json.decode(response.body);
         return jsonList.map((json) => DockerContainer.fromJson(json)).toList();
       } else {
-        throw Exception('Failed to load stack containers: ${response.statusCode}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -564,10 +608,11 @@ class DockerService {
         final Map<String, dynamic> jsonMap = json.decode(response.body);
         return jsonMap;
       } else {
-        throw Exception('Failed to load git version: ${response.statusCode}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -584,10 +629,11 @@ class DockerService {
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Failed to load system info: ${response.statusCode}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -692,10 +738,11 @@ class DockerService {
 
         return _parseDockerLogs(response.bodyBytes);
       } else {
-        throw Exception('Failed to load logs: ${response.statusCode}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 
@@ -759,10 +806,11 @@ class DockerService {
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Failed to load available ports: ${response.statusCode}');
+        final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
+                throw Exception(msg);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      throw e is Exception ? e : Exception('Network error');
     }
   }
 }

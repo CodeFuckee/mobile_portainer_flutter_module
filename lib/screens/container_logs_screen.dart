@@ -5,6 +5,7 @@ import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
 import 'dart:async';
 import '../services/docker_service.dart';
 import '../widgets/error_view.dart';
+import 'package:mobile_portainer_flutter_module/utils/api_error_handler.dart';
 import '../widgets/loading_view.dart';
 
 class ContainerLogsScreen extends StatefulWidget {
@@ -135,6 +136,7 @@ class _ContainerLogsScreenState extends State<ContainerLogsScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
+          ApiErrorHandler.show(context, e);
           _error = e.toString();
           _isLoading = false;
         });
