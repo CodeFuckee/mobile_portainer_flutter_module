@@ -47,8 +47,11 @@ dependencies {
 }
 
 // Suppress AAR metadata check for plugins requiring desugaring
-tasks.whenTaskAdded { task ->
-    if (task.name == 'checkReleaseAarMetadata' || task.name == 'checkDebugAarMetadata') {
-        task.enabled = false
+// AGP 8.x+ lazy task registration; must disable at task-graph-ready time
+gradle.taskGraph.whenReady { taskGraph ->
+    taskGraph.allTasks.each { task ->
+        if (task.name.contains('check') && task.name.toLowerCase().contains('aarmetadata')) {
+            task.enabled = false
+        }
     }
 }
