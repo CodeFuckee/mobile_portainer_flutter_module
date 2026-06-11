@@ -139,15 +139,6 @@ deploy_to_synology:
     - job: flutter_build_web
       artifacts: true
     - job: selenium_tests
-    - job: flutter_build_apk
-    - job: flutter_build_macos_intel
-    - job: flutter_build_macos_arm
-    - job: flutter_build_har
-    - job: flutter_build_windows_x64
-    - job: flutter_build_windows_arm64
-    - job: flutter_build_linux_x64
-    - job: flutter_build_linux_arm64
-    - job: flutter_build_ios
   before_script:
     - DOCKER="docker"
     - DOCKERFILE="Dockerfile.web.cn"
