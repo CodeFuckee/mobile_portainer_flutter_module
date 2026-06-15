@@ -12,6 +12,7 @@ import '../widgets/resize_handle.dart';
 import '../theme/app_theme.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
+import '../utils/platform_detector.dart';
 
 
 class MainTabScreen extends StatefulWidget {
@@ -301,7 +302,8 @@ class _MainTabScreenState extends State<MainTabScreen> {
       child: Center(
         heightFactor: 1.0,
         child: Container(
-          margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+          margin: EdgeInsets.fromLTRB(20, 0, 20,
+              (PlatformDetector.isOhos || PlatformDetector.isAndroid || PlatformDetector.isIOS) ? 0 : 16),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(34),
             child: BackdropFilter(
