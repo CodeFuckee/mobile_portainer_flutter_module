@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
@@ -25,6 +26,7 @@ class ContainerDetailsScreen extends StatefulWidget {
   final String apiKey;
   final bool isSelf;
   final bool ignoreSsl;
+  final VoidCallback? onBack;
 
   const ContainerDetailsScreen({
     super.key,
@@ -34,6 +36,7 @@ class ContainerDetailsScreen extends StatefulWidget {
     required this.apiKey,
     this.isSelf = false,
     this.ignoreSsl = false,
+    this.onBack,
   });
 
   @override
@@ -45,6 +48,8 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
   String? _error;
   Map<String, dynamic>? _containerDetails;
   String _timezoneCode = 'system';
+
+  ColorScheme get _cs => Theme.of(context).colorScheme;
 
   @override
   void initState() {
@@ -99,6 +104,12 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
       length: 6,
       child: Scaffold(
         appBar: AppBar(
+          leading: widget.onBack != null
+              ? IconButton(
+                  icon: const Icon(RemixIcon.arrowLeftLine),
+                  onPressed: widget.onBack,
+                )
+              : null,
           title: Text(widget.containerName),
           bottom: TabBar(
             isScrollable: true,
@@ -114,12 +125,12 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.refresh),
+              icon: const Icon(RemixIcon.refreshLine),
               onPressed: _fetchDetails,
             ),
             if (!_isLoading && _containerDetails != null)
               IconButton(
-                icon: const Icon(Icons.more_vert),
+                icon: const Icon(RemixIcon.more2Fill),
                 onPressed: _showActions,
               ),
           ],
@@ -135,7 +146,7 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
                     children: [
                       Text(
                         _error!,
-                        style: const TextStyle(color: Colors.red),
+                        style: TextStyle(color: _cs.error),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),
@@ -393,10 +404,10 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
           const SizedBox(height: 16),
         ] else if ((details['Mounts'] == null ||
             (details['Mounts'] as List).isEmpty)) ...[
-          const Center(
+          Center(
             child: Text(
               "No storage configuration found.",
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(color: _cs.onSurfaceVariant),
             ),
           ),
         ],
@@ -488,7 +499,7 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
 
   Widget _buildEnvCard(List<dynamic> envs) {
     return Card(
-      elevation: 2,
+      elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -505,10 +516,10 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
                 children: [
                   Text(
                     key,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
-                      color: Colors.grey,
+                      color: _cs.onSurfaceVariant,
                     ),
                   ),
                   SelectableText(
@@ -530,7 +541,7 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
 
   Widget _buildMountsCard(List<dynamic> mounts) {
     return Card(
-      elevation: 2,
+      elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -590,10 +601,10 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
             children: [
               Text(
                 'Volume',
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
-                  color: Colors.grey,
+                  color: _cs.onSurfaceVariant,
                 ),
               ),
               SelectableText(key, style: const TextStyle(fontSize: 13)),
@@ -605,7 +616,7 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
     });
 
     return Card(
-      elevation: 2,
+      elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -628,10 +639,10 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
             children: [
               Text(
                 key,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
-                  color: Colors.grey,
+                  color: _cs.onSurfaceVariant,
                 ),
               ),
               SelectableText(
@@ -646,7 +657,7 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
     });
 
     return Card(
-      elevation: 2,
+      elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -741,44 +752,44 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
     // Define actions
     final actionStart = _ActionItem(
       t.actionStart,
-      Icons.play_arrow,
-      Colors.green,
+      RemixIcon.playLine,
+      _cs.onSurface,
       'start',
     );
     final actionStop = _ActionItem(
       t.actionStop,
-      Icons.stop,
-      Colors.red,
+      RemixIcon.stopLine,
+      _cs.error,
       'stop',
     );
     final actionKill = _ActionItem(
       t.actionKill,
-      Icons.dangerous,
-      Colors.redAccent,
+      RemixIcon.forbidLine,
+      _cs.error,
       'kill',
     );
     final actionRestart = _ActionItem(
       t.actionRestart,
-      Icons.refresh,
-      Colors.blue,
+      RemixIcon.refreshLine,
+      _cs.onSurface,
       'restart',
     );
     final actionPause = _ActionItem(
       t.actionPause,
-      Icons.pause,
-      Colors.orange,
+      RemixIcon.pauseLine,
+      _cs.onSurfaceVariant,
       'pause',
     );
     final actionResume = _ActionItem(
       t.actionResume,
-      Icons.play_circle_outline,
-      Colors.greenAccent,
+      RemixIcon.playCircleLine,
+      _cs.onSurface,
       'resume',
     );
     final actionRemove = _ActionItem(
       t.actionRemove,
-      Icons.delete,
-      Colors.grey,
+      RemixIcon.deleteBinLine,
+      _cs.onSurfaceVariant,
       'remove',
     );
 
@@ -832,7 +843,7 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: _cs.shadow.withAlpha(25),
                   blurRadius: 10,
                   offset: const Offset(0, -2),
                 ),
@@ -847,7 +858,7 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
                   height: 4,
                   margin: const EdgeInsets.only(bottom: 24),
                   decoration: BoxDecoration(
-                    color: Colors.grey[300],
+                    color: _cs.onSurfaceVariant.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -897,12 +908,12 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.grey[800] : Colors.grey[100],
+                  color: isDark ? _cs.onSurfaceVariant.withValues(alpha: 0.6) : _cs.onSurfaceVariant.withValues(alpha: 0.7),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   icon,
-                  color: isDark ? Colors.white70 : Colors.black87,
+                  color: isDark ? Colors.white70 : _cs.onSurface.withAlpha(222),
                   size: 24,
                 ),
               ),
@@ -915,7 +926,7 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
                 ),
               ),
               const Spacer(),
-              Icon(Icons.chevron_right, color: Colors.grey[400], size: 20),
+              Icon(RemixIcon.arrowRightSLine, color: _cs.onSurfaceVariant, size: 20),
             ],
           ),
         ),

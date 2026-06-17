@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
@@ -228,7 +229,7 @@ class _ContainerLogsScreenState extends State<ContainerLogsScreen> {
     final t = AppLocalizations.of(context)!;
     return [
       IconButton(
-        icon: const Icon(Icons.search),
+        icon: const Icon(RemixIcon.searchLine),
         onPressed: () {
           setState(() {
             _isSearching = true;
@@ -240,7 +241,7 @@ class _ContainerLogsScreenState extends State<ContainerLogsScreen> {
         },
       ),
       IconButton(
-        icon: Icon(_isPaused ? Icons.play_arrow : Icons.pause),
+        icon: Icon(_isPaused ? RemixIcon.playLine : RemixIcon.pauseLine),
         tooltip: _isPaused ? t.actionResume : t.actionPause,
         onPressed: () {
           setState(() {
@@ -252,7 +253,7 @@ class _ContainerLogsScreenState extends State<ContainerLogsScreen> {
         },
       ),
       IconButton(
-        icon: Icon(_showTimestamps ? Icons.access_time_filled : Icons.access_time),
+        icon: Icon(_showTimestamps ? RemixIcon.timeFill : RemixIcon.timeLine),
         tooltip: _showTimestamps ? 'Hide Timestamps' : 'Show Timestamps',
         onPressed: () {
           setState(() {
@@ -261,11 +262,11 @@ class _ContainerLogsScreenState extends State<ContainerLogsScreen> {
         },
       ),
       IconButton(
-        icon: const Icon(Icons.refresh),
+        icon: const Icon(RemixIcon.refreshLine),
         onPressed: _fetchLogs,
       ),
       IconButton(
-        icon: const Icon(Icons.copy),
+        icon: const Icon(RemixIcon.fileCopyLine),
         onPressed: _logLines.isEmpty ? null : () {
           Clipboard.setData(ClipboardData(text: _logLines.join('\n')));
           NotifyUtils.showNotify(context, 'Logs copied to clipboard');
@@ -286,12 +287,12 @@ class _ContainerLogsScreenState extends State<ContainerLogsScreen> {
             ? TextField(
                 controller: _searchController,
                 focusNode: _searchFocusNode,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'Search logs...',
                   border: InputBorder.none,
-                  hintStyle: TextStyle(color: Colors.white70),
+                  hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 onChanged: (value) => _performSearch(value),
                 onSubmitted: (_) => _nextMatch(),
                 textInputAction: TextInputAction.search,
@@ -317,17 +318,17 @@ class _ContainerLogsScreenState extends State<ContainerLogsScreen> {
                ),
              ),
              IconButton(
-               icon: const Icon(Icons.keyboard_arrow_up),
+               icon: const Icon(RemixIcon.arrowUpSLine),
                onPressed: _prevMatch,
                tooltip: 'Previous',
              ),
              IconButton(
-               icon: const Icon(Icons.keyboard_arrow_down),
+               icon: const Icon(RemixIcon.arrowDownSLine),
                onPressed: _nextMatch,
                tooltip: 'Next',
              ),
              IconButton(
-               icon: const Icon(Icons.close),
+               icon: const Icon(RemixIcon.closeLine),
                onPressed: () {
                  setState(() {
                    _isSearching = false;
@@ -348,7 +349,7 @@ class _ContainerLogsScreenState extends State<ContainerLogsScreen> {
                   retryLabel: 'Retry',
                 )
               : Container(
-                  color: const Color(0xFF1E1E1E), // VS Code like background
+                  color: Theme.of(context).colorScheme.surfaceContainerLowest,
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       return Scrollbar(
@@ -384,8 +385,7 @@ class _ContainerLogsScreenState extends State<ContainerLogsScreen> {
                                     return Container(
                                       height: _itemHeight,
                                       color: isCurrentMatch
-                                          ? const Color(
-                                              0xFF3D3D3D) // Highlight current match line
+                                          ? Theme.of(context).colorScheme.surfaceContainerHighest
                                           : null,
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 16.0),
@@ -422,7 +422,7 @@ class _ContainerLogsScreenState extends State<ContainerLogsScreen> {
             heroTag: "zoom_in",
             mini: true,
             backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
-            child: Icon(Icons.add, color: Theme.of(context).colorScheme.onSurface),
+            child: Icon(RemixIcon.addLine, color: Theme.of(context).colorScheme.onSurface),
             onPressed: () {
               setState(() {
                 if (_fontSize < 30) {
@@ -437,7 +437,7 @@ class _ContainerLogsScreenState extends State<ContainerLogsScreen> {
             heroTag: "zoom_out",
             mini: true,
             backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
-            child: Icon(Icons.remove, color: Theme.of(context).colorScheme.onSurface),
+            child: Icon(RemixIcon.indeterminateCircleLine, color: Theme.of(context).colorScheme.onSurface),
             onPressed: () {
               setState(() {
                 if (_fontSize > 8) {
@@ -458,39 +458,41 @@ class _ContainerLogsScreenState extends State<ContainerLogsScreen> {
     final match = timestampRegex.firstMatch(line);
     
     List<TextSpan> baseSpans = [];
-    
+
+    final cs = Theme.of(context).colorScheme;
+
     if (match != null) {
       final timestamp = match.group(1)!;
       final content = match.group(2) ?? '';
-      
+
       if (_showTimestamps) {
         baseSpans.add(TextSpan(
           text: '$timestamp ',
-          style: const TextStyle(color: Color(0xFF569CD6)), // Blue for timestamp
+          style: TextStyle(color: cs.primary),
         ));
       }
-      
-      Color contentColor = const Color(0xFFD4D4D4);
+
+      Color contentColor = cs.onSurface;
       if (content.contains('ERROR') || content.contains('Exception') || content.contains('fail')) {
-        contentColor = const Color(0xFFF44747); // Red
+        contentColor = cs.error;
       } else if (content.contains('WARN')) {
-        contentColor = const Color(0xFFCCA700); // Yellow
+        contentColor = cs.tertiary;
       } else if (content.contains('INFO')) {
-        contentColor = const Color(0xFF4EC9B0); // Teal
+        contentColor = cs.primary;
       }
-      
+
       baseSpans.add(TextSpan(
         text: content,
         style: TextStyle(color: contentColor),
       ));
     } else {
-      Color lineColor = const Color(0xFFD4D4D4);
+      Color lineColor = cs.onSurface;
       if (line.contains('ERROR') || line.contains('Exception') || line.contains('fail')) {
-        lineColor = const Color(0xFFF44747);
+        lineColor = cs.error;
       } else if (line.contains('WARN')) {
-        lineColor = const Color(0xFFCCA700);
+        lineColor = cs.tertiary;
       }
-      
+
       baseSpans.add(TextSpan(
         text: line,
         style: TextStyle(color: lineColor),
@@ -522,9 +524,9 @@ class _ContainerLogsScreenState extends State<ContainerLogsScreen> {
         finalSpans.add(TextSpan(
           text: text.substring(indexOfMatch, indexOfMatch + lowerQuery.length),
           style: span.style?.copyWith(
-            backgroundColor: const Color(0xFF6A5D00), // Dark yellow background for match
-            color: Colors.white,
-          ) ?? const TextStyle(backgroundColor: Color(0xFF6A5D00), color: Colors.white),
+            backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
+            color: Theme.of(context).colorScheme.onTertiaryContainer,
+          ) ?? TextStyle(backgroundColor: Theme.of(context).colorScheme.tertiaryContainer, color: Theme.of(context).colorScheme.onTertiaryContainer),
         ));
 
         start = indexOfMatch + lowerQuery.length;

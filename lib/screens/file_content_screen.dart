@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
 import '../services/docker_service.dart';
@@ -89,7 +90,7 @@ class _FileContentScreenState extends State<FileContentScreen> {
         actions: [
           if (!_isEditing)
             IconButton(
-              icon: const Icon(Icons.edit),
+              icon: const Icon(RemixIcon.editLine),
               onPressed: () {
                 setState(() {
                   _isEditing = true;
@@ -98,11 +99,11 @@ class _FileContentScreenState extends State<FileContentScreen> {
             )
           else ...[
             IconButton(
-              icon: const Icon(Icons.save),
+              icon: const Icon(RemixIcon.saveLine),
               onPressed: _isLoading ? null : _saveFile,
             ),
             IconButton(
-              icon: const Icon(Icons.close),
+              icon: const Icon(RemixIcon.closeLine),
               onPressed: () {
                 setState(() {
                   _isEditing = false;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 
 class ActionItem {
   final String label;
@@ -141,7 +142,7 @@ class _ActionTile extends StatelessWidget {
         ),
       ),
       trailing: Icon(
-        Icons.chevron_right,
+        RemixIcon.arrowRightSLine,
         color: colorScheme.onSurfaceVariant,
       ),
       onTap: onTap,

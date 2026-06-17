@@ -35,40 +35,41 @@ class DockerColors extends ThemeExtension<DockerColors> {
     required this.dirIcon,
   });
 
+  // Arco Design aligned colors
   static const light = DockerColors(
-    statusRunning: Color(0xFF2E7D32),
-    statusExited: Color(0xFFC62828),
-    statusCreated: Color(0xFF0A84FF),
-    statusRestarting: Color(0xFFEF6C00),
-    statusPaused: Color(0xFFF9A825),
-    sectionTitle: Color(0xFF0A84FF),
-    labelText: Color(0xFF6E7278),
-    valueText: Color(0xFF1A1C1E),
-    copyButton: Color(0xFF9EA2A8),
-    inUseBorder: Color(0xFF2E7D32),
-    inUseBackground: Color(0xFFE8F5E9),
-    mountedBorder: Color(0xFF2E7D32),
-    mountedBackground: Color(0xFFE8F5E9),
-    fileIcon: Color(0xFF8E9298),
-    dirIcon: Color(0xFF0A84FF),
+    statusRunning: Color(0xFF00B42A),
+    statusExited: Color(0xFFF53F3F),
+    statusCreated: Color(0xFF165DFF),
+    statusRestarting: Color(0xFFFF7D00),
+    statusPaused: Color(0xFF86909C),
+    sectionTitle: Color(0xFF165DFF),
+    labelText: Color(0xFF4E5969),
+    valueText: Color(0xFF1D2129),
+    copyButton: Color(0xFF86909C),
+    inUseBorder: Color(0xFF00B42A),
+    inUseBackground: Color(0xFFE8FFEA),
+    mountedBorder: Color(0xFF00B42A),
+    mountedBackground: Color(0xFFE8FFEA),
+    fileIcon: Color(0xFF86909C),
+    dirIcon: Color(0xFF165DFF),
   );
 
   static const dark = DockerColors(
-    statusRunning: Color(0xFF66BB6A),
-    statusExited: Color(0xFFFF8A80),
-    statusCreated: Color(0xFF4DA3FF),
-    statusRestarting: Color(0xFFFFB74D),
-    statusPaused: Color(0xFFFFD54F),
-    sectionTitle: Color(0xFF4DA3FF),
-    labelText: Color(0xFFAEB2BB),
-    valueText: Color(0xFFE2E5EC),
-    copyButton: Color(0xFF90959F),
-    inUseBorder: Color(0xFF81C784),
-    inUseBackground: Color(0xFF1B5E20),
-    mountedBorder: Color(0xFF81C784),
-    mountedBackground: Color(0xFF1B5E20),
-    fileIcon: Color(0xFF9EA3AD),
-    dirIcon: Color(0xFF4DA3FF),
+    statusRunning: Color(0xFF52CC6D),
+    statusExited: Color(0xFFF76560),
+    statusCreated: Color(0xFF4080FF),
+    statusRestarting: Color(0xFFFF9933),
+    statusPaused: Color(0xFF86909C),
+    sectionTitle: Color(0xFF4080FF),
+    labelText: Color(0xFF86909C),
+    valueText: Color(0xFFE5E6EB),
+    copyButton: Color(0xFF86909C),
+    inUseBorder: Color(0xFF52CC6D),
+    inUseBackground: Color(0xFF1A4A1A),
+    mountedBorder: Color(0xFF52CC6D),
+    mountedBackground: Color(0xFF1A4A1A),
+    fileIcon: Color(0xFF86909C),
+    dirIcon: Color(0xFF4080FF),
   );
 
   @override
@@ -132,12 +133,12 @@ class DockerColors extends ThemeExtension<DockerColors> {
 }
 
 class DockerResourceIconColor {
-  static const images = Color(0xFF00897B);
-  static const networks = Color(0xFFE65100);
-  static const stacks = Color(0xFF00695C);
-  static const volumes = Color(0xFF4E342E);
-  static const envVars = Color(0xFF37474F);
-  static const ports = Color(0xFF283593);
+  static const images = Color(0xFF00B42A);
+  static const networks = Color(0xFFFF7D00);
+  static const stacks = Color(0xFF165DFF);
+  static const volumes = Color(0xFF4E5969);
+  static const envVars = Color(0xFFF53F3F);
+  static const ports = Color(0xFF722ED1);
 
   const DockerResourceIconColor._();
 }

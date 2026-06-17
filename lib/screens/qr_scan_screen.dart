@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../services/harmonyos_platform.dart';
 import '../utils/platform_detector.dart';
@@ -49,7 +50,7 @@ class _QrScanScreenState extends State<QrScanScreen> {
               const Text('Opening scanner...'),
               const SizedBox(height: 24),
               ElevatedButton.icon(
-                icon: const Icon(Icons.refresh),
+                icon: const Icon(RemixIcon.refreshLine),
                 label: const Text('Retry'),
                 onPressed: _scanOnHarmonyOS,
               ),
@@ -74,12 +75,12 @@ class _QrScanScreenState extends State<QrScanScreen> {
               builder: (context, state, child) {
                 switch (state.torchState) {
                   case TorchState.off:
-                    return const Icon(Icons.flash_off, color: Colors.grey);
+                    return const Icon(RemixIcon.flashlightLine, color: Colors.grey);
                   case TorchState.on:
-                    return const Icon(Icons.flash_on, color: Colors.yellow);
+                    return const Icon(RemixIcon.flashlightLine, color: Colors.yellow);
                   case TorchState.unavailable:
                   case TorchState.auto:
-                    return const Icon(Icons.flash_off, color: Colors.grey);
+                    return const Icon(RemixIcon.flashlightLine, color: Colors.grey);
                 }
               },
             ),
@@ -91,11 +92,11 @@ class _QrScanScreenState extends State<QrScanScreen> {
               builder: (context, state, child) {
                 switch (state.cameraDirection) {
                   case CameraFacing.front:
-                    return const Icon(Icons.camera_front);
+                    return const Icon(RemixIcon.cameraLine);
                   case CameraFacing.back:
-                    return const Icon(Icons.camera_rear);
+                    return const Icon(RemixIcon.cameraLine);
                   default:
-                    return const Icon(Icons.camera);
+                    return const Icon(RemixIcon.cameraLine);
                 }
               },
             ),

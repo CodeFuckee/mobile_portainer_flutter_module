@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
 import 'dashboard_screen.dart';
 import 'home_screen.dart';
@@ -8,7 +9,6 @@ import 'images_screen.dart';
 import 'resources_screen.dart';
 import 'settings_screen.dart';
 import 'container_details_screen.dart';
-import '../widgets/resize_handle.dart';
 import '../theme/app_theme.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
@@ -26,11 +26,6 @@ class _MainTabScreenState extends State<MainTabScreen> {
   int _selectedIndex = 0;
   bool _settingsChanged = false;
   String _containerLayoutMode = 'grid';
-
-  String? _selectedContainerId;
-  String? _selectedContainerName;
-  bool _selectedContainerIsSelf = false;
-  double _splitRatio = 0.5;
 
   final GlobalKey<DashboardScreenState> _dashboardKey =
       GlobalKey<DashboardScreenState>();
@@ -81,11 +76,6 @@ class _MainTabScreenState extends State<MainTabScreen> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      if (index != 1) {
-        _selectedContainerId = null;
-        _selectedContainerName = null;
-        _selectedContainerIsSelf = false;
-      }
     });
     if (_settingsChanged) {
       _dashboardKey.currentState?.refresh();
@@ -118,11 +108,6 @@ class _MainTabScreenState extends State<MainTabScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    if (_selectedIndex == 1) {
-      return _buildContainersMasterDetail(t, screenWidth);
-    }
 
     String currentEffectiveMode = 'list';
     if (_selectedIndex == 1) {
@@ -189,97 +174,13 @@ class _MainTabScreenState extends State<MainTabScreen> {
               right: 16,
               bottom: AppTheme.fabBottomInset,
               child: FloatingActionButton(
+                heroTag: 'fab_run_container',
                 onPressed: () {
                   _containersKey.currentState?.showRunContainerDialog();
                 },
-                child: const Icon(Icons.add),
+                child: const Icon(RemixIcon.addLine),
               ),
             ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildContainersMasterDetail(AppLocalizations t, double totalWidth) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final hasSelection = _selectedContainerId != null;
-    final leftFlex = (_splitRatio * 1000).round();
-    final rightFlex = 1000 - leftFlex;
-
-    return Scaffold(
-      body: Row(
-        children: [
-          Expanded(
-            flex: hasSelection ? leftFlex : 1,
-            child: Scaffold(
-              appBar: AppBar(
-                backgroundColor: colorScheme.surface,
-                elevation: 0,
-                scrolledUnderElevation: 0,
-                title: Text(t.titleContainers),
-                actions: _buildActions(t, _containerLayoutMode),
-              ),
-              body: Stack(
-                children: [
-                  HomeScreen(
-                    key: _containersKey,
-                    layoutMode: _containerLayoutMode,
-                    onContainerSelected: (id, name, isSelf) {
-                      setState(() {
-                        if (_selectedContainerId == id) {
-                          _selectedContainerId = null;
-                          _selectedContainerName = null;
-                          _selectedContainerIsSelf = false;
-                        } else {
-                          _selectedContainerId = id;
-                          _selectedContainerName = name;
-                          _selectedContainerIsSelf = isSelf;
-                        }
-                      });
-                    },
-                    selectedContainerId: _selectedContainerId,
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: _buildCustomBottomNavBar(context, t),
-                  ),
-                  Positioned(
-                    right: 16,
-                    bottom: AppTheme.fabBottomInset,
-                    child: FloatingActionButton(
-                      onPressed: () {
-                        _containersKey.currentState?.showRunContainerDialog();
-                      },
-                      child: const Icon(Icons.add),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          if (hasSelection) ...[
-            ResizeHandle(
-              totalWidth: totalWidth,
-              onResized: (delta) {
-                setState(() {
-                  _splitRatio = (_splitRatio + delta).clamp(0.2, 0.8);
-                });
-              },
-            ),
-            Expanded(
-              flex: rightFlex,
-              child: ContainerDetailsScreen(
-                containerId: _selectedContainerId!,
-                containerName: _selectedContainerName!,
-                apiUrl: _containersKey.currentState?.currentApiUrl ?? '',
-                apiKey: _containersKey.currentState?.currentApiKey ?? '',
-                isSelf: _selectedContainerIsSelf,
-                ignoreSsl: _containersKey.currentState?.currentIgnoreSsl ?? false,
-              ),
-            ),
-          ],
         ],
       ),
     );
@@ -288,10 +189,10 @@ class _MainTabScreenState extends State<MainTabScreen> {
   Widget _buildCustomBottomNavBar(BuildContext context, AppLocalizations t) {
     final colorScheme = Theme.of(context).colorScheme;
     final items = [
-      (Icons.dashboard_outlined, Icons.dashboard, t.titleDashboard),
-      (Icons.dns_outlined, Icons.dns, t.titleContainers),
-      (Icons.category_outlined, Icons.category, t.titleResources),
-      (Icons.settings_outlined, Icons.settings, t.titleSettings),
+      (RemixIcon.dashboardLine, RemixIcon.dashboardFill, t.titleDashboard),
+      (RemixIcon.serverLine, RemixIcon.serverLine, t.titleContainers),
+      (RemixIcon.apps2Line, RemixIcon.apps2Fill, t.titleResources),
+      (RemixIcon.settings3Line, RemixIcon.settings3Line, t.titleSettings),
     ];
 
     const double itemWidth = 72.0;
@@ -362,14 +263,14 @@ class _MainTabScreenState extends State<MainTabScreen> {
       if (_selectedIndex == 1)
         IconButton(
           icon: Icon(currentEffectiveMode == 'grid'
-              ? Icons.view_list
-              : Icons.grid_view),
+              ? RemixIcon.listUnordered
+              : RemixIcon.gridLine),
           onPressed: _toggleLayoutMode,
           tooltip: 'Switch Layout',
         ),
       if (_selectedIndex < 2)
         IconButton(
-          icon: const Icon(Icons.refresh),
+          icon: const Icon(RemixIcon.refreshLine),
           onPressed: () {
             if (_selectedIndex == 0) {
               _dashboardKey.currentState?.refresh();
@@ -387,8 +288,8 @@ class _MainTabScreenState extends State<MainTabScreen> {
             : t.msgWsDisconnected,
         child: Icon(
           (_containersKey.currentState?.isWsConnected ?? false)
-              ? Icons.cloud_done
-              : Icons.cloud_off,
+              ? RemixIcon.cloudLine
+              : RemixIcon.cloudOffLine,
           color: (_containersKey.currentState?.isWsConnected ?? false)
               ? Theme.of(context).colorScheme.primary
               : Theme.of(context).colorScheme.onSurfaceVariant,
@@ -402,10 +303,10 @@ class _MainTabScreenState extends State<MainTabScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     final items = [
-      (Icons.dashboard_outlined, Icons.dashboard, t.titleDashboard),
-      (Icons.dns_outlined, Icons.dns, t.titleContainers),
-      (Icons.category_outlined, Icons.category, t.titleResources),
-      (Icons.settings_outlined, Icons.settings, t.titleSettings),
+      (RemixIcon.dashboardLine, RemixIcon.dashboardFill, t.titleDashboard),
+      (RemixIcon.serverLine, RemixIcon.serverLine, t.titleContainers),
+      (RemixIcon.apps2Line, RemixIcon.apps2Fill, t.titleResources),
+      (RemixIcon.settings3Line, RemixIcon.settings3Line, t.titleSettings),
     ];
 
     const double itemHeight = 72.0;
@@ -456,7 +357,7 @@ class _MainTabScreenState extends State<MainTabScreen> {
                     borderRadius: BorderRadius.circular(36),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: colorScheme.shadow.withAlpha(25),
                         blurRadius: 15,
                     offset: const Offset(0, 5),
                   ),
@@ -510,10 +411,11 @@ class _MainTabScreenState extends State<MainTabScreen> {
             right: 16,
             bottom: 16,
             child: FloatingActionButton(
+              heroTag: 'fab_run_container_wide',
               onPressed: () {
                 _containersKey.currentState?.showRunContainerDialog();
               },
-              child: const Icon(Icons.add),
+              child: const Icon(RemixIcon.addLine),
             ),
           ),
       ],

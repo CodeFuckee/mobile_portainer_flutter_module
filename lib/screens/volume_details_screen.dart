@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import '../services/docker_service.dart';
@@ -16,6 +17,7 @@ class VolumeDetailsScreen extends StatefulWidget {
   final String apiUrl;
   final String apiKey;
   final bool ignoreSsl;
+  final VoidCallback? onBack;
 
   const VolumeDetailsScreen({
     super.key,
@@ -23,6 +25,7 @@ class VolumeDetailsScreen extends StatefulWidget {
     required this.apiUrl,
     required this.apiKey,
     this.ignoreSsl = false,
+    this.onBack,
   });
 
   @override
@@ -76,7 +79,7 @@ class _VolumeDetailsScreenState extends State<VolumeDetailsScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
             child: Text(t.actionDelete),
           ),
         ],
@@ -112,15 +115,21 @@ class _VolumeDetailsScreenState extends State<VolumeDetailsScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: widget.onBack != null
+            ? IconButton(
+                icon: const Icon(RemixIcon.arrowLeftLine),
+                onPressed: widget.onBack,
+              )
+            : null,
         title: Text(widget.volumeName),
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete),
+            icon: const Icon(RemixIcon.deleteBinLine),
             onPressed: _deleteVolume,
             tooltip: t.actionDelete,
           ),
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(RemixIcon.refreshLine),
             onPressed: _fetchDetails,
           ),
         ],
@@ -198,19 +207,19 @@ class _VolumeDetailsScreenState extends State<VolumeDetailsScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Row(
                       children: [
-                        const Icon(Icons.view_in_ar, size: 16, color: Colors.blue),
+                        Icon(RemixIcon.box3Line, size: 16, color: Theme.of(context).colorScheme.primary),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             container.toString(),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
-                              color: Colors.blue,
+                              color: Theme.of(context).colorScheme.primary,
                               decoration: TextDecoration.underline,
                             ),
                           ),
                         ),
-                        const Icon(Icons.arrow_forward_ios, size: 12, color: Colors.grey),
+                        Icon(RemixIcon.arrowRightSLine, size: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
                       ],
                     ),
                   ),
@@ -334,7 +343,7 @@ class _VolumeDetailsScreenState extends State<VolumeDetailsScreen> {
             width: 100,
             child: Text(
               label,
-              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+              style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
           ),
           Expanded(
@@ -358,9 +367,9 @@ class _VolumeDetailsScreenState extends State<VolumeDetailsScreen> {
                 Clipboard.setData(ClipboardData(text: value));
                 NotifyUtils.showNotify(context, '$label copied');
               },
-              child: const Padding(
-                padding: EdgeInsets.only(left: 8.0),
-                child: Icon(Icons.copy, size: 16, color: Colors.grey),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Icon(RemixIcon.fileCopyLine, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
             ),
         ],

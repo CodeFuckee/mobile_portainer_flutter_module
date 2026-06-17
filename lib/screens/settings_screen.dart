@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_portainer_flutter_module/screens/qr_scan_screen.dart';
 import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
@@ -261,7 +262,7 @@ class SettingsScreenState extends State<SettingsScreen> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               ListTile(
-                leading: const Icon(Icons.qr_code_scanner),
+                leading: const Icon(RemixIcon.qrScanLine),
                 title: Text(t.buttonScanQr),
                 onTap: () async {
                   Navigator.pop(context);
@@ -277,7 +278,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.edit),
+                leading: const Icon(RemixIcon.editLine),
                 title: Text(t.buttonManualInput),
                 onTap: () {
                   Navigator.pop(context);
@@ -365,7 +366,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                       hintText: t.hintApiKey,
                       suffixIcon: IconButton(
                         icon: Icon(
-                          isApiKeyVisible ? Icons.visibility : Icons.visibility_off,
+                          isApiKeyVisible ? RemixIcon.eyeLine : RemixIcon.eyeOffLine,
                         ),
                         onPressed: () {
                           setStateDialog(() {
@@ -728,7 +729,7 @@ class SettingsScreenState extends State<SettingsScreen> {
       children: [
         _buildSectionHeader(
           t.sectionServers,
-          Icons.dns_rounded,
+          RemixIcon.serverLine,
           colorScheme,
           textTheme,
           trailing: _buildAddButton(t.buttonAddServer, () => _showAddServerOptions(), colorScheme),
@@ -738,7 +739,7 @@ class SettingsScreenState extends State<SettingsScreen> {
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: _servers.isEmpty
                 ? _buildEmptyState(
-                    icon: Icons.dns_outlined,
+                    icon: RemixIcon.serverLine,
                     text: t.buttonAddServer,
                     dimIconColor: dimIconColor,
                     dimTextColor: dimTextColor,
@@ -773,7 +774,7 @@ class SettingsScreenState extends State<SettingsScreen> {
           width: 34,
           height: 34,
           alignment: Alignment.center,
-          child: Icon(Icons.add_rounded, size: 20, color: colorScheme.primary),
+          child: Icon(RemixIcon.addLine, size: 20, color: colorScheme.primary),
         ),
       ),
     );
@@ -804,7 +805,7 @@ class SettingsScreenState extends State<SettingsScreen> {
           child: ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             leading: _iconContainer(
-              isActive ? Icons.dns_rounded : Icons.dns_outlined,
+              isActive ? RemixIcon.serverLine : RemixIcon.serverLine,
               42,
               serverIconBg,
               serverIconColor,
@@ -842,7 +843,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                 ],
                 if (isWebBackend) ...[
                   const SizedBox(width: 6),
-                  Icon(Icons.lock, size: 14, color: colorScheme.onSurfaceVariant.withAlpha(150)),
+                  Icon(RemixIcon.lockLine, size: 14, color: colorScheme.onSurfaceVariant.withAlpha(150)),
                 ],
               ],
             ),
@@ -859,7 +860,7 @@ class SettingsScreenState extends State<SettingsScreen> {
             trailing: isWebBackend
                 ? null
                 : PopupMenuButton<String>(
-                    icon: Icon(Icons.more_vert_rounded, size: 20, color: colorScheme.onSurfaceVariant),
+                    icon: Icon(RemixIcon.more2Fill, size: 20, color: colorScheme.onSurfaceVariant),
                     onSelected: (value) {
                       if (value == 'edit') {
                         _showServerDialog(server: server, index: index);
@@ -876,7 +877,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                         child: Row(
                           children: [
-                            Icon(Icons.edit_rounded, size: 20, color: colorScheme.onSurface),
+                            Icon(RemixIcon.editLine, size: 20, color: colorScheme.onSurface),
                             const SizedBox(width: 12),
                             Text(t.actionEdit),
                           ],
@@ -887,7 +888,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                         child: Row(
                           children: [
-                            Icon(Icons.copy_rounded, size: 20, color: colorScheme.onSurface),
+                            Icon(RemixIcon.fileCopyLine, size: 20, color: colorScheme.onSurface),
                             const SizedBox(width: 12),
                             Text(t.actionCopy),
                           ],
@@ -898,7 +899,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                         child: Row(
                           children: [
-                            Icon(Icons.delete_outline_rounded, size: 20, color: colorScheme.error),
+                            Icon(RemixIcon.deleteBinLine, size: 20, color: colorScheme.error),
                             const SizedBox(width: 12),
                             Text(t.actionDelete, style: TextStyle(color: colorScheme.error)),
                           ],
@@ -934,7 +935,7 @@ class SettingsScreenState extends State<SettingsScreen> {
       children: [
         _buildSectionHeader(
           t.titleApiKeys,
-          Icons.key_rounded,
+          RemixIcon.key2Line,
           colorScheme,
           textTheme,
           trailing: _buildAddButton(t.actionCreateKey, _createApiKey, colorScheme),
@@ -969,7 +970,7 @@ class SettingsScreenState extends State<SettingsScreen> {
         padding: const EdgeInsets.symmetric(vertical: 20),
         child: Column(
           children: [
-            Icon(Icons.error_outline_rounded, size: 36, color: colorScheme.error),
+            Icon(RemixIcon.errorWarningLine, size: 36, color: colorScheme.error),
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -982,7 +983,7 @@ class SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 8),
             TextButton.icon(
               onPressed: _loadApiKeys,
-              icon: const Icon(Icons.refresh_rounded, size: 18),
+              icon: const Icon(RemixIcon.refreshLine, size: 18),
               label: Text(t.msgRetry),
             ),
           ],
@@ -992,7 +993,7 @@ class SettingsScreenState extends State<SettingsScreen> {
 
     if (_apiKeys.isEmpty) {
       return _buildEmptyState(
-        icon: Icons.key_off_rounded,
+        icon: RemixIcon.key2Line,
         text: t.msgNoApiKeys,
         dimIconColor: dimIconColor,
         dimTextColor: dimTextColor,
@@ -1040,7 +1041,7 @@ class SettingsScreenState extends State<SettingsScreen> {
             children: [
               Row(
                 children: [
-                  _iconContainer(Icons.vpn_key_rounded, 36, colorScheme.tertiaryContainer, colorScheme.tertiary),
+                  _iconContainer(RemixIcon.key2Line, 36, colorScheme.tertiaryContainer, colorScheme.tertiary),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -1053,7 +1054,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(isVisible ? Icons.visibility_off_rounded : Icons.visibility_rounded, size: 18),
+                    icon: Icon(isVisible ? RemixIcon.eyeOffLine : RemixIcon.eyeLine, size: 18),
                     onPressed: () {
                       setState(() {
                         if (isVisible) {
@@ -1067,13 +1068,13 @@ class SettingsScreenState extends State<SettingsScreen> {
                     visualDensity: VisualDensity.compact,
                   ),
                   IconButton(
-                    icon: const Icon(Icons.copy_rounded, size: 18),
+                    icon: const Icon(RemixIcon.fileCopyLine, size: 18),
                     onPressed: () => _copyApiKey(key),
                     tooltip: t.actionCopy,
                     visualDensity: VisualDensity.compact,
                   ),
                   IconButton(
-                    icon: Icon(Icons.delete_outline_rounded, size: 18, color: colorScheme.error),
+                    icon: Icon(RemixIcon.deleteBinLine, size: 18, color: colorScheme.error),
                     onPressed: () => _deleteApiKey(key),
                     tooltip: t.actionDelete,
                     visualDensity: VisualDensity.compact,
@@ -1090,7 +1091,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.key_rounded, size: 14, color: colorScheme.onSurfaceVariant.withAlpha(150)),
+                    Icon(RemixIcon.key2Line, size: 14, color: colorScheme.onSurfaceVariant.withAlpha(150)),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -1106,7 +1107,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    Icon(Icons.schedule_rounded, size: 14, color: colorScheme.onSurfaceVariant.withAlpha(150)),
+                    Icon(RemixIcon.timeLine, size: 14, color: colorScheme.onSurfaceVariant.withAlpha(150)),
                     const SizedBox(width: 6),
                     Text('${t.labelExpiresAt}: ${_formatDate(expiresAt)}', style: textTheme.bodySmall),
                   ],
@@ -1131,14 +1132,14 @@ class SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader(t.sectionOther, Icons.settings_rounded, colorScheme, textTheme),
+        _buildSectionHeader(t.sectionOther, RemixIcon.settings3Line, colorScheme, textTheme),
         Card(
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Column(
               children: [
                 _buildSettingDropdown(
-                  icon: Icons.translate_rounded,
+                  icon: RemixIcon.globalLine,
                   title: t.labelLanguage,
                   value: _currentLanguage,
                   items: [
@@ -1151,7 +1152,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                 ),
                 _buildSettingDivider(dividerColor),
                 _buildSettingDropdown(
-                  icon: Icons.schedule_rounded,
+                  icon: RemixIcon.timeLine,
                   title: t.labelTimezone,
                   value: _currentTimezone,
                   items: [
@@ -1168,17 +1169,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                 if (!PlatformDetector.isWeb) ...[
                   _buildSettingDivider(dividerColor),
                   _buildSettingTile(
-                    icon: Icons.system_update_rounded,
+                    icon: RemixIcon.refreshLine,
                     title: t.actionUpdate,
                     onTap: _checkUpdate,
                     colorScheme: colorScheme,
-                    trailing: Icon(Icons.chevron_right_rounded, color: colorScheme.onSurfaceVariant),
+                    trailing: Icon(RemixIcon.arrowRightSLine, color: colorScheme.onSurfaceVariant),
                   ),
                 ],
                 if (PlatformDetector.isWeb) ...[
                   _buildSettingDivider(dividerColor),
                   _buildSettingTile(
-                    icon: Icons.logout_rounded,
+                    icon: RemixIcon.logoutBoxLine,
                     title: t.btnLogout,
                     onTap: () async {
                       await AuthService.logout();
@@ -1189,16 +1190,16 @@ class SettingsScreenState extends State<SettingsScreen> {
                       }
                     },
                     colorScheme: colorScheme,
-                    trailing: Icon(Icons.chevron_right_rounded, color: colorScheme.onSurfaceVariant),
+                    trailing: Icon(RemixIcon.arrowRightSLine, color: colorScheme.onSurfaceVariant),
                   ),
                 ],
                 _buildSettingDivider(dividerColor),
                 _buildSettingTile(
-                  icon: Icons.code_rounded,
+                  icon: RemixIcon.terminalLine,
                   title: t.labelGithub,
                   onTap: _openGithub,
                   colorScheme: colorScheme,
-                  trailing: Icon(Icons.open_in_new_rounded, size: 18, color: colorScheme.onSurfaceVariant),
+                  trailing: Icon(RemixIcon.externalLinkLine, size: 18, color: colorScheme.onSurfaceVariant),
                 ),
               ],
             ),

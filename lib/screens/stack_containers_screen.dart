@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
@@ -16,10 +17,12 @@ import 'container_details_screen.dart';
 
 class StackContainersScreen extends StatefulWidget {
   final String stackName;
+  final VoidCallback? onBack;
 
   const StackContainersScreen({
     super.key,
     required this.stackName,
+    this.onBack,
   });
 
   @override
@@ -197,15 +200,21 @@ class StackContainersScreenState extends State<StackContainersScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: widget.onBack != null
+            ? IconButton(
+                icon: const Icon(RemixIcon.arrowLeftLine),
+                onPressed: widget.onBack,
+              )
+            : null,
         title: Text(widget.stackName),
         actions: [
           IconButton(
-            icon: Icon(Icons.delete_sweep, color: Theme.of(context).colorScheme.error),
+            icon: Icon(RemixIcon.deleteBinLine, color: Theme.of(context).colorScheme.error),
             onPressed: _allContainers.isEmpty ? null : _deleteAllContainers,
           ),
           IconButton(
             icon: Icon(
-              _isCompactMode ? Icons.view_agenda_outlined : Icons.view_list,
+              _isCompactMode ? RemixIcon.listView : RemixIcon.listUnordered,
             ),
             onPressed: () {
               setState(() {
@@ -214,7 +223,7 @@ class StackContainersScreenState extends State<StackContainersScreen> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(RemixIcon.refreshLine),
             onPressed: _fetchContainers,
           ),
         ],
@@ -239,7 +248,7 @@ class StackContainersScreenState extends State<StackContainersScreen> {
           else if (_filteredContainers.isEmpty)
             Expanded(
               child: EmptyView(
-                icon: Icons.inbox_outlined,
+                icon: RemixIcon.inboxLine,
                 message: t.msgNoContainers,
               ),
             )
@@ -392,7 +401,7 @@ class StackContainersScreenState extends State<StackContainersScreen> {
                                       ],
                                     ),
                                   ),
-                                  const Icon(Icons.chevron_right),
+                                  const Icon(RemixIcon.arrowRightSLine),
                                 ],
                               ),
                               if (container.image.isNotEmpty) ...[

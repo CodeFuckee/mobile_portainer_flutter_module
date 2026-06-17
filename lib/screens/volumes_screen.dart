@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import '../services/docker_service.dart';
@@ -154,7 +155,7 @@ class VolumesScreenState extends State<VolumesScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
             child: Text(t.actionDelete),
           ),
         ],
@@ -189,6 +190,7 @@ class VolumesScreenState extends State<VolumesScreen> {
     final t = AppLocalizations.of(context)!;
     
     final colorScheme = Theme.of(context).colorScheme;
+    final dockerColors = Theme.of(context).extension<DockerColors>();
 
     if (_error != null) {
       return ErrorView(
@@ -238,7 +240,7 @@ class VolumesScreenState extends State<VolumesScreen> {
                     height: 50,
                     alignment: Alignment.center,
                     child: Icon(
-                      Icons.filter_list,
+                      RemixIcon.filterLine,
                       color: _currentFilter != VolumeFilter.all
                           ? colorScheme.primary
                           : colorScheme.onSurfaceVariant,
@@ -260,7 +262,7 @@ class VolumesScreenState extends State<VolumesScreen> {
             child: _isLoading
                 ? const LoadingView(type: LoadingType.list)
                 : _filteredVolumes.isEmpty
-                  ? EmptyView(icon: Icons.storage_outlined, message: t.msgNoContainers)
+                  ? EmptyView(icon: RemixIcon.hardDriveLine, message: t.msgNoContainers)
                   : ListView.builder(
                     itemCount: _filteredVolumes.length,
                     itemBuilder: (context, index) {
@@ -301,14 +303,14 @@ class VolumesScreenState extends State<VolumesScreen> {
                                       vertical: 2,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.green.withOpacity(0.1),
-                                      border: Border.all(color: Colors.green),
+                                      color: dockerColors?.inUseBackground ?? const Color(0xFFE8FFEA),
+                                      border: Border.all(color: dockerColors?.inUseBorder ?? const Color(0xFF00B42A)),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
                                       t.labelInUse,
-                                      style: const TextStyle(
-                                        color: Colors.green,
+                                      style: TextStyle(
+                                        color: dockerColors?.inUseBorder ?? const Color(0xFF00B42A),
                                         fontSize: 10,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -320,19 +322,19 @@ class VolumesScreenState extends State<VolumesScreen> {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.blue.withOpacity(0.1),
+                                    color: colorScheme.primary.withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(
                                       volume.driver,
-                                      style: const TextStyle(
-                                        color: Colors.blue,
+                                      style: TextStyle(
+                                        color: colorScheme.primary,
                                         fontSize: 10,
                                       ),
                                     ),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.delete, size: 20, color: Colors.grey),
+                                    icon: Icon(RemixIcon.deleteBinLine, size: 20, color: colorScheme.onSurfaceVariant),
                                     onPressed: () => _deleteVolume(volume),
                                     tooltip: t.actionDelete,
                                   ),
@@ -374,21 +376,21 @@ class VolumesScreenState extends State<VolumesScreen> {
                                                   margin: const EdgeInsets.only(left: 8),
                                                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                                   decoration: BoxDecoration(
-                                                    color: Colors.green.withOpacity(0.1),
-                                                    border: Border.all(color: Colors.green),
+                                                    color: dockerColors?.inUseBackground ?? const Color(0xFFE8FFEA),
+                                                    border: Border.all(color: dockerColors?.inUseBorder ?? const Color(0xFF00B42A)),
                                                     borderRadius: BorderRadius.circular(4),
                                                   ),
                                                   child: Text(
                                                     t.labelInUse,
-                                                    style: const TextStyle(
-                                                      color: Colors.green,
+                                                    style: TextStyle(
+                                                      color: dockerColors?.inUseBorder ?? const Color(0xFF00B42A),
                                                       fontSize: 10,
                                                       fontWeight: FontWeight.bold,
                                                     ),
                                                   ),
                                                 ),
                                               IconButton(
-                                                icon: const Icon(Icons.delete, size: 20, color: Colors.grey),
+                                                icon: Icon(RemixIcon.deleteBinLine, size: 20, color: colorScheme.onSurfaceVariant),
                                                 onPressed: () => _deleteVolume(volume),
                                                 tooltip: t.actionDelete,
                                               ),
@@ -398,7 +400,7 @@ class VolumesScreenState extends State<VolumesScreen> {
                                           Text(
                                             '${t.labelDriver}: ${volume.driver}',
                                             style: TextStyle(
-                                              color: Colors.grey[600],
+                                              color: colorScheme.onSurfaceVariant,
                                               fontSize: 12,
                                             ),
                                           ),
@@ -407,7 +409,7 @@ class VolumesScreenState extends State<VolumesScreen> {
                                             Text(
                                               volume.mountpoint,
                                               style: TextStyle(
-                                                color: Colors.grey[600],
+                                                color: colorScheme.onSurfaceVariant,
                                                 fontSize: 12,
                                                 fontFamily: 'Monospace'
                                               ),
@@ -420,7 +422,7 @@ class VolumesScreenState extends State<VolumesScreen> {
                                             Text(
                                               volume.created,
                                               style: TextStyle(
-                                                color: Colors.grey[600],
+                                                color: colorScheme.onSurfaceVariant,
                                                 fontSize: 12,
                                               ),
                                             ),

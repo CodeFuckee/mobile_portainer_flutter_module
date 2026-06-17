@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 
 class AppSearchBar extends StatelessWidget {
   final TextEditingController controller;
@@ -38,7 +39,7 @@ class AppSearchBar extends StatelessWidget {
                     fontSize: 14,
                   ),
                   prefixIcon: Icon(
-                    Icons.search,
+                    RemixIcon.searchLine,
                     color: colorScheme.onSurfaceVariant,
                     size: 22,
                   ),

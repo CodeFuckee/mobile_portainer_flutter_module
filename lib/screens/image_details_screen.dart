@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import '../services/docker_service.dart';
 import 'package:intl/intl.dart';
@@ -12,10 +13,11 @@ import '../widgets/loading_view.dart';
 
 class ImageDetailsScreen extends StatefulWidget {
   final String imageId;
-  final String imageName; // RepoTags[0] or short ID
+  final String imageName;
   final String apiUrl;
   final String apiKey;
   final bool ignoreSsl;
+  final VoidCallback? onBack;
 
   const ImageDetailsScreen({
     super.key,
@@ -24,6 +26,7 @@ class ImageDetailsScreen extends StatefulWidget {
     required this.apiUrl,
     required this.apiKey,
     this.ignoreSsl = false,
+    this.onBack,
   });
 
   @override
@@ -82,10 +85,16 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: widget.onBack != null
+            ? IconButton(
+                icon: const Icon(RemixIcon.arrowLeftLine),
+                onPressed: widget.onBack,
+              )
+            : null,
         title: Text(widget.imageName, style: const TextStyle(fontSize: 16)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(RemixIcon.refreshLine),
             onPressed: _fetchDetails,
           ),
         ],
@@ -246,7 +255,7 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
                         color: accentColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(Icons.inventory_2_outlined, color: accentColor, size: 26),
+                      child: Icon(RemixIcon.archiveLine, color: accentColor, size: 26),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -278,9 +287,9 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    _buildStatItem(Icons.data_usage, _formatSize(details['Size']), 'Size', colorScheme),
-                    _buildStatItem(Icons.access_time, _formatDate(details['Created']), 'Created', colorScheme),
-                    _buildStatItem(Icons.memory, '${details['Os']}/${details['Architecture']}', 'OS/Arch', colorScheme),
+                    _buildStatItem(RemixIcon.pieChartLine, _formatSize(details['Size']), 'Size', colorScheme),
+                    _buildStatItem(RemixIcon.timeLine, _formatDate(details['Created']), 'Created', colorScheme),
+                    _buildStatItem(RemixIcon.cpuLine, '${details['Os']}/${details['Architecture']}', 'OS/Arch', colorScheme),
                   ],
                 ),
               ],
@@ -380,7 +389,7 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(key, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.grey)),
+                  Text(key, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant)),
                   const SizedBox(height: 2),
                   SelectableText(value, style: const TextStyle(fontFamily: 'monospace', fontSize: 13)),
                 ],
@@ -444,7 +453,7 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(key, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Colors.grey)),
+                  Text(key, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
                   const SizedBox(height: 2),
                   SelectableText(value.toString(), style: const TextStyle(fontSize: 13)),
                 ],

@@ -109,4 +109,13 @@ class HarmonyosPlatform {
   static Future<String?> scanQrCode() async {
     return await _channel.invokeMethod<String>('scanQrCode');
   }
+
+  // ==================== Split Screen ====================
+
+  /// 退出分屏模式。原生端检查当前是否处于分屏状态：
+  /// - 若在分屏中，退出分屏并返回 true
+  /// - 若不在分屏中，返回 false
+  static Future<bool> exitSplitScreen() async {
+    return await _channel.invokeMethod<bool>('exitSplitScreen') ?? false;
+  }
 }

@@ -42,6 +42,7 @@ dependencies:
   share_plus: ^12.0.2
   permission_handler: ^11.3.0
   device_info_plus: ^10.1.0
+  remix_icons_flutter: ^4.9.3
 
 dev_dependencies:
   flutter_test:

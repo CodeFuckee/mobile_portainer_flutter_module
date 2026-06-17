@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'loading_view.dart';
@@ -124,7 +125,7 @@ class _EnvVarsSelectorState extends State<EnvVarsSelector> with SingleTickerProv
                 
                 Navigator.pop(context, result);
               } : null,
-              child: const Icon(Icons.check),
+              child: const Icon(RemixIcon.checkLine),
             ),
           ],
         ),
@@ -184,7 +185,7 @@ class _EnvVarsSelectorState extends State<EnvVarsSelector> with SingleTickerProv
             });
           },
           secondary: IconButton(
-            icon: const Icon(Icons.info_outline),
+            icon: const Icon(RemixIcon.informationLine),
             onPressed: () {
                // Show group content preview
                showDialog(

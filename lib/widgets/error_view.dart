@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 
 class ErrorView extends StatelessWidget {
   final String message;
@@ -25,7 +26,7 @@ class ErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.error_outline, size: 64, color: colorScheme.error),
+            Icon(RemixIcon.errorWarningLine, size: 64, color: colorScheme.error),
             const SizedBox(height: 16),
             Text(
               message,
@@ -46,7 +47,7 @@ class ErrorView extends StatelessWidget {
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 onPressed: onRetry,
-                icon: const Icon(Icons.refresh),
+                icon: const Icon(RemixIcon.refreshLine),
                 label: Text(retryLabel ?? 'Retry'),
               ),
             ],

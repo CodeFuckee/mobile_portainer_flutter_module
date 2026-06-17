@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 
 class LayoutToggle extends StatelessWidget {
   final bool isCompactMode;
@@ -25,7 +26,7 @@ class LayoutToggle extends StatelessWidget {
           height: 44,
           alignment: Alignment.center,
           child: Icon(
-            isCompactMode ? Icons.grid_view : Icons.view_list,
+            isCompactMode ? RemixIcon.layoutGridLine : RemixIcon.listView,
             size: 22,
             color: colorScheme.onSurfaceVariant,
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import '../services/docker_service.dart';
@@ -16,6 +17,7 @@ class NetworkDetailsScreen extends StatefulWidget {
   final String apiUrl;
   final String apiKey;
   final bool ignoreSsl;
+  final VoidCallback? onBack;
 
   const NetworkDetailsScreen({
     super.key,
@@ -24,6 +26,7 @@ class NetworkDetailsScreen extends StatefulWidget {
     required this.apiUrl,
     required this.apiKey,
     this.ignoreSsl = false,
+    this.onBack,
   });
 
   @override
@@ -69,10 +72,16 @@ class _NetworkDetailsScreenState extends State<NetworkDetailsScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: widget.onBack != null
+            ? IconButton(
+                icon: const Icon(RemixIcon.arrowLeftLine),
+                onPressed: widget.onBack,
+              )
+            : null,
         title: Text(widget.networkName),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(RemixIcon.refreshLine),
             onPressed: _fetchDetails,
           ),
         ],
@@ -299,7 +308,7 @@ class _NetworkDetailsScreenState extends State<NetworkDetailsScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Row(
                       children: [
-                        const Icon(Icons.view_in_ar, size: 16, color: Colors.blue),
+                        Icon(RemixIcon.box3Line, size: 16, color: Theme.of(context).colorScheme.primary),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Column(
@@ -307,9 +316,9 @@ class _NetworkDetailsScreenState extends State<NetworkDetailsScreen> {
                             children: [
                               Text(
                                 containerName,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 14,
-                                  color: Colors.blue,
+                                  color: Theme.of(context).colorScheme.primary,
                                   decoration: TextDecoration.underline,
                                 ),
                               ),
@@ -324,7 +333,7 @@ class _NetworkDetailsScreenState extends State<NetworkDetailsScreen> {
                             ],
                           ),
                         ),
-                        const Icon(Icons.arrow_forward_ios, size: 12, color: Colors.grey),
+                        Icon(RemixIcon.arrowRightSLine, size: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
                       ],
                     ),
                   ),
@@ -374,7 +383,7 @@ class _NetworkDetailsScreenState extends State<NetworkDetailsScreen> {
                     borderRadius: BorderRadius.circular(20),
                     child: const Padding(
                       padding: EdgeInsets.all(8.0),
-                      child: Icon(Icons.copy, size: 16),
+                      child: Icon(RemixIcon.fileCopyLine, size: 16),
                     ),
                   ),
               ],

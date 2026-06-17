@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
@@ -175,7 +176,7 @@ class NetworksScreenState extends State<NetworksScreen> {
             child: _isLoading
                 ? const LoadingView(type: LoadingType.list)
                 : _filteredNetworks.isEmpty
-                  ? const EmptyView(icon: Icons.hub_outlined, message: '')
+                  ? const EmptyView(icon: RemixIcon.shareCircleLine, message: '')
                   : ListView.builder(
                     itemCount: _filteredNetworks.length,
                     itemBuilder: (context, index) {
@@ -249,8 +250,8 @@ class NetworksScreenState extends State<NetworksScreen> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    _buildInfoItem(Icons.settings_ethernet, network.driver),
-                                    _buildInfoItem(Icons.access_time, _formatDate(network.created)),
+                                    _buildInfoItem(RemixIcon.globalLine, network.driver),
+                                    _buildInfoItem(RemixIcon.timeLine, _formatDate(network.created)),
                                   ],
                                 ),
                               ],
@@ -269,11 +270,11 @@ class NetworksScreenState extends State<NetworksScreen> {
   Widget _buildInfoItem(IconData icon, String text) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: Colors.grey),
+        Icon(icon, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
         const SizedBox(width: 4),
         Text(
           text,
-          style: const TextStyle(color: Colors.grey),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
       ],
     );

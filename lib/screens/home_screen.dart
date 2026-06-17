@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
 import 'dart:async';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
@@ -58,6 +59,8 @@ class HomeScreenState extends State<HomeScreen> {
   String? _error;
   String _currentApiUrl = '';
   String _currentApiKey = '';
+
+  ColorScheme get _cs => Theme.of(context).colorScheme;
   bool _currentIgnoreSsl = false;
   WebSocketChannel? _eventChannel;
   Timer? _reconnectTimer;
@@ -422,7 +425,7 @@ class HomeScreenState extends State<HomeScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
+                      border: Border.all(color: _cs.onSurfaceVariant),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: DropdownButtonHideUnderline(
@@ -469,7 +472,7 @@ class HomeScreenState extends State<HomeScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
+                      border: Border.all(color: _cs.onSurfaceVariant),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: DropdownButtonHideUnderline(
@@ -549,7 +552,7 @@ class HomeScreenState extends State<HomeScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: TextButton.icon(
-                      icon: const Icon(Icons.add_circle_outline),
+                      icon: const Icon(RemixIcon.addCircleLine),
                       label: Text(t.actionInsertEnvVars),
                       onPressed: () async {
                         final List<Map<String, String>>? selectedVars = await Navigator.push(
@@ -657,7 +660,6 @@ class HomeScreenState extends State<HomeScreen> {
 
   Widget _buildStatsBar() {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     int running = 0, stopped = 0, paused = 0;
     for (final c in _allContainers) {
       switch (c.status) {
@@ -668,9 +670,9 @@ class HomeScreenState extends State<HomeScreen> {
     }
 
     final filterChips = [
-      ('running', Icons.play_circle_outline, running, StatusBadge.colorFor('running', theme)),
-      ('exited', Icons.stop_circle_outlined, stopped, StatusBadge.colorFor('exited', theme)),
-      ('paused', Icons.pause_circle_outline, paused, StatusBadge.colorFor('paused', theme)),
+      ('running', RemixIcon.playCircleLine, running, StatusBadge.colorFor('running', theme)),
+      ('exited', RemixIcon.stopCircleLine, stopped, StatusBadge.colorFor('exited', theme)),
+      ('paused', RemixIcon.pauseCircleLine, paused, StatusBadge.colorFor('paused', theme)),
     ];
 
     return Padding(
@@ -683,7 +685,7 @@ class HomeScreenState extends State<HomeScreen> {
               '${_allContainers.length} 个容器',
               style: TextStyle(
                 fontSize: 12,
-                color: colorScheme.onSurfaceVariant,
+                color: _cs.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -706,7 +708,7 @@ class HomeScreenState extends State<HomeScreen> {
                       decoration: BoxDecoration(
                         color: isSelected
                             ? color.withValues(alpha: 0.15)
-                            : colorScheme.surfaceContainerHighest,
+                            : _cs.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(20),
                         border: isSelected
                             ? Border.all(color: color.withValues(alpha: 0.5))
@@ -722,7 +724,7 @@ class HomeScreenState extends State<HomeScreen> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: isSelected ? color : colorScheme.onSurfaceVariant,
+                              color: isSelected ? color : _cs.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -744,8 +746,6 @@ class HomeScreenState extends State<HomeScreen> {
     final bool hasActiveFilters =
         _selectedStatus != 'all' || _selectedStack != 'all';
 
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Column(
       children: [
         AppSearchBar(
@@ -753,7 +753,7 @@ class HomeScreenState extends State<HomeScreen> {
           hintText: t.hintSearch,
           onChanged: _onSearchChanged,
           trailing: Material(
-            color: colorScheme.surfaceContainerHighest,
+            color: _cs.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(16),
             child: InkWell(
               borderRadius: BorderRadius.circular(16),
@@ -764,15 +764,15 @@ class HomeScreenState extends State<HomeScreen> {
                 alignment: Alignment.center,
                 decoration: hasActiveFilters
                     ? BoxDecoration(
-                        border: Border.all(color: colorScheme.primary, width: 2),
+                        border: Border.all(color: _cs.primary, width: 2),
                         borderRadius: BorderRadius.circular(16),
                       )
                     : null,
                 child: Icon(
-                  Icons.tune,
+                  RemixIcon.equalizerLine,
                   color: hasActiveFilters
-                      ? colorScheme.primary
-                      : colorScheme.onSurfaceVariant,
+                      ? _cs.primary
+                      : _cs.onSurfaceVariant,
                 ),
               ),
             ),
@@ -794,7 +794,7 @@ class HomeScreenState extends State<HomeScreen> {
         else if (_filteredContainers.isEmpty)
           Expanded(
             child: EmptyView(
-              icon: Icons.inbox_outlined,
+              icon: RemixIcon.inboxLine,
               message: t.msgNoContainers,
             ),
           )
@@ -885,44 +885,44 @@ class HomeScreenState extends State<HomeScreen> {
     // Define actions
     final actionStart = ActionItem(
       label: t.actionStart,
-      icon: Icons.play_arrow,
-      color: dockerColors?.statusRunning ?? Colors.green,
+      icon: RemixIcon.playLine,
+      color: dockerColors?.statusRunning ?? _cs.onSurface,
       actionCode: 'start',
     );
     final actionStop = ActionItem(
       label: t.actionStop,
-      icon: Icons.stop,
-      color: dockerColors?.statusExited ?? Colors.red,
+      icon: RemixIcon.stopLine,
+      color: dockerColors?.statusExited ?? _cs.error,
       actionCode: 'stop',
     );
     final actionKill = ActionItem(
       label: t.actionKill,
-      icon: Icons.dangerous,
-      color: Colors.redAccent,
+      icon: RemixIcon.forbidLine,
+      color: _cs.error,
       actionCode: 'kill',
     );
     final actionRestart = ActionItem(
       label: t.actionRestart,
-      icon: Icons.refresh,
-      color: dockerColors?.statusCreated ?? Colors.blue,
+      icon: RemixIcon.refreshLine,
+      color: dockerColors?.statusCreated ?? _cs.onSurfaceVariant,
       actionCode: 'restart',
     );
     final actionPause = ActionItem(
       label: t.actionPause,
-      icon: Icons.pause,
-      color: dockerColors?.statusRestarting ?? Colors.orange,
+      icon: RemixIcon.pauseLine,
+      color: dockerColors?.statusRestarting ?? _cs.onSurfaceVariant,
       actionCode: 'pause',
     );
     final actionResume = ActionItem(
       label: t.actionResume,
-      icon: Icons.play_circle_outline,
-      color: Colors.greenAccent,
+      icon: RemixIcon.playCircleLine,
+      color: _cs.onSurface,
       actionCode: 'resume',
     );
     final actionRemove = ActionItem(
       label: t.actionRemove,
-      icon: Icons.delete,
-      color: Colors.grey,
+      icon: RemixIcon.deleteBinLine,
+      color: _cs.onSurfaceVariant,
       actionCode: 'remove',
     );
 
@@ -970,7 +970,7 @@ class HomeScreenState extends State<HomeScreen> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: _cs.shadow.withAlpha(25),
                   blurRadius: 10,
                   offset: const Offset(0, -2),
                 ),
@@ -985,7 +985,7 @@ class HomeScreenState extends State<HomeScreen> {
                   height: 4,
                   margin: const EdgeInsets.only(bottom: 24),
                   decoration: BoxDecoration(
-                    color: Colors.grey[300],
+                    color: _cs.onSurfaceVariant.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -1000,7 +1000,7 @@ class HomeScreenState extends State<HomeScreen> {
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        Icons.dns,
+                        RemixIcon.serverLine,
                         color: _getStatusColor(container.status),
                         size: 24,
                       ),
@@ -1023,7 +1023,7 @@ class HomeScreenState extends State<HomeScreen> {
                             "Status: ${container.status}",
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey[600],
+                              color: _cs.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -1080,12 +1080,12 @@ class HomeScreenState extends State<HomeScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.grey[800] : Colors.grey[100],
+                  color: isDark ? _cs.onSurfaceVariant.withValues(alpha: 0.6) : _cs.onSurfaceVariant.withValues(alpha: 0.7),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   icon,
-                  color: isDark ? Colors.white70 : Colors.black87,
+                  color: isDark ? Colors.white70 : _cs.onSurface.withAlpha(222),
                   size: 24,
                 ),
               ),
@@ -1098,7 +1098,7 @@ class HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const Spacer(),
-              Icon(Icons.chevron_right, color: Colors.grey[400], size: 20),
+              Icon(RemixIcon.arrowRightSLine, color: _cs.onSurfaceVariant, size: 20),
             ],
           ),
         ),
@@ -1108,17 +1108,16 @@ class HomeScreenState extends State<HomeScreen> {
 
   Widget _buildContainerTile(DockerContainer container, AppLocalizations t) {
     final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
     final statusColor = _getStatusColor(container.status);
 
     final isSelected = container.id == widget.selectedContainerId;
 
     return Container(
       decoration: BoxDecoration(
-        color: isSelected ? colorScheme.primary.withOpacity(0.08) : null,
+        color: isSelected ? _cs.primary.withOpacity(0.08) : null,
         border: Border(
           bottom: BorderSide(
-            color: colorScheme.outlineVariant,
+            color: _cs.outlineVariant,
             width: 0.5,
           ),
         ),
@@ -1150,7 +1149,7 @@ class HomeScreenState extends State<HomeScreen> {
                         style: textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
-                          color: colorScheme.onSurface,
+                          color: _cs.onSurface,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -1159,7 +1158,7 @@ class HomeScreenState extends State<HomeScreen> {
                         Text(
                           container.image,
                           style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
+                            color: _cs.onSurfaceVariant,
                             fontSize: 12,
                           ),
                           overflow: TextOverflow.ellipsis,
@@ -1171,7 +1170,7 @@ class HomeScreenState extends State<HomeScreen> {
                 const SizedBox(width: 8),
                 StatusBadge(status: container.status, fontSize: 11),
                 const SizedBox(width: 4),
-                Icon(Icons.chevron_right, size: 18, color: colorScheme.onSurfaceVariant),
+                Icon(RemixIcon.arrowRightSLine, size: 18, color: _cs.onSurfaceVariant),
               ],
             ),
           ),
@@ -1186,7 +1185,6 @@ class HomeScreenState extends State<HomeScreen> {
     EdgeInsetsGeometry? margin,
   }) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
     final isDark = theme.brightness == Brightness.dark;
 
@@ -1195,14 +1193,14 @@ class HomeScreenState extends State<HomeScreen> {
     return Container(
       margin: margin ?? const EdgeInsets.only(bottom: 8, left: 16, right: 16),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        color: _cs.surface,
         borderRadius: BorderRadius.circular(14),
         border: isSelected
-            ? Border.all(color: colorScheme.primary, width: 2)
+            ? Border.all(color: _cs.primary, width: 2)
             : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
+            color: _cs.shadow.withAlpha(isDark ? 51 : 13),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -1226,7 +1224,7 @@ class HomeScreenState extends State<HomeScreen> {
                       width: 38,
                       height: 38,
                       decoration: BoxDecoration(
-                        color: colorScheme.primary.withValues(alpha: 0.12),
+                        color: _cs.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       alignment: Alignment.center,
@@ -1235,7 +1233,7 @@ class HomeScreenState extends State<HomeScreen> {
                             ? container.name[0].toUpperCase()
                             : '?',
                         style: TextStyle(
-                          color: colorScheme.primary,
+                          color: _cs.primary,
                           fontWeight: FontWeight.bold,
                           fontSize: 17,
                         ),
@@ -1250,7 +1248,7 @@ class HomeScreenState extends State<HomeScreen> {
                             container.name,
                             style: textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.w600,
-                              color: colorScheme.onSurface,
+                              color: _cs.onSurface,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -1260,7 +1258,7 @@ class HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     _buildIconBtn(
-                      Icons.article_outlined,
+                      RemixIcon.fileTextLine,
                       () {
                         Navigator.push(
                           context,
@@ -1278,20 +1276,20 @@ class HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(width: 2),
                     _buildIconBtn(
-                      Icons.more_vert,
+                      RemixIcon.more2Fill,
                       () => _showContainerActions(container),
                     ),
                   ],
                 ),
               const SizedBox(height: 10),
-              Divider(height: 1, color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+              Divider(height: 1, color: _cs.outlineVariant.withValues(alpha: 0.5)),
               const SizedBox(height: 10),
               if (container.stack.isNotEmpty)
-                _buildInfoChip(Icons.layers_outlined, t.labelStack, container.stack),
+                _buildInfoChip(RemixIcon.stackLine, t.labelStack, container.stack),
               if (container.image.isNotEmpty)
-                _buildInfoChip(Icons.image_outlined, t.labelImage, container.image),
+                _buildInfoChip(RemixIcon.imageLine, t.labelImage, container.image),
               if (container.ports.isNotEmpty)
-                _buildInfoChip(Icons.link, t.labelPorts, container.ports),
+                _buildInfoChip(RemixIcon.linkM, t.labelPorts, container.ports),
               ],
             ),
           ),
@@ -1301,7 +1299,6 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildIconBtn(IconData icon, VoidCallback onTap) {
-    final colorScheme = Theme.of(context).colorScheme;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -1309,25 +1306,24 @@ class HomeScreenState extends State<HomeScreen> {
         borderRadius: BorderRadius.circular(8),
         child: Padding(
           padding: const EdgeInsets.all(6),
-          child: Icon(icon, size: 20, color: colorScheme.onSurfaceVariant),
+          child: Icon(icon, size: 20, color: _cs.onSurfaceVariant),
         ),
       ),
     );
   }
 
   Widget _buildInfoChip(IconData icon, String label, String value) {
-    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 5),
       child: Row(
         children: [
-          Icon(icon, size: 14, color: colorScheme.onSurfaceVariant),
+          Icon(icon, size: 14, color: _cs.onSurfaceVariant),
           const SizedBox(width: 6),
           Text(
             '$label: ',
             style: textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
+              color: _cs.onSurfaceVariant,
               fontSize: 12,
             ),
           ),
@@ -1337,7 +1333,7 @@ class HomeScreenState extends State<HomeScreen> {
               style: textTheme.bodySmall?.copyWith(
                 fontWeight: FontWeight.w500,
                 fontSize: 12,
-                color: colorScheme.onSurface,
+                color: _cs.onSurface,
               ),
               overflow: TextOverflow.ellipsis,
             ),

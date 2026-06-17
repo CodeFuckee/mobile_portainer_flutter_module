@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import '../services/docker_service.dart';
@@ -110,7 +111,7 @@ class _PortsScreenState extends State<PortsScreen> {
                   t.msgAvailablePorts(totalAvailable),
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                Icon(Icons.check_circle, color: Colors.green),
+                Icon(RemixIcon.checkboxCircleLine, color: Colors.green),
               ],
             ),
           ),
@@ -123,7 +124,7 @@ class _PortsScreenState extends State<PortsScreen> {
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 child: ListTile(
-                  leading: const Icon(Icons.compare_arrows),
+                  leading: const Icon(RemixIcon.arrowLeftRightLine),
                   title: Text(range),
                   subtitle: Text(t.msgPortRange),
                 ),

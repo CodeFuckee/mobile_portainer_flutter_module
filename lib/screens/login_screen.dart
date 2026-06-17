@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import '../services/auth_service.dart';
 import 'main_tab_screen.dart';
@@ -80,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Icon(
-                      Icons.dock,
+                      RemixIcon.serverLine,
                       size: 64,
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -96,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       decoration: InputDecoration(
                         labelText: t.labelUsername,
                         hintText: t.hintUsername,
-                        prefixIcon: const Icon(Icons.person),
+                        prefixIcon: const Icon(RemixIcon.userLine),
                         border: const OutlineInputBorder(),
                       ),
                       textInputAction: TextInputAction.next,
@@ -115,11 +116,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       decoration: InputDecoration(
                         labelText: t.labelPassword,
                         hintText: t.hintPassword,
-                        prefixIcon: const Icon(Icons.lock),
+                        prefixIcon: const Icon(RemixIcon.lockLine),
                         suffixIcon: IconButton(
                           icon: Icon(_obscurePassword
-                              ? Icons.visibility_off
-                              : Icons.visibility),
+                              ? RemixIcon.eyeOffLine
+                              : RemixIcon.eyeLine),
                           onPressed: () {
                             setState(() {
                               _obscurePassword = !_obscurePassword;
@@ -149,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.error_outline,
+                            Icon(RemixIcon.errorWarningLine,
                                 color: Theme.of(context)
                                     .colorScheme
                                     .onErrorContainer,
@@ -183,7 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     height: 20,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      color: Colors.white,
+                                      color: Color(0xFFFFFFFF),
                                     ),
                                   ),
                                   const SizedBox(width: 12),

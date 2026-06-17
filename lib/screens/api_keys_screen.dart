@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import '../services/auth_service.dart';
@@ -193,8 +194,9 @@ class _ApiKeysScreenState extends State<ApiKeysScreen> {
         title: Text(t.titleApiKeys),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'fab_create_api_key',
         onPressed: _createKey,
-        child: const Icon(Icons.add),
+        child: const Icon(RemixIcon.addLine),
       ),
       body: _buildBody(t),
     );
@@ -210,7 +212,7 @@ class _ApiKeysScreenState extends State<ApiKeysScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.error_outline, size: 48, color: Theme.of(context).colorScheme.error),
+            Icon(RemixIcon.errorWarningLine, size: 48, color: Theme.of(context).colorScheme.error),
             const SizedBox(height: 16),
             Text(_error!, style: Theme.of(context).textTheme.bodyLarge),
             const SizedBox(height: 16),
@@ -228,7 +230,7 @@ class _ApiKeysScreenState extends State<ApiKeysScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.vpn_key_off, size: 48, color: Theme.of(context).hintColor),
+            Icon(RemixIcon.key2Line, size: 48, color: Theme.of(context).hintColor),
             const SizedBox(height: 16),
             Text(t.msgNoApiKeys, style: Theme.of(context).textTheme.bodyLarge),
           ],
@@ -277,7 +279,7 @@ class _ApiKeysScreenState extends State<ApiKeysScreen> {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(isVisible ? Icons.visibility_off : Icons.visibility, size: 20),
+                  icon: Icon(isVisible ? RemixIcon.eyeOffLine : RemixIcon.eyeLine, size: 20),
                   onPressed: () {
                     setState(() {
                       if (isVisible) {
@@ -290,12 +292,12 @@ class _ApiKeysScreenState extends State<ApiKeysScreen> {
                   tooltip: isVisible ? t.actionHide : t.actionShow,
                 ),
                 IconButton(
-                  icon: const Icon(Icons.copy, size: 20),
+                  icon: const Icon(RemixIcon.fileCopyLine, size: 20),
                   onPressed: () => _copyKey(key),
                   tooltip: t.actionCopy,
                 ),
                 IconButton(
-                  icon: Icon(Icons.delete_outline, size: 20, color: Theme.of(context).colorScheme.error),
+                  icon: Icon(RemixIcon.deleteBinLine, size: 20, color: Theme.of(context).colorScheme.error),
                   onPressed: () => _deleteKey(key),
                   tooltip: t.actionDelete,
                 ),
@@ -310,7 +312,7 @@ class _ApiKeysScreenState extends State<ApiKeysScreen> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.vpn_key, size: 16),
+                  const Icon(RemixIcon.key2Line, size: 16),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -329,7 +331,7 @@ class _ApiKeysScreenState extends State<ApiKeysScreen> {
               Row(
                 children: [
                   if (createdAt.isNotEmpty) ...[
-                    Icon(Icons.calendar_today, size: 14, color: Theme.of(context).hintColor),
+                    Icon(RemixIcon.calendarLine, size: 14, color: Theme.of(context).hintColor),
                     const SizedBox(width: 4),
                     Text(
                       '${t.labelCreatedAt}: $createdAt',
@@ -340,7 +342,7 @@ class _ApiKeysScreenState extends State<ApiKeysScreen> {
                   ],
                   if (createdAt.isNotEmpty && expiresAt != null) const Spacer(),
                   if (expiresAt != null) ...[
-                    Icon(Icons.timer, size: 14, color: Theme.of(context).hintColor),
+                    Icon(RemixIcon.timerLine, size: 14, color: Theme.of(context).hintColor),
                     const SizedBox(width: 4),
                     Text(
                       '${t.labelExpiresAt}: ${_formatDate(expiresAt)}',

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 
 enum ToastType { success, error, warning, info }
 
@@ -113,28 +114,28 @@ class _ToastStyle {
 
   static const _styles = {
     ToastType.success: _ToastStyle(
-      icon: Icons.check_circle,
+      icon: RemixIcon.checkboxCircleFill,
       borderLight: Color(0xFF2E7D32),
       borderDark: Color(0xFF66BB6A),
       bgLight: Color(0xFFE8F5E9),
       bgDark: Color(0xFF1B5E20),
     ),
     ToastType.error: _ToastStyle(
-      icon: Icons.error,
+      icon: RemixIcon.errorWarningFill,
       borderLight: Color(0xFFC62828),
       borderDark: Color(0xFFFF8A80),
       bgLight: Color(0xFFFFEBEE),
       bgDark: Color(0x50B71C1C),
     ),
     ToastType.warning: _ToastStyle(
-      icon: Icons.warning_amber,
+      icon: RemixIcon.alertFill,
       borderLight: Color(0xFFEF6C00),
       borderDark: Color(0xFFFFB74D),
       bgLight: Color(0xFFFFF3E0),
       bgDark: Color(0x50E65100),
     ),
     ToastType.info: _ToastStyle(
-      icon: Icons.info,
+      icon: RemixIcon.informationFill,
       borderLight: Color(0xFF0A84FF),
       borderDark: Color(0xFF4DA3FF),
       bgLight: Color(0xFFE3F2FD),
@@ -271,7 +272,7 @@ class _ToastWidgetState extends State<_ToastWidget>
                   GestureDetector(
                     onTap: _dismiss,
                     child: Icon(
-                      Icons.close,
+                      RemixIcon.closeFill,
                       color: cs.onSurface.withAlpha(100),
                       size: 18,
                     ),

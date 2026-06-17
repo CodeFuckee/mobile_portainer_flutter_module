@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import '../widgets/loading_view.dart';
@@ -84,7 +85,7 @@ class _EnvVarsScreenState extends State<EnvVarsScreen> with SingleTickerProvider
             controller: _tabController,
             isScrollable: true,
             labelColor: Theme.of(context).primaryColor,
-            unselectedLabelColor: Colors.grey,
+            unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
             tabs: [
               Tab(text: t.tabGlobal),
               Tab(text: t.tabGroups),
@@ -123,11 +124,11 @@ class _EnvVarsScreenState extends State<EnvVarsScreen> with SingleTickerProvider
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.blue),
+                          icon: Icon(RemixIcon.editLine, color: Theme.of(context).colorScheme.primary),
                           onPressed: () => _showAddEditVarDialog(context, t, index: index),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
+                          icon: Icon(RemixIcon.deleteBinLine, color: Theme.of(context).colorScheme.error),
                           onPressed: () => _deleteGlobalVar(index, t),
                         ),
                       ],
@@ -137,8 +138,9 @@ class _EnvVarsScreenState extends State<EnvVarsScreen> with SingleTickerProvider
               },
             ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'fab_add_env_var',
         onPressed: () => _showAddEditVarDialog(context, t),
-        child: const Icon(Icons.add),
+        child: const Icon(RemixIcon.addLine),
       ),
     );
   }
@@ -171,7 +173,7 @@ class _EnvVarsScreenState extends State<EnvVarsScreen> with SingleTickerProvider
                             onPressed: () => _showAddEditGroupDialog(context, t, index: index),
                           ),
                           TextButton(
-                            child: Text(t.actionDelete, style: const TextStyle(color: Colors.red)),
+                            child: Text(t.actionDelete, style: TextStyle(color: Theme.of(context).colorScheme.error)),
                             onPressed: () => _deleteGroup(index, t),
                           ),
                         ],
@@ -182,8 +184,9 @@ class _EnvVarsScreenState extends State<EnvVarsScreen> with SingleTickerProvider
               },
             ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'fab_add_env_group',
         onPressed: () => _showAddEditGroupDialog(context, t),
-        child: const Icon(Icons.add),
+        child: const Icon(RemixIcon.addLine),
       ),
     );
   }
@@ -207,7 +210,7 @@ class _EnvVarsScreenState extends State<EnvVarsScreen> with SingleTickerProvider
               });
               await _saveGlobalVars();
             },
-            child: Text(t.actionDelete, style: const TextStyle(color: Colors.red)),
+            child: Text(t.actionDelete, style: TextStyle(color: Theme.of(context).colorScheme.error)),
           ),
         ],
       ),
@@ -233,7 +236,7 @@ class _EnvVarsScreenState extends State<EnvVarsScreen> with SingleTickerProvider
               });
               await _saveGroups();
             },
-            child: Text(t.actionDelete, style: const TextStyle(color: Colors.red)),
+            child: Text(t.actionDelete, style: TextStyle(color: Theme.of(context).colorScheme.error)),
           ),
         ],
       ),
@@ -326,7 +329,7 @@ class _EnvVarsScreenState extends State<EnvVarsScreen> with SingleTickerProvider
                     children: [
                       Text(t.titleEnvVars, style: const TextStyle(fontWeight: FontWeight.bold)),
                       IconButton(
-                        icon: const Icon(Icons.add_circle),
+                        icon: const Icon(RemixIcon.addCircleLine),
                         onPressed: () async {
                           final newVar = await _showInlineVarDialog(context, t);
                           if (newVar != null) {
@@ -347,7 +350,7 @@ class _EnvVarsScreenState extends State<EnvVarsScreen> with SingleTickerProvider
                           title: Text(tempVars[i]['key']!),
                           subtitle: Text(tempVars[i]['value']!),
                           trailing: IconButton(
-                            icon: const Icon(Icons.remove_circle, color: Colors.red),
+                            icon: Icon(RemixIcon.indeterminateCircleLine, color: Theme.of(context).colorScheme.error),
                             onPressed: () {
                               setStateDialog(() {
                                 tempVars.removeAt(i);

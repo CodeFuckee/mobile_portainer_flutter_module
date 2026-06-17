@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import 'package:intl/intl.dart';
 import '../models/docker_image.dart';
@@ -172,7 +173,7 @@ class ImagesScreenState extends State<ImagesScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
             child: Text(t.actionDelete),
           ),
         ],
@@ -253,7 +254,7 @@ class ImagesScreenState extends State<ImagesScreen> {
         else if (_filteredImages.isEmpty)
            Expanded(
             child: EmptyView(
-              icon: Icons.image_outlined,
+              icon: RemixIcon.imageLine,
               message: t.msgNoContainers,
             ),
           )
@@ -380,7 +381,7 @@ class ImagesScreenState extends State<ImagesScreen> {
           ],
         ),
         trailing: IconButton(
-          icon: Icon(Icons.delete_outline, size: 20, color: colorScheme.error),
+          icon: Icon(RemixIcon.deleteBinLine, size: 20, color: colorScheme.error),
           onPressed: () => _confirmDelete(image),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
@@ -423,7 +424,7 @@ class ImagesScreenState extends State<ImagesScreen> {
                   if (image.inUse) _buildInUseBadge(dockerColors, t),
                   const SizedBox(width: 4),
                   IconButton(
-                    icon: Icon(Icons.delete_outline, size: 20, color: colorScheme.error),
+                    icon: Icon(RemixIcon.deleteBinLine, size: 20, color: colorScheme.error),
                     onPressed: () => _confirmDelete(image),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
@@ -445,9 +446,9 @@ class ImagesScreenState extends State<ImagesScreen> {
               const SizedBox(height: 10),
               Row(
                 children: [
-                  _buildInfoChip(Icons.data_usage, _formatSize(image.size), colorScheme),
+                  _buildInfoChip(RemixIcon.pieChartLine, _formatSize(image.size), colorScheme),
                   const Spacer(),
-                  _buildInfoChip(Icons.access_time, _formatDate(image.created), colorScheme),
+                  _buildInfoChip(RemixIcon.timeLine, _formatDate(image.created), colorScheme),
                 ],
               ),
             ],
@@ -461,14 +462,14 @@ class ImagesScreenState extends State<ImagesScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: (dockerColors?.inUseBackground ?? Colors.green).withValues(alpha: 0.15),
-        border: Border.all(color: dockerColors?.inUseBorder ?? Colors.green, width: 1),
+        color: dockerColors?.inUseBackground ?? const Color(0xFFE8FFEA),
+        border: Border.all(color: dockerColors?.inUseBorder ?? const Color(0xFF00B42A), width: 1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         t.labelInUse,
         style: TextStyle(
-          color: dockerColors?.inUseBorder ?? Colors.green,
+          color: dockerColors?.inUseBorder ?? const Color(0xFF00B42A),
           fontSize: 11,
           fontWeight: FontWeight.w600,
         ),

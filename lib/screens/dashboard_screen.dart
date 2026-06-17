@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'package:mobile_portainer_flutter_module/services/docker_service.dart';
@@ -305,7 +306,7 @@ class DashboardScreenState extends State<DashboardScreen> {
           ? const Center(child: LoadingView(type: LoadingType.card))
           : _serversData.isEmpty
               ? EmptyView(
-                  icon: Icons.dns_outlined,
+                  icon: RemixIcon.serverLine,
                   message: t.labelServerInfo,
                 )
               : RefreshIndicator(
@@ -403,7 +404,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
-                        Icons.dns_rounded,
+                        RemixIcon.serverLine,
                         color: colorScheme.onPrimaryContainer,
                         size: 24,
                       ),
@@ -449,7 +450,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                             Row(
                               children: [
                                 Icon(
-                                  Icons.access_time,
+                                  RemixIcon.timeLine,
                                   size: 14,
                                   color: colorScheme.onSurfaceVariant,
                                 ),
@@ -481,7 +482,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.error_outline, color: colorScheme.error, size: 20),
+                        Icon(RemixIcon.errorWarningLine, color: colorScheme.error, size: 20),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -518,7 +519,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                         _buildStatItem(
                           t.labelRunning,
                           server.runningContainers.toString(),
-                          Colors.green,
+                          const Color(0xFF00B42A),
                         ),
                         _buildDivider(),
                         _buildStatItem(
@@ -686,7 +687,7 @@ class DashboardScreenState extends State<DashboardScreen> {
           valueColor: AlwaysStoppedAnimation<Color>(
             percent > 80
                 ? colorScheme.error
-                : (percent > 60 ? Colors.orange : colorScheme.primary),
+                : (percent > 60 ? const Color(0xFFFF7D00) : colorScheme.primary),
           ),
           minHeight: 4,
           borderRadius: BorderRadius.circular(2),

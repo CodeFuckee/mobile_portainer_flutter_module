@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import '../theme/theme_extensions.dart';
 
 class InfoRow extends StatelessWidget {
@@ -82,7 +83,7 @@ class InfoRow extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: Icon(
-                  Icons.copy,
+                  RemixIcon.fileCopyLine,
                   size: 16,
                   color: dockerColors?.copyButton ?? Colors.grey,
                 ),

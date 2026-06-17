@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/main_tab_screen.dart';
@@ -6,13 +8,29 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'services/notification_service.dart';
 import 'services/auth_service.dart';
+import 'services/back_press_service.dart';
 import 'services/harmonyos_shared_prefs.dart';
 import 'utils/platform_detector.dart';
 import 'theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Workaround for Flutter framework bug: on macOS, synthesized Caps Lock
+  // KeyUpEvents can arrive without corresponding KeyDownEvents in
+  // _pressedKeys, triggering an assertion error in
+  // HardwareKeyboard._assertEventIsRegular (hardware_keyboard.dart:522).
+  // This only affects debug mode — assert is stripped in release builds.
+  PlatformDispatcher.instance.onError = (error, stack) {
+    if (error is AssertionError &&
+        error.toString().contains('_pressedKeys.containsKey')) {
+      return true; // Silently suppress the Caps Lock assertion
+    }
+    return false; // Let other errors through
+  };
+
   await NotificationService.instance.initialize();
+  BackPressService.initialize();
   String? languageCode;
   if (PlatformDetector.isOhos) {
     final prefs = await HarmonyosPreferences.getInstance();

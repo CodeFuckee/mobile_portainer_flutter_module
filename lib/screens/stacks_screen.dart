@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import '../services/docker_service.dart';
@@ -148,7 +149,7 @@ class StacksScreenState extends State<StacksScreen> {
             child: _isLoading
                 ? const LoadingView(type: LoadingType.list)
                 : _filteredStacks.isEmpty
-                  ? EmptyView(icon: Icons.apps_outlined, message: t.msgNoContainers)
+                  ? EmptyView(icon: RemixIcon.appsLine, message: t.msgNoContainers)
                   : ListView.builder(
                     itemCount: _filteredStacks.length,
                     itemBuilder: (context, index) {
@@ -208,7 +209,7 @@ class StacksScreenState extends State<StacksScreen> {
                                         ],
                                       ),
                                     ),
-                                    Icon(Icons.apps, color: Colors.blue.withOpacity(0.7)),
+                                    Icon(RemixIcon.appsLine, color: Theme.of(context).colorScheme.primary.withOpacity(0.7)),
                                   ],
                                 ),
                               ],

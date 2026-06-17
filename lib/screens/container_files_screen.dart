@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
@@ -12,6 +13,7 @@ import '../utils/file_helper.dart';
 import '../widgets/error_view.dart';
 import 'package:mobile_portainer_flutter_module/utils/api_error_handler.dart';
 import '../widgets/loading_view.dart';
+import '../theme/theme_extensions.dart';
 
 import 'file_content_screen.dart';
 
@@ -276,7 +278,7 @@ class _ContainerFilesScreenState extends State<ContainerFilesScreen> {
           child: Wrap(
             children: <Widget>[
               ListTile(
-                leading: const Icon(Icons.download),
+                leading: const Icon(RemixIcon.downloadLine),
                 title: Text(t.labelDownload),
                 onTap: () {
                   Navigator.pop(context);
@@ -284,7 +286,7 @@ class _ContainerFilesScreenState extends State<ContainerFilesScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.share),
+                leading: const Icon(RemixIcon.shareForwardLine),
                 title: Text(t.labelShare),
                 onTap: () {
                   Navigator.pop(context);
@@ -346,6 +348,7 @@ class _ContainerFilesScreenState extends State<ContainerFilesScreen> {
   }
 
   Widget _buildBody(AppLocalizations t) {
+    final colorScheme = Theme.of(context).colorScheme;
     if (!widget.isRunning) {
       return Center(
         child: Padding(
@@ -353,7 +356,7 @@ class _ContainerFilesScreenState extends State<ContainerFilesScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.info_outline, color: Colors.grey, size: 48),
+              Icon(RemixIcon.informationLine, color: colorScheme.onSurfaceVariant, size: 48),
               const SizedBox(height: 16),
               Text(
                 t.msgContainerClosed,
@@ -385,7 +388,7 @@ class _ContainerFilesScreenState extends State<ContainerFilesScreen> {
       itemBuilder: (context, index) {
         if (_currentPath != '/' && index == 0) {
           return ListTile(
-            leading: const Icon(Icons.folder, color: Colors.blue),
+            leading: Icon(RemixIcon.folderLine, color: colorScheme.primary),
             title: const Text('..'),
             onTap: _navigateUp,
           );
@@ -401,18 +404,19 @@ class _ContainerFilesScreenState extends State<ContainerFilesScreen> {
     IconData icon;
     Color iconColor;
     final t = AppLocalizations.of(context)!;
+    final dockerColors = Theme.of(context).extension<DockerColors>();
 
     if (file.isDirectory) {
-      icon = Icons.folder;
-      iconColor = Colors.blue;
+      icon = RemixIcon.folderLine;
+      iconColor = Theme.of(context).colorScheme.primary;
     } else {
-      icon = Icons.insert_drive_file;
-      iconColor = Colors.grey;
+      icon = RemixIcon.fileLine;
+      iconColor = Theme.of(context).colorScheme.onSurfaceVariant;
     }
 
     if (file.isSymlink) {
       // Maybe overlay a small arrow or just change icon
-      icon = Icons.shortcut;
+      icon = RemixIcon.linkM;
     }
 
     return ListTile(
@@ -425,14 +429,14 @@ class _ContainerFilesScreenState extends State<ContainerFilesScreen> {
               margin: const EdgeInsets.only(left: 8),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
-                border: Border.all(color: Colors.green),
+                color: dockerColors?.mountedBackground ?? const Color(0xFFE8FFEA),
+                border: Border.all(color: dockerColors?.mountedBorder ?? const Color(0xFF00B42A)),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
                 t.labelMounted,
-                style: const TextStyle(
-                  color: Colors.green,
+                style: TextStyle(
+                  color: dockerColors?.mountedBorder ?? const Color(0xFF00B42A),
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
                 ),
@@ -446,7 +450,7 @@ class _ContainerFilesScreenState extends State<ContainerFilesScreen> {
       ),
       trailing: !file.isDirectory
           ? IconButton(
-              icon: const Icon(Icons.more_vert),
+              icon: const Icon(RemixIcon.more2Fill),
               onPressed: () => _showFileOptions(file),
             )
           : null,
