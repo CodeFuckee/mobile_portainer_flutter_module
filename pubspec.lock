@@ -465,10 +465,10 @@ packages:
     dependency: "direct main"
     description:
       name: remix_icons_flutter
-      sha256: "25c6d82d1f142ab6e12038e4e1776f16d0a1153f9ac36146798ceef03560f8c2"
+      sha256: a203fc53a6a879f3eeba5ae668f733fdd2eec5e4928afe21263692fe75ac7fc1
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "4.9.3+1"
+    version: "4.9.3"
   share_plus:
     dependency: "direct main"
     description:
