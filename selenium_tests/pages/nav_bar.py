@@ -8,7 +8,7 @@ from config import debug_sleep
 class NavBar(BasePage):
     """底部导航栏 Page Object — 通过 Flutter 语义树文本内容定位。"""
 
-    TAB_XPATH_TEMPLATE = '//flt-semantics[contains(text(),"{text}")]'
+    TAB_XPATH_TEMPLATE = '//flt-semantics[contains(@aria-label,"{text}") or contains(text(),"{text}")]'
 
     TAB_MAP = {
         "Dashboard": ["Dashboard", "概览"],

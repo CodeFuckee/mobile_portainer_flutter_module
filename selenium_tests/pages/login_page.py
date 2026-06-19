@@ -14,7 +14,7 @@ class LoginPage(BasePage):
     TEXT_EDITING_INPUT = (By.CSS_SELECTOR, "input.flt-text-editing")
     USERNAME_SEMANTICS = (By.XPATH, '//flt-semantics[contains(@role,"text")]')
     USERNAME_INPUT = USERNAME_SEMANTICS
-    LOGIN_BUTTON = (By.XPATH, '//flt-semantics[contains(text(),"Login") or contains(text(),"登录")]')
+    LOGIN_BUTTON = (By.XPATH, '//flt-semantics[contains(@aria-label,"Login") or contains(@aria-label,"登录") or contains(text(),"Login") or contains(text(),"登录")]')
 
     def _focus_first_textfield(self):
         """点击第一个 Flutter 文本字段使其获得焦点，创建 input.flt-text-editing 元素。"""
