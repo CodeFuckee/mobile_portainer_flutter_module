@@ -130,7 +130,7 @@ jobs:
         run: flutter gen-l10n
 
       - name: Build Web
-        run: flutter build web --release --build-name=${{ needs.bump-version.outputs.new_tag }} --build-number=${{ github.run_number }}
+        run: flutter build web --release --no-tree-shake-icons --build-name=${{ needs.bump-version.outputs.new_tag }} --build-number=${{ github.run_number }}
 
       - name: Package Web
         run: |
