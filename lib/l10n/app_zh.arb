@@ -46,6 +46,7 @@
   "sectionServers": "服务器列表",
   "sectionOther": "其他设置",
   "buttonAddServer": "添加服务器",
+  "hintAddServer": "点击添加 Docker 服务器",
   "labelServerName": "服务器名称",
   "msgServerAdded": "已添加服务器",
   "msgServerUpdated": "已更新服务器",

@@ -152,6 +152,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get buttonAddServer => 'Add Server';
 
   @override
+  String get hintAddServer => 'Tap to add a Docker server';
+
+  @override
   String get labelServerName => 'Server Name';
 
   @override

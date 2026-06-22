@@ -46,6 +46,7 @@
   "sectionServers": "Servers",
   "sectionOther": "Other Settings",
   "buttonAddServer": "Add Server",
+  "hintAddServer": "Tap to add a Docker server",
   "labelServerName": "Server Name",
   "msgServerAdded": "Server added",
   "msgServerUpdated": "Server updated",

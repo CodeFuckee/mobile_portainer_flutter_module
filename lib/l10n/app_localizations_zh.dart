@@ -152,6 +152,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get buttonAddServer => '添加服务器';
 
   @override
+  String get hintAddServer => '点击添加 Docker 服务器';
+
+  @override
   String get labelServerName => '服务器名称';
 
   @override

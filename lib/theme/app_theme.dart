@@ -85,7 +85,7 @@ class AppTheme {
     final isDark = colorScheme.brightness == Brightness.dark;
     final textTheme = isDark
         ? Typography.material2021().white
-        : Typography.material2021().englishLike;
+        : Typography.material2021().black;
 
     return ThemeData(
       useMaterial3: true,
@@ -167,6 +167,8 @@ class AppTheme {
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         prefixIconColor: colorScheme.onSurfaceVariant,
+        labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+        floatingLabelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
         hintStyle: TextStyle(color: colorScheme.onSurfaceVariant.withAlpha(140)),
       ),
 
@@ -253,6 +255,22 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
         ),
+      ),
+
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.selected)) {
+            return colorScheme.onPrimary;
+          }
+          return colorScheme.surfaceContainerLowest;
+        }),
+        trackColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.selected)) {
+            return colorScheme.primary;
+          }
+          return colorScheme.onSurfaceVariant.withValues(alpha: 0.3);
+        }),
+        trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
       ),
 
       extensions: [dockerColors],

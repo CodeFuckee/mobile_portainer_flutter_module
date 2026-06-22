@@ -377,6 +377,12 @@ abstract class AppLocalizations {
   /// **'Add Server'**
   String get buttonAddServer;
 
+  /// No description provided for @hintAddServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to add a Docker server'**
+  String get hintAddServer;
+
   /// No description provided for @labelServerName.
   ///
   /// In en, this message translates to:

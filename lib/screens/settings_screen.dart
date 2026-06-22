@@ -344,6 +344,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   TextField(
                     controller: nameController,
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                     decoration: InputDecoration(
                       labelText: t.labelServerName,
                       hintText: 'My Home Server',
@@ -352,6 +353,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 16),
                   TextField(
                     controller: urlController,
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                     decoration: InputDecoration(
                       labelText: t.labelDockerApiUrl,
                       hintText: t.hintIpPort,
@@ -361,6 +363,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 16),
                   TextField(
                     controller: apiKeyController,
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                     decoration: InputDecoration(
                       labelText: t.labelApiKey,
                       hintText: t.hintApiKey,
@@ -438,7 +441,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                 child: Text(t.buttonSave),
               ),
             ],
-          );
+        );
         },
       ),
     ).whenComplete(() {
@@ -508,6 +511,7 @@ class SettingsScreenState extends State<SettingsScreen> {
             children: [
               TextField(
                 controller: nameController,
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 decoration: InputDecoration(
                   labelText: t.labelApiKeyName,
                   hintText: t.hintApiKeyName,
@@ -517,6 +521,7 @@ class SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 16),
               TextField(
                 controller: keyController,
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 decoration: InputDecoration(
                   labelText: t.labelApiKeyValue,
                   hintText: t.hintApiKeyValue,
@@ -700,17 +705,61 @@ class SettingsScreenState extends State<SettingsScreen> {
     required String text,
     required Color dimIconColor,
     required Color dimTextColor,
+    String? subtitle,
+    VoidCallback? onTap,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 28),
+    final content = Padding(
+      padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 24),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 40, color: dimIconColor),
-          const SizedBox(height: 12),
-          Text(text, style: TextStyle(color: dimTextColor)),
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: dimIconColor.withAlpha(30),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 28, color: dimIconColor),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            text,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: dimTextColor,
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          if (subtitle != null) ...[
+            const SizedBox(height: 6),
+            Text(
+              subtitle,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: dimTextColor.withAlpha(120),
+                fontSize: 12,
+              ),
+            ),
+          ],
         ],
       ),
     );
+
+    if (onTap != null) {
+      return Material(
+        color: dimIconColor.withAlpha(10),
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: onTap,
+          child: content,
+        ),
+      );
+    }
+
+    return content;
   }
 
   // --- Server Section ---
@@ -739,10 +788,12 @@ class SettingsScreenState extends State<SettingsScreen> {
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: _servers.isEmpty
                 ? _buildEmptyState(
-                    icon: RemixIcon.serverLine,
+                    icon: RemixIcon.addCircleLine,
                     text: t.buttonAddServer,
-                    dimIconColor: dimIconColor,
-                    dimTextColor: dimTextColor,
+                    dimIconColor: colorScheme.primary,
+                    dimTextColor: colorScheme.onSurface,
+                    subtitle: t.hintAddServer,
+                    onTap: () => _showAddServerOptions(),
                   )
                 : Column(
                     children: List.generate(_servers.length, (index) {
