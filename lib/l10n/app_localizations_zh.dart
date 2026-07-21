@@ -539,6 +539,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get btnLogout => '退出登录';
 
   @override
+  String get actionChangePassword => '修改密码';
+
+  @override
+  String get labelCurrentPassword => '当前密码';
+
+  @override
+  String get labelNewPassword => '新密码';
+
+  @override
+  String get labelConfirmNewPassword => '确认新密码';
+
+  @override
+  String get msgPasswordRequired => '请输入密码';
+
+  @override
+  String get msgPasswordMismatch => '两次输入的密码不一致';
+
+  @override
+  String get msgPasswordChanged => '密码修改成功';
+
+  @override
   String get titleApiKeys => 'API 密钥管理';
 
   @override

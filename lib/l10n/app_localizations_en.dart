@@ -539,6 +539,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get btnLogout => 'Logout';
 
   @override
+  String get actionChangePassword => 'Change Password';
+
+  @override
+  String get labelCurrentPassword => 'Current Password';
+
+  @override
+  String get labelNewPassword => 'New Password';
+
+  @override
+  String get labelConfirmNewPassword => 'Confirm New Password';
+
+  @override
+  String get msgPasswordRequired => 'Please enter a password';
+
+  @override
+  String get msgPasswordMismatch => 'The passwords do not match';
+
+  @override
+  String get msgPasswordChanged => 'Password changed successfully';
+
+  @override
   String get titleApiKeys => 'API Keys';
 
   @override

@@ -609,6 +609,13 @@ class SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> _showChangePasswordDialog() async {
+    await showDialog<void>(
+      context: context,
+      builder: (_) => const _ChangePasswordDialog(),
+    );
+  }
+
   void _copyApiKey(Map<String, dynamic> key) {
     final t = AppLocalizations.of(context)!;
     final keyValue = key['key']?.toString() ??
@@ -1230,6 +1237,14 @@ class SettingsScreenState extends State<SettingsScreen> {
                 if (PlatformDetector.isWeb) ...[
                   _buildSettingDivider(dividerColor),
                   _buildSettingTile(
+                    icon: RemixIcon.lockPasswordLine,
+                    title: t.actionChangePassword,
+                    onTap: _showChangePasswordDialog,
+                    colorScheme: colorScheme,
+                    trailing: Icon(RemixIcon.arrowRightSLine, color: colorScheme.onSurfaceVariant),
+                  ),
+                  _buildSettingDivider(dividerColor),
+                  _buildSettingTile(
                     icon: RemixIcon.logoutBoxLine,
                     title: t.btnLogout,
                     onTap: () async {
@@ -1324,5 +1339,148 @@ class SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildSettingDivider(Color dividerColor) {
     return Divider(indent: 66, endIndent: 16, color: dividerColor);
+  }
+}
+
+class _ChangePasswordDialog extends StatefulWidget {
+  const _ChangePasswordDialog();
+
+  @override
+  State<_ChangePasswordDialog> createState() => _ChangePasswordDialogState();
+}
+
+class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _currentPasswordController = TextEditingController();
+  final _newPasswordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  bool _obscureCurrentPassword = true;
+  bool _obscureNewPassword = true;
+  bool _obscureConfirmPassword = true;
+  bool _isSubmitting = false;
+
+  @override
+  void dispose() {
+    _currentPasswordController.dispose();
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (_isSubmitting || !_formKey.currentState!.validate()) return;
+
+    setState(() => _isSubmitting = true);
+    try {
+      await AuthService.changePassword(
+        currentPassword: _currentPasswordController.text,
+        newPassword: _newPasswordController.text,
+      );
+      if (!mounted) return;
+      NotifyUtils.showNotify(context, AppLocalizations.of(context)!.msgPasswordChanged);
+      Navigator.pop(context);
+    } catch (e) {
+      if (mounted) {
+        NotifyUtils.showNotify(context, e.toString());
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+
+    return AlertDialog(
+      title: Text(t.actionChangePassword),
+      content: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildPasswordField(
+                controller: _currentPasswordController,
+                label: t.labelCurrentPassword,
+                obscureText: _obscureCurrentPassword,
+                onVisibilityChanged: () => setState(() {
+                  _obscureCurrentPassword = !_obscureCurrentPassword;
+                }),
+                textInputAction: TextInputAction.next,
+                validator: (value) => value == null || value.isEmpty ? t.msgPasswordRequired : null,
+              ),
+              const SizedBox(height: 16),
+              _buildPasswordField(
+                controller: _newPasswordController,
+                label: t.labelNewPassword,
+                obscureText: _obscureNewPassword,
+                onVisibilityChanged: () => setState(() {
+                  _obscureNewPassword = !_obscureNewPassword;
+                }),
+                textInputAction: TextInputAction.next,
+                validator: (value) => value == null || value.isEmpty ? t.msgPasswordRequired : null,
+              ),
+              const SizedBox(height: 16),
+              _buildPasswordField(
+                controller: _confirmPasswordController,
+                label: t.labelConfirmNewPassword,
+                obscureText: _obscureConfirmPassword,
+                onVisibilityChanged: () => setState(() {
+                  _obscureConfirmPassword = !_obscureConfirmPassword;
+                }),
+                textInputAction: TextInputAction.done,
+                onFieldSubmitted: (_) => _submit(),
+                validator: (value) {
+                  if (value == null || value.isEmpty) return t.msgPasswordRequired;
+                  return value == _newPasswordController.text ? null : t.msgPasswordMismatch;
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _isSubmitting ? null : () => Navigator.pop(context),
+          child: Text(t.actionCancel),
+        ),
+        FilledButton(
+          onPressed: _isSubmitting ? null : _submit,
+          child: _isSubmitting
+              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+              : Text(t.actionChangePassword),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPasswordField({
+    required TextEditingController controller,
+    required String label,
+    required bool obscureText,
+    required VoidCallback onVisibilityChanged,
+    required TextInputAction textInputAction,
+    required String? Function(String?) validator,
+    ValueChanged<String>? onFieldSubmitted,
+  }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      enabled: !_isSubmitting,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: const Icon(RemixIcon.lockPasswordLine),
+        suffixIcon: IconButton(
+          icon: Icon(obscureText ? RemixIcon.eyeOffLine : RemixIcon.eyeLine),
+          onPressed: onVisibilityChanged,
+        ),
+      ),
+      textInputAction: textInputAction,
+      onFieldSubmitted: onFieldSubmitted,
+      validator: validator,
+    );
   }
 }

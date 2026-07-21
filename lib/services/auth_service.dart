@@ -276,6 +276,52 @@ class AuthService {
     }
   }
 
+  /// 修改当前 Web 管理员的密码。
+  static Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final prefs = await PreferencesService.getInstance();
+    final serverUrl = prefs.getString(_serverUrlKey);
+    final token = prefs.getString(_tokenKey);
+
+    if (serverUrl == null || token == null) {
+      throw Exception('未登录');
+    }
+
+    final url = Uri.parse('${_cleanUrl(serverUrl)}/admin/password');
+    final client = http.Client();
+
+    try {
+      final response = await client.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'current_password': currentPassword,
+          'new_password': newPassword,
+        }),
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 204) {
+        String detail = '修改密码失败 (${response.statusCode})';
+        try {
+          final data = json.decode(response.body);
+          if (data is Map && data['message'] != null) {
+            detail = data['message'].toString();
+          } else if (data is Map && data['detail'] != null) {
+            detail = data['detail'].toString();
+          }
+        } catch (_) {}
+        throw Exception(detail);
+      }
+    } finally {
+      client.close();
+    }
+  }
+
   /// 登出，清除认证信息
   static Future<void> logout() async {
     final prefs = await PreferencesService.getInstance();

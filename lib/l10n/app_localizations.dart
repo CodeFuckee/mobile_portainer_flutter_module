@@ -1115,6 +1115,48 @@ abstract class AppLocalizations {
   /// **'Logout'**
   String get btnLogout;
 
+  /// No description provided for @actionChangePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get actionChangePassword;
+
+  /// No description provided for @labelCurrentPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Password'**
+  String get labelCurrentPassword;
+
+  /// No description provided for @labelNewPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get labelNewPassword;
+
+  /// No description provided for @labelConfirmNewPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm New Password'**
+  String get labelConfirmNewPassword;
+
+  /// No description provided for @msgPasswordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a password'**
+  String get msgPasswordRequired;
+
+  /// No description provided for @msgPasswordMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'The passwords do not match'**
+  String get msgPasswordMismatch;
+
+  /// No description provided for @msgPasswordChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Password changed successfully'**
+  String get msgPasswordChanged;
+
   /// No description provided for @titleApiKeys.
   ///
   /// In en, this message translates to:
