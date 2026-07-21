@@ -8,7 +8,6 @@ import 'package:mobile_portainer_flutter_module/services/docker_service.dart';
 import 'package:mobile_portainer_flutter_module/utils/api_error_handler.dart';
 import 'package:mobile_portainer_flutter_module/models/server_usage.dart';
 import 'package:intl/intl.dart';
-import '../theme/theme_extensions.dart';
 import '../widgets/loading_view.dart';
 import '../widgets/empty_view.dart';
 

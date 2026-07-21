@@ -8,7 +8,6 @@ import 'home_screen.dart';
 import 'images_screen.dart';
 import 'resources_screen.dart';
 import 'settings_screen.dart';
-import 'container_details_screen.dart';
 import '../theme/app_theme.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
@@ -228,7 +227,7 @@ class _MainTabScreenState extends State<MainTabScreen> {
                               isSelected ? item.$2 : item.$1,
                               color: isSelected
                                   ? colorScheme.primary
-                                  : colorScheme.onSurface.withOpacity(0.8),
+                                  : colorScheme.onSurface.withValues(alpha: 0.8),
                               size: 26,
                             ),
                             const SizedBox(height: 4),
@@ -241,7 +240,7 @@ class _MainTabScreenState extends State<MainTabScreen> {
                                     : FontWeight.normal,
                                 color: isSelected
                                     ? colorScheme.primary
-                                    : colorScheme.onSurface.withOpacity(0.5),
+                                    : colorScheme.onSurface.withValues(alpha: 0.5),
                               ),
                             ),
                           ],
@@ -297,130 +296,5 @@ class _MainTabScreenState extends State<MainTabScreen> {
       ),
     ];
   }
-
-  Widget _buildWideLayout(Widget body, AppLocalizations t, String currentEffectiveMode) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
-
-    final items = [
-      (RemixIcon.dashboardLine, RemixIcon.dashboardFill, t.titleDashboard),
-      (RemixIcon.serverLine, RemixIcon.serverLine, t.titleContainers),
-      (RemixIcon.apps2Line, RemixIcon.apps2Fill, t.titleResources),
-      (RemixIcon.settings3Line, RemixIcon.settings3Line, t.titleSettings),
-    ];
-
-    const double itemHeight = 72.0;
-    const double verticalPadding = 24.0;
-    final navRailHeight = items.length * itemHeight + verticalPadding;
-
-    return Stack(
-      children: [
-        Column(
-          children: [
-            Container(
-              height: 60,
-              color: colorScheme.surface,
-              padding: const EdgeInsets.fromLTRB(24, 18, 24, 0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      _getTitle(t),
-                      style: textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                  ),
-                  ..._buildActions(t, currentEffectiveMode),
-                ],
-              ),
-            ),
-            Divider(height: 1, color: colorScheme.outlineVariant),
-            Expanded(child: body),
-          ],
-        ),
-        Positioned(
-          left: 16,
-          top: 0,
-          bottom: 0,
-          child: Center(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(36),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Container(
-                  height: navRailHeight,
-                  width: 72,
-                  decoration: BoxDecoration(
-                    color: colorScheme.surface.withValues(alpha: 0.85),
-                    borderRadius: BorderRadius.circular(36),
-                    boxShadow: [
-                      BoxShadow(
-                        color: colorScheme.shadow.withAlpha(25),
-                        blurRadius: 15,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: List.generate(items.length, (index) {
-                  final isSelected = _selectedIndex == index;
-                  final item = items[index];
-                  return Expanded(
-                    child: GestureDetector(
-                      onTap: () => _onItemTapped(index),
-                      behavior: HitTestBehavior.opaque,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            isSelected ? item.$2 : item.$1,
-                            color: isSelected
-                                ? colorScheme.primary
-                                : colorScheme.onSurface.withOpacity(0.5),
-                            size: 26,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            item.$3,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: isSelected
-                                  ? FontWeight.w600
-                                  : FontWeight.normal,
-                              color: isSelected
-                                  ? colorScheme.primary
-                                  : colorScheme.onSurface.withOpacity(0.5),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }),
-              ),
-            ),
-            ),
-            ),
-          ),
-        ),
-        if (_selectedIndex == 1)
-          Positioned(
-            right: 16,
-            bottom: 16,
-            child: FloatingActionButton(
-              heroTag: 'fab_run_container_wide',
-              onPressed: () {
-                _containersKey.currentState?.showRunContainerDialog();
-              },
-              child: const Icon(RemixIcon.addLine),
-            ),
-          ),
-      ],
-    );
-  }
-
 
 }

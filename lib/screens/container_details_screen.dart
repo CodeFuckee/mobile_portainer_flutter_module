@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:remix_icons_flutter/remixicon_ids.dart';
-import 'package:flutter/services.dart';
 import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
 import 'package:mobile_portainer_flutter_module/services/platform/preferences_service.dart';
 import '../services/docker_service.dart';
 import 'package:mobile_portainer_flutter_module/utils/api_error_handler.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
-import '../theme/theme_extensions.dart';
 import '../widgets/section_title.dart';
 import '../widgets/info_card.dart';
 import '../widgets/info_row.dart';
-import '../widgets/loading_view.dart';
-import '../widgets/action_sheet.dart';
 import 'container_logs_screen.dart';
 import 'volume_details_screen.dart';
 import 'container_files_screen.dart';
@@ -243,7 +239,7 @@ class _ContainerDetailsScreenState extends State<ContainerDetailsScreen> {
 
   Widget _buildActionChip(_ActionItem action) {
     return Material(
-      color: action.color.withOpacity(0.08),
+      color: action.color.withValues(alpha: .08),
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: () => _performAction(action.actionCode),

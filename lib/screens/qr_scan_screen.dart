@@ -95,8 +95,6 @@ class _QrScanScreenState extends State<QrScanScreen> {
                     return const Icon(RemixIcon.cameraLine);
                   case CameraFacing.back:
                     return const Icon(RemixIcon.cameraLine);
-                  default:
-                    return const Icon(RemixIcon.cameraLine);
                 }
               },
             ),

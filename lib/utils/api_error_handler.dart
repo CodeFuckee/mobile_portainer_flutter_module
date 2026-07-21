@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mobile_portainer_flutter_module/widgets/app_toast.dart';
 import 'package:mobile_portainer_flutter_module/utils/toast_utils.dart';
 import 'platform_detector.dart';
-import 'notify_utils.dart';
 
 /// Centralized API error handler — extracts a user-friendly message from
 /// exceptions thrown by DockerService and shows it as a toast.

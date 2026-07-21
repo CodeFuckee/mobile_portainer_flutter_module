@@ -1249,7 +1249,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     title: t.btnLogout,
                     onTap: () async {
                       await AuthService.logout();
-                      if (context.mounted) {
+                      if (mounted) {
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(builder: (_) => const LoginScreen()),
                         );
@@ -1311,7 +1311,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                 labelText: title,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               ),
-              value: value,
+              initialValue: value,
               items: items,
               onChanged: onChanged,
             ),

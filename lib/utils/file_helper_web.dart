@@ -44,17 +44,21 @@ class FileHelper {
   }
 
   static Future<void> shareFile(String filePath, String name, {String? text}) async {
-    await Share.shareXFiles(
-      [XFile(filePath)],
+    await SharePlus.instance.share(ShareParams(
       text: text,
-    );
+      title: text,
+      files: [XFile(filePath)],
+      subject: name,
+    ));
   }
 
   static Future<void> shareBytes(Uint8List bytes, String name, {String? text}) async {
-    await Share.shareXFiles(
-      [XFile.fromData(bytes, name: name, mimeType: 'application/octet-stream')],
+    await SharePlus.instance.share(ShareParams(
       text: text,
-    );
+      title: text,
+      files: [XFile.fromData(bytes, name: name, mimeType: 'application/octet-stream')],
+      subject: name,
+    ));
   }
 
   /// 触发浏览器下载文件

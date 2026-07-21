@@ -322,7 +322,7 @@ class VolumesScreenState extends State<VolumesScreen> {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: colorScheme.primary.withOpacity(0.1),
+                                    color: colorScheme.primary.withValues(alpha: .1),
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(

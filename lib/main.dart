@@ -34,7 +34,7 @@ void main() async {
   String? languageCode;
   if (PlatformDetector.isOhos) {
     final prefs = await HarmonyosPreferences.getInstance();
-    languageCode = await prefs.getString('language_code');
+    languageCode = prefs.getString('language_code');
   } else {
     final prefs = await SharedPreferences.getInstance();
     languageCode = prefs.getString('language_code');

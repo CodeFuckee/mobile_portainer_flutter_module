@@ -42,10 +42,11 @@ class FileHelper {
       await HarmonyosPlatform.shareFile(filePath, text: text ?? '');
       return;
     }
-    await Share.shareXFiles(
-      [XFile(filePath)],
+    await SharePlus.instance.share(ShareParams(
       text: text,
-    );
+      files: [XFile(filePath)],
+      subject: name,
+    ));
   }
 
   static Future<void> triggerDownload(String name, Uint8List bytes) async {
@@ -60,9 +61,11 @@ class FileHelper {
       await HarmonyosPlatform.shareFile(filePath, text: text ?? '');
       return;
     }
-    await Share.shareXFiles(
-      [XFile.fromData(bytes, name: name, mimeType: 'application/octet-stream')],
+    await SharePlus.instance.share(ShareParams(
       text: text,
-    );
+      title: text,
+      files: [XFile.fromData(bytes, name: name, mimeType: 'application/octet-stream')],
+      subject: name,
+    ));
   }
 }

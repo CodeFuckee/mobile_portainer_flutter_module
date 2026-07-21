@@ -5,7 +5,6 @@ import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
 import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:share_plus/share_plus.dart';
 import '../services/docker_service.dart';
 import '../models/container_file.dart';
 import '../utils/platform_detector.dart';

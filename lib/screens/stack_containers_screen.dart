@@ -6,13 +6,11 @@ import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
 import '../models/docker_container.dart';
 import '../services/docker_service.dart';
 import '../theme/theme_extensions.dart';
-import '../widgets/status_badge.dart';
 import '../widgets/app_search_bar.dart';
 import '../widgets/error_view.dart';
 import 'package:mobile_portainer_flutter_module/utils/api_error_handler.dart';
 import '../widgets/empty_view.dart';
 import '../widgets/loading_view.dart';
-import '../widgets/layout_toggle.dart';
 import 'container_details_screen.dart';
 
 class StackContainersScreen extends StatefulWidget {

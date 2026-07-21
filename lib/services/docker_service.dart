@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'platform/http_helper.dart';
@@ -655,11 +655,12 @@ class DockerService {
       httpUrl = '$httpUrl?api_key=${Uri.encodeComponent(apiKey!)}';
     }
 
-    final logUrl = apiKey != null && apiKey!.isNotEmpty
-        ? httpUrl.replaceFirst(apiKey!, '***')
-        : httpUrl;
-    print('WebSocket URL: $logUrl');
-
+    if(kDebugMode){
+      final logUrl = apiKey != null && apiKey!.isNotEmpty
+          ? httpUrl.replaceFirst(apiKey!, '***')
+          : httpUrl;
+      print('WebSocket URL: $logUrl');
+    }
     final uri = Uri.parse(httpUrl);
     return WsHelper.connectUpgrade(uri, apiKey: apiKey, ignoreSsl: ignoreSsl);
   }

@@ -996,7 +996,7 @@ class HomeScreenState extends State<HomeScreen> {
                       decoration: BoxDecoration(
                         color: _getStatusColor(
                           container.status,
-                        ).withOpacity(0.1),
+                        ).withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -1114,7 +1114,7 @@ class HomeScreenState extends State<HomeScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: isSelected ? _cs.primary.withOpacity(0.08) : null,
+        color: isSelected ? _cs.primary.withValues(alpha: 0.08) : null,
         border: Border(
           bottom: BorderSide(
             color: _cs.outlineVariant,

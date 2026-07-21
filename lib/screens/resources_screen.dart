@@ -337,7 +337,7 @@ class _PullProgressDialogState extends State<_PullProgressDialog> {
                     setState(() {});
                     if (!_hasError) {
                       await Future.delayed(const Duration(seconds: 1));
-                      if (mounted) {
+                      if (context.mounted) {
                         Navigator.pop(context);
                         if (context.mounted) {
                           NotifyUtils.showNotify(context, t.msgImagePullSuccess);

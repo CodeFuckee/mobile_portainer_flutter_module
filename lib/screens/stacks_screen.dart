@@ -209,7 +209,7 @@ class StacksScreenState extends State<StacksScreen> {
                                         ],
                                       ),
                                     ),
-                                    Icon(RemixIcon.appsLine, color: Theme.of(context).colorScheme.primary.withOpacity(0.7)),
+                                    Icon(RemixIcon.appsLine, color: Theme.of(context).colorScheme.primary.withValues(alpha: .7)),
                                   ],
                                 ),
                               ],
