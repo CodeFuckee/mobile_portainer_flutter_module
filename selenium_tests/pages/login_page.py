@@ -11,7 +11,14 @@ from config import debug_sleep
 class LoginPage(BasePage):
     """Flutter CanvasKit 登录页 — 通过键盘交互操作。"""
 
-    TEXT_EDITING_INPUT = (By.CSS_SELECTOR, "input.flt-text-editing")
+    # Flutter 文本编辑 input 选择器：
+    # - 新版 CanvasKit 使用 data-semantics-role="text-field"（无 class 属性）
+    # - 旧版 CanvasKit 使用 class="flt-text-editing"
+    TEXT_EDITING_INPUT = (
+        By.CSS_SELECTOR,
+        "input[data-semantics-role='text-field']:not([disabled]), "
+        "input.flt-text-editing"
+    )
     USERNAME_SEMANTICS = (By.XPATH, '//flt-semantics[contains(@role,"text")]')
     USERNAME_INPUT = USERNAME_SEMANTICS
     LOGIN_BUTTON = (By.XPATH, '//flt-semantics[contains(@aria-label,"Login") or contains(@aria-label,"登录") or contains(text(),"Login") or contains(text(),"登录")]')
@@ -117,18 +124,38 @@ class LoginPage(BasePage):
     def _get_active_input(self):
         """获取当前活跃的 Flutter 文本编辑 input 元素。
 
-        Docker 环境下 Chromium 不会自动聚焦文本字段，需要先点击
-        Flutter 语义节点来触发输入框获得焦点。
+        优先通过 document.activeElement 获取当前获得焦点的 input，
+        若没有焦点 input 则尝试点击文本字段使其获得焦点。
         """
-        # 先尝试查找已有的 input
+        # Step 1: 检查当前获得焦点的元素
+        active = self.driver.execute_script("""
+            const el = document.activeElement;
+            if (el && el.tagName === 'INPUT' && (
+                el.getAttribute('data-semantics-role') === 'text-field' ||
+                el.classList.contains('flt-text-editing')
+            )) {
+                return true;
+            }
+            return false;
+        """)
+        if active:
+            return self.driver.switch_to.active_element
+
+        # Step 2: 查找已有的非禁用 input
         inputs = self.driver.find_elements(*self.TEXT_EDITING_INPUT)
         if inputs:
-            return inputs[-1]
+            # 点击第一个可交互的 input 使其获得焦点
+            try:
+                inputs[0].click()
+                time.sleep(0.3)
+                return self.driver.switch_to.active_element
+            except Exception:
+                return inputs[0]
 
-        # 尝试聚焦文本字段
+        # Step 3: 尝试聚焦文本字段（点击 canvas / 语义节点）
         self._focus_first_textfield()
 
-        # 等待 input 出现（最长 10 秒，适应 CI 慢速渲染）
+        # Step 4: 等待 input 出现（最长 10 秒，适应 CI 慢速渲染）
         try:
             WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located(self.TEXT_EDITING_INPUT)
@@ -152,7 +179,7 @@ class LoginPage(BasePage):
                 "找不到 Flutter 文本编辑 input。"
                 "可能原因: (1) 语义树未启用 (2) 页面未完全渲染 (3) CanvasKit 未初始化。"
             )
-        return inputs[-1]
+        return inputs[0]
 
     def enter_username(self, username: str):
         debug_sleep(1)

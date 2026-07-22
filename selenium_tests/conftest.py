@@ -62,57 +62,66 @@ def enable_flutter_semantics(driver):
         })();
     """)
 
-    # Step 2: 等待 placeholder 出现在 DOM 中（最多 20 秒，适应 CI 慢速渲染）
-    try:
-        WebDriverWait(driver, 20).until(
-            EC.presence_of_element_located(
-                (By.CSS_SELECTOR, "flt-semantics-placeholder")
+    # Step 2: 检查语义树是否已激活（URL 参数 ?enable_semantics=true 自动激活）
+    # 如果语义树已有内容，无需等待/点击 placeholder
+    initial_children = driver.execute_script("""
+        const host = document.querySelector('flt-semantics-host');
+        return host ? host.children.length : 0;
+    """)
+    semantics_already_active = initial_children > 0
+
+    if not semantics_already_active:
+        # Step 3: 等待 placeholder 出现在 DOM 中（最多 5 秒）
+        try:
+            WebDriverWait(driver, 5).until(
+                EC.presence_of_element_located(
+                    (By.CSS_SELECTOR, "flt-semantics-placeholder")
+                )
             )
-        )
-    except Exception:
-        pass  # 即使超时也继续，placeholder 可能不需要点击（URL 参数已激活语义树）
+        except Exception:
+            pass  # 即使超时也继续
 
-    # Step 3: 点击 placeholder 直到语义树有内容（最多 30 次 × 0.5 秒 = 15 秒）
-    for _ in range(30):
-        count = driver.execute_script("""
-            (function() {
-                const placeholder = document.querySelector('flt-semantics-placeholder');
-                if (placeholder) {
-                    // 确保 placeholder 完全可见和可点击
-                    placeholder.style.cssText = [
-                        'display:block !important',
-                        'opacity:1 !important',
-                        'visibility:visible !important',
-                        'pointer-events:auto !important',
-                        'position:fixed',
-                        'top:0',
-                        'left:0',
-                        'width:100%',
-                        'height:100%',
-                        'z-index:99999',
-                    ].join(';');
+        # Step 4: 点击 placeholder 直到语义树有内容（最多 30 次 × 0.5 秒 = 15 秒）
+        for _ in range(30):
+            count = driver.execute_script("""
+                return (function() {
+                    const placeholder = document.querySelector('flt-semantics-placeholder');
+                    if (placeholder) {
+                        // 确保 placeholder 完全可见和可点击
+                        placeholder.style.cssText = [
+                            'display:block !important',
+                            'opacity:1 !important',
+                            'visibility:visible !important',
+                            'pointer-events:auto !important',
+                            'position:fixed',
+                            'top:0',
+                            'left:0',
+                            'width:100%',
+                            'height:100%',
+                            'z-index:99999',
+                        ].join(';');
 
-                    // Flutter CanvasKit 监听 pointer 事件（非 click），同时发送多种事件确保兼容
-                    placeholder.dispatchEvent(new PointerEvent('pointerdown', {
-                        bubbles: true, cancelable: true
-                    }));
-                    placeholder.dispatchEvent(new PointerEvent('pointerup', {
-                        bubbles: true, cancelable: true
-                    }));
-                    placeholder.dispatchEvent(new MouseEvent('click', {
-                        bubbles: true, cancelable: true
-                    }));
-                    placeholder.click();
-                }
-                const host = document.querySelector('flt-semantics-host');
-                return host ? host.children.length : 0;
-            })();
-        """)
-        if count > 0:
-            break
-        time.sleep(0.5)
+                        // Flutter CanvasKit 监听 pointer 事件（非 click），同时发送多种事件确保兼容
+                        placeholder.dispatchEvent(new PointerEvent('pointerdown', {
+                            bubbles: true, cancelable: true
+                        }));
+                        placeholder.dispatchEvent(new PointerEvent('pointerup', {
+                            bubbles: true, cancelable: true
+                        }));
+                        placeholder.dispatchEvent(new MouseEvent('click', {
+                            bubbles: true, cancelable: true
+                        }));
+                        placeholder.click();
+                    }
+                    const host = document.querySelector('flt-semantics-host');
+                    return host ? host.children.length : 0;
+                })();
+            """)
+            if count and count > 0:
+                break
+            time.sleep(0.5)
 
-    # Step 4: 等待语义树稳定
+    # Step 5: 等待语义树稳定
     time.sleep(2)
 
 
