@@ -322,6 +322,202 @@ class AuthService {
     }
   }
 
+  /// 获取 SMTP 邮件配置。
+  static Future<Map<String, dynamic>> getEmailConfig() async {
+    final prefs = await PreferencesService.getInstance();
+    final serverUrl = prefs.getString(_serverUrlKey);
+    final token = prefs.getString(_tokenKey);
+
+    if (serverUrl == null || token == null) {
+      throw Exception('未登录');
+    }
+
+    final url = Uri.parse('${_cleanUrl(serverUrl)}/admin/email/config');
+    final client = http.Client();
+
+    try {
+      final response = await client.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'x-api-key': token,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body) as Map<String, dynamic>;
+      } else {
+        String detail = '获取邮件配置失败 (${response.statusCode})';
+        try {
+          final data = json.decode(response.body);
+          if (data is Map && data['message'] != null) {
+            detail = data['message'].toString();
+          } else if (data is Map && data['detail'] != null) {
+            detail = data['detail'].toString();
+          }
+        } catch (_) {}
+        throw Exception(detail);
+      }
+    } finally {
+      client.close();
+    }
+  }
+
+  /// 保存 SMTP 邮件配置。
+  static Future<void> saveSmtpConfig({
+    required String host,
+    required int port,
+    required String username,
+    String password = '',
+    required String fromEmail,
+    String fromName = 'Mobile Portainer',
+    bool useSsl = false,
+    bool useStarttls = true,
+    int timeout = 10,
+  }) async {
+    final prefs = await PreferencesService.getInstance();
+    final serverUrl = prefs.getString(_serverUrlKey);
+    final token = prefs.getString(_tokenKey);
+
+    if (serverUrl == null || token == null) {
+      throw Exception('未登录');
+    }
+
+    final url = Uri.parse('${_cleanUrl(serverUrl)}/admin/email/config');
+    final client = http.Client();
+
+    try {
+      final response = await client.put(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'x-api-key': token,
+        },
+        body: json.encode({
+          'host': host,
+          'port': port,
+          'username': username,
+          'password': password,
+          'from_email': fromEmail,
+          'from_name': fromName,
+          'use_ssl': useSsl,
+          'use_starttls': useStarttls,
+          'timeout': timeout,
+        }),
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 204) {
+        String detail = '保存 SMTP 配置失败 (${response.statusCode})';
+        try {
+          final data = json.decode(response.body);
+          if (data is Map && data['message'] != null) {
+            detail = data['message'].toString();
+          } else if (data is Map && data['detail'] != null) {
+            detail = data['detail'].toString();
+          }
+        } catch (_) {}
+        throw Exception(detail);
+      }
+    } finally {
+      client.close();
+    }
+  }
+
+  /// 获取当前用户个人信息。
+  static Future<Map<String, dynamic>> getProfile() async {
+    final prefs = await PreferencesService.getInstance();
+    final serverUrl = prefs.getString(_serverUrlKey);
+    final token = prefs.getString(_tokenKey);
+
+    if (serverUrl == null || token == null) {
+      throw Exception('未登录');
+    }
+
+    final url = Uri.parse('${_cleanUrl(serverUrl)}/admin/profile');
+    final client = http.Client();
+
+    try {
+      final response = await client.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'x-api-key': token,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body) as Map<String, dynamic>;
+      } else {
+        String detail = '获取个人信息失败 (${response.statusCode})';
+        try {
+          final data = json.decode(response.body);
+          if (data is Map && data['message'] != null) {
+            detail = data['message'].toString();
+          } else if (data is Map && data['detail'] != null) {
+            detail = data['detail'].toString();
+          }
+        } catch (_) {}
+        throw Exception(detail);
+      }
+    } finally {
+      client.close();
+    }
+  }
+
+  /// 更新用户个人信息（绑定/修改邮箱）。
+  static Future<Map<String, dynamic>> updateProfile({
+    String? email,
+  }) async {
+    final prefs = await PreferencesService.getInstance();
+    final serverUrl = prefs.getString(_serverUrlKey);
+    final token = prefs.getString(_tokenKey);
+
+    if (serverUrl == null || token == null) {
+      throw Exception('未登录');
+    }
+
+    final url = Uri.parse('${_cleanUrl(serverUrl)}/admin/profile');
+    final client = http.Client();
+
+    try {
+      final body = <String, dynamic>{};
+      if (email != null) {
+        body['email'] = email;
+      }
+
+      final response = await client.put(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'x-api-key': token,
+        },
+        body: json.encode(body),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        if (response.body.isNotEmpty) {
+          return json.decode(response.body) as Map<String, dynamic>;
+        }
+        return <String, dynamic>{};
+      } else {
+        String detail = '更新个人信息失败 (${response.statusCode})';
+        try {
+          final data = json.decode(response.body);
+          if (data is Map && data['message'] != null) {
+            detail = data['message'].toString();
+          } else if (data is Map && data['detail'] != null) {
+            detail = data['detail'].toString();
+          }
+        } catch (_) {}
+        throw Exception(detail);
+      }
+    } finally {
+      client.close();
+    }
+  }
+
   /// 登出，清除认证信息
   static Future<void> logout() async {
     final prefs = await PreferencesService.getInstance();

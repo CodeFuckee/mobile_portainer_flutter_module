@@ -10,7 +10,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 # 确保 selenium_tests 目录在 sys.path 中，以便导入 conftest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from conftest import _get_chrome_version, _find_cached_chromedriver  # noqa: E402
+from conftest import _get_chrome_version, _find_cached_chromedriver, _get_chromedriver_version  # noqa: E402
 
 
 _SYSTEM_CHROMEDRIVER = os.environ.get("CHROMEDRIVER_PATH", "")
@@ -31,6 +31,21 @@ def chromedriver_path():
         if cached:
             print(f"[chromedriver] 使用缓存: {cached}")
             return cached
+
+    # 查找系统 PATH 中的 chromedriver（如 Homebrew 安装的）
+    import shutil
+    system_cd = shutil.which("chromedriver")
+    if system_cd:
+        # 检查系统 chromedriver 版本是否与 Chrome 匹配
+        cd_info = _get_chromedriver_version(system_cd)
+        if cd_info and chrome_info and cd_info[1] != chrome_info[1]:
+            print(
+                f"[chromedriver] 系统 chromedriver 版本 ({cd_info[1]}) "
+                f"与 Chrome ({chrome_info[1]}) 不匹配，跳过"
+            )
+        else:
+            print(f"[chromedriver] 使用系统安装: {system_cd}")
+            return system_cd
 
     print("[chromedriver] 缓存未命中，由 webdriver-manager 下载...")
     return ChromeDriverManager().install()

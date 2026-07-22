@@ -181,16 +181,14 @@ if os.path.isdir(cache):
 
     if [ "$cd_major" != "$chrome_major" ]; then
         echo ""
-        echo "❌ ChromeDriver 版本不匹配！"
+        echo "⚠️  ChromeDriver 版本不匹配！"
         echo "   Chrome 主版本:        $chrome_major"
         echo "   ChromeDriver 主版本:   $cd_major"
         echo ""
-        echo "   修复方法："
-        echo "   1. 删除缓存，让 webdriver-manager 自动下载匹配版本："
-        echo "      rm -rf ~/.wdm/drivers/chromedriver"
-        echo "   2. 或手动指定 CHROMEDRIVER_PATH 环境变量："
-        echo "      CHROMEDRIVER_PATH=/path/to/chromedriver ./run_tests.sh"
-        exit 1
+        echo "   系统 chromedriver 将被跳过，由 webdriver-manager 自动下载匹配版本。"
+        echo "   如需使用系统 chromedriver，请升级 Chrome 或降级 chromedriver："
+        echo "     brew upgrade --cask google-chrome"
+        echo ""
     fi
 
     echo "[chromedriver] ✓ 版本匹配"

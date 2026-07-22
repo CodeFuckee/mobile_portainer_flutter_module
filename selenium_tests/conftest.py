@@ -119,6 +119,27 @@ def _get_chrome_version() -> tuple[str, str] | None:
     return None
 
 
+def _get_chromedriver_version(binary_path: str) -> tuple[str, str] | None:
+    """获取 chromedriver 二进制文件的版本号。
+    Returns (full_version, major_version) 或 None。
+    """
+    import subprocess
+    import re
+
+    try:
+        out = subprocess.check_output(
+            [binary_path, "--version"], stderr=subprocess.STDOUT, timeout=5
+        ).decode()
+        m = re.search(r"(\d+\.\d+\.\d+\.\d+)", out)
+        if m:
+            full = m.group(1)
+            major = full.split(".")[0]
+            return (full, major)
+    except Exception:
+        pass
+    return None
+
+
 def _find_cached_chromedriver(chrome_major: str) -> str | None:
     """在 webdriver-manager 缓存中查找匹配 Chrome 主版本的 chromedriver。
     Returns chromedriver 路径或 None。
@@ -126,6 +147,17 @@ def _find_cached_chromedriver(chrome_major: str) -> str | None:
     import glob as _glob
 
     cache = os.path.expanduser("~/.wdm/drivers/chromedriver")
+    if not os.path.exists(cache):
+        return None
+
+    # 新版 webdriver-manager (v4+): chromedriver 是直接的二进制文件
+    if os.path.isfile(cache):
+        cd_info = _get_chromedriver_version(cache)
+        if cd_info and cd_info[1] == chrome_major:
+            return cache
+        return None
+
+    # 旧版 webdriver-manager: chromedriver/<version>/<platform>/chromedriver
     if not os.path.isdir(cache):
         return None
 
@@ -162,6 +194,7 @@ def _create_chrome_driver(base_url: str = ""):
     options.add_argument("--enable-unsafe-swiftshader")
     options.add_argument("--window-size=1920,1080")
 
+    service = None
     if CHROMEDRIVER_PATH:
         service = ChromeService(executable_path=CHROMEDRIVER_PATH)
     else:
@@ -174,8 +207,23 @@ def _create_chrome_driver(base_url: str = ""):
             print(f"[chromedriver] 使用缓存: {cached}")
             service = ChromeService(executable_path=cached)
         else:
-            print("[chromedriver] 缓存未命中，由 webdriver-manager 下载...")
-            service = ChromeService(ChromeDriverManager().install())
+            # 查找系统 PATH 中的 chromedriver（如 Homebrew 安装的）
+            import shutil
+            system_cd = shutil.which("chromedriver")
+            if system_cd:
+                # 检查系统 chromedriver 版本是否与 Chrome 匹配
+                cd_info = _get_chromedriver_version(system_cd)
+                if cd_info and chrome_info and cd_info[1] != chrome_info[1]:
+                    print(
+                        f"[chromedriver] 系统 chromedriver 版本 ({cd_info[1]}) "
+                        f"与 Chrome ({chrome_info[1]}) 不匹配，跳过"
+                    )
+                else:
+                    print(f"[chromedriver] 使用系统安装: {system_cd}")
+                    service = ChromeService(executable_path=system_cd)
+            if not service:
+                print("[chromedriver] 缓存未命中，由 webdriver-manager 下载...")
+                service = ChromeService(ChromeDriverManager().install())
 
     return webdriver.Chrome(service=service, options=options)
 

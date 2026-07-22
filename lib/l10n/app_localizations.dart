@@ -1246,6 +1246,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select a container to view details'**
   String get msgNoContainerSelected;
+
+  /// No description provided for @titleSystemSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'System Settings'**
+  String get titleSystemSettings;
+
+  /// No description provided for @titleEmailSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Email Settings'**
+  String get titleEmailSettings;
+
+  /// No description provided for @labelSmtpHost.
+  ///
+  /// In en, this message translates to:
+  /// **'SMTP Host'**
+  String get labelSmtpHost;
+
+  /// No description provided for @labelSmtpPort.
+  ///
+  /// In en, this message translates to:
+  /// **'SMTP Port'**
+  String get labelSmtpPort;
+
+  /// No description provided for @labelSmtpUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get labelSmtpUsername;
+
+  /// No description provided for @labelSmtpPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get labelSmtpPassword;
+
+  /// No description provided for @labelSmtpFromEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'From Email'**
+  String get labelSmtpFromEmail;
+
+  /// No description provided for @labelSmtpFromName.
+  ///
+  /// In en, this message translates to:
+  /// **'From Name'**
+  String get labelSmtpFromName;
+
+  /// No description provided for @labelSmtpUseSsl.
+  ///
+  /// In en, this message translates to:
+  /// **'Use SSL'**
+  String get labelSmtpUseSsl;
+
+  /// No description provided for @labelSmtpUseStarttls.
+  ///
+  /// In en, this message translates to:
+  /// **'Use STARTTLS'**
+  String get labelSmtpUseStarttls;
+
+  /// No description provided for @labelSmtpTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Timeout (seconds)'**
+  String get labelSmtpTimeout;
+
+  /// No description provided for @hintSmtpHost.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., smtp.gmail.com'**
+  String get hintSmtpHost;
+
+  /// No description provided for @hintSmtpPort.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., 587'**
+  String get hintSmtpPort;
+
+  /// No description provided for @hintSmtpUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'SMTP username'**
+  String get hintSmtpUsername;
+
+  /// No description provided for @hintSmtpPasswordKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty to keep unchanged'**
+  String get hintSmtpPasswordKeep;
+
+  /// No description provided for @hintSmtpFromEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., noreply@example.com'**
+  String get hintSmtpFromEmail;
+
+  /// No description provided for @hintSmtpFromName.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile Portainer'**
+  String get hintSmtpFromName;
+
+  /// No description provided for @msgSmtpSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'SMTP settings saved'**
+  String get msgSmtpSaved;
+
+  /// No description provided for @titleProfileSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Info'**
+  String get titleProfileSettings;
+
+  /// No description provided for @titlePersonalInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Info'**
+  String get titlePersonalInfo;
+
+  /// No description provided for @labelEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get labelEmail;
+
+  /// No description provided for @hintEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email address'**
+  String get hintEmail;
+
+  /// No description provided for @hintEmailBind.
+  ///
+  /// In en, this message translates to:
+  /// **'Bind your email to receive notifications and recover your account'**
+  String get hintEmailBind;
+
+  /// No description provided for @actionBindEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Bind Email'**
+  String get actionBindEmail;
+
+  /// No description provided for @actionChangeEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Email'**
+  String get actionChangeEmail;
+
+  /// No description provided for @msgEmailBound.
+  ///
+  /// In en, this message translates to:
+  /// **'Email bound successfully'**
+  String get msgEmailBound;
+
+  /// No description provided for @msgEmailUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Email updated successfully'**
+  String get msgEmailUpdated;
+
+  /// No description provided for @msgEmailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter an email address'**
+  String get msgEmailRequired;
+
+  /// No description provided for @msgEmailInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email address'**
+  String get msgEmailInvalid;
+
+  /// No description provided for @labelNotBound.
+  ///
+  /// In en, this message translates to:
+  /// **'Not bound'**
+  String get labelNotBound;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

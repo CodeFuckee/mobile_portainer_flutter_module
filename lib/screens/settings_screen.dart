@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:remix_icons_flutter/remixicon_ids.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_portainer_flutter_module/screens/qr_scan_screen.dart';
+import 'package:mobile_portainer_flutter_module/screens/email_settings_screen.dart';
+import 'package:mobile_portainer_flutter_module/screens/profile_settings_screen.dart';
 import 'package:mobile_portainer_flutter_module/utils/notify_utils.dart';
 import 'package:mobile_portainer_flutter_module/utils/api_error_handler.dart';
 
@@ -1224,6 +1226,34 @@ class SettingsScreenState extends State<SettingsScreen> {
                   onChanged: _updateTimezone,
                   colorScheme: colorScheme,
                 ),
+                if (PlatformDetector.isWeb) ...[
+                  _buildSettingDivider(dividerColor),
+                  _buildSettingTile(
+                    icon: RemixIcon.user3Line,
+                    title: t.titleProfileSettings,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const ProfileSettingsScreen()),
+                      );
+                    },
+                    colorScheme: colorScheme,
+                    trailing: Icon(RemixIcon.arrowRightSLine, color: colorScheme.onSurfaceVariant),
+                  ),
+                  _buildSettingDivider(dividerColor),
+                  _buildSettingTile(
+                    icon: RemixIcon.mailSettingsLine,
+                    title: t.titleSystemSettings,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const EmailSettingsScreen()),
+                      );
+                    },
+                    colorScheme: colorScheme,
+                    trailing: Icon(RemixIcon.arrowRightSLine, color: colorScheme.onSurfaceVariant),
+                  ),
+                ],
                 if (!PlatformDetector.isWeb) ...[
                   _buildSettingDivider(dividerColor),
                   _buildSettingTile(

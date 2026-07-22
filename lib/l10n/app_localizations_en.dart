@@ -603,4 +603,94 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get msgNoContainerSelected => 'Select a container to view details';
+
+  @override
+  String get titleSystemSettings => 'System Settings';
+
+  @override
+  String get titleEmailSettings => 'Email Settings';
+
+  @override
+  String get labelSmtpHost => 'SMTP Host';
+
+  @override
+  String get labelSmtpPort => 'SMTP Port';
+
+  @override
+  String get labelSmtpUsername => 'Username';
+
+  @override
+  String get labelSmtpPassword => 'Password';
+
+  @override
+  String get labelSmtpFromEmail => 'From Email';
+
+  @override
+  String get labelSmtpFromName => 'From Name';
+
+  @override
+  String get labelSmtpUseSsl => 'Use SSL';
+
+  @override
+  String get labelSmtpUseStarttls => 'Use STARTTLS';
+
+  @override
+  String get labelSmtpTimeout => 'Timeout (seconds)';
+
+  @override
+  String get hintSmtpHost => 'e.g., smtp.gmail.com';
+
+  @override
+  String get hintSmtpPort => 'e.g., 587';
+
+  @override
+  String get hintSmtpUsername => 'SMTP username';
+
+  @override
+  String get hintSmtpPasswordKeep => 'Leave empty to keep unchanged';
+
+  @override
+  String get hintSmtpFromEmail => 'e.g., noreply@example.com';
+
+  @override
+  String get hintSmtpFromName => 'Mobile Portainer';
+
+  @override
+  String get msgSmtpSaved => 'SMTP settings saved';
+
+  @override
+  String get titleProfileSettings => 'Personal Info';
+
+  @override
+  String get titlePersonalInfo => 'Personal Info';
+
+  @override
+  String get labelEmail => 'Email';
+
+  @override
+  String get hintEmail => 'Enter your email address';
+
+  @override
+  String get hintEmailBind => 'Bind your email to receive notifications and recover your account';
+
+  @override
+  String get actionBindEmail => 'Bind Email';
+
+  @override
+  String get actionChangeEmail => 'Change Email';
+
+  @override
+  String get msgEmailBound => 'Email bound successfully';
+
+  @override
+  String get msgEmailUpdated => 'Email updated successfully';
+
+  @override
+  String get msgEmailRequired => 'Please enter an email address';
+
+  @override
+  String get msgEmailInvalid => 'Please enter a valid email address';
+
+  @override
+  String get labelNotBound => 'Not bound';
 }

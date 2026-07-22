@@ -603,4 +603,94 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get msgNoContainerSelected => '选择一个容器查看详情';
+
+  @override
+  String get titleSystemSettings => '系统设置';
+
+  @override
+  String get titleEmailSettings => '邮件设置';
+
+  @override
+  String get labelSmtpHost => 'SMTP 服务器';
+
+  @override
+  String get labelSmtpPort => 'SMTP 端口';
+
+  @override
+  String get labelSmtpUsername => '用户名';
+
+  @override
+  String get labelSmtpPassword => '密码';
+
+  @override
+  String get labelSmtpFromEmail => '发件人邮箱';
+
+  @override
+  String get labelSmtpFromName => '发件人名称';
+
+  @override
+  String get labelSmtpUseSsl => '使用 SSL';
+
+  @override
+  String get labelSmtpUseStarttls => '使用 STARTTLS';
+
+  @override
+  String get labelSmtpTimeout => '超时时间（秒）';
+
+  @override
+  String get hintSmtpHost => '例如 smtp.gmail.com';
+
+  @override
+  String get hintSmtpPort => '例如 587';
+
+  @override
+  String get hintSmtpUsername => 'SMTP 用户名';
+
+  @override
+  String get hintSmtpPasswordKeep => '留空保持不变';
+
+  @override
+  String get hintSmtpFromEmail => '例如 noreply@example.com';
+
+  @override
+  String get hintSmtpFromName => 'Mobile Portainer';
+
+  @override
+  String get msgSmtpSaved => 'SMTP 设置已保存';
+
+  @override
+  String get titleProfileSettings => '个人信息';
+
+  @override
+  String get titlePersonalInfo => '个人信息';
+
+  @override
+  String get labelEmail => '邮箱';
+
+  @override
+  String get hintEmail => '请输入邮箱地址';
+
+  @override
+  String get hintEmailBind => '绑定邮箱后可接收通知和找回账户';
+
+  @override
+  String get actionBindEmail => '绑定邮箱';
+
+  @override
+  String get actionChangeEmail => '修改邮箱';
+
+  @override
+  String get msgEmailBound => '邮箱绑定成功';
+
+  @override
+  String get msgEmailUpdated => '邮箱更新成功';
+
+  @override
+  String get msgEmailRequired => '请输入邮箱地址';
+
+  @override
+  String get msgEmailInvalid => '请输入有效的邮箱地址';
+
+  @override
+  String get labelNotBound => '未绑定';
 }
