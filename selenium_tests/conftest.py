@@ -48,6 +48,26 @@ def enable_flutter_semantics(driver):
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
 
+    # Step 0: 注入浏览器端诊断脚本，捕获 JS 错误便于排查
+    driver.execute_script("""
+        window.__selenium_errors = [];
+        window.addEventListener('error', function(e) {
+            window.__selenium_errors.push({
+                message: e.message || String(e),
+                filename: e.filename,
+                lineno: e.lineno,
+                colno: e.colno,
+                type: 'error'
+            });
+        });
+        window.addEventListener('unhandledrejection', function(e) {
+            window.__selenium_errors.push({
+                message: e.reason?.message || String(e.reason),
+                type: 'unhandledrejection'
+            });
+        });
+    """)
+
     # Step 1: 禁用 glass-pane 的鼠标拦截（使用 !important 防止被覆盖）
     driver.execute_script("""
         (function() {
@@ -138,6 +158,57 @@ def _wait_flutter_ready(driver, timeout: int = 60):
         time.sleep(3)
     except Exception:
         pass  # 超时不算致命错误，继续执行测试
+
+
+def get_flutter_diagnostics(driver) -> dict:
+    """收集 Flutter 渲染诊断信息，用于 CI 环境下排查渲染失败原因。
+
+    Returns:
+        dict 包含以下键:
+        - flutter_view_exists: bool，flutter-view 元素是否存在
+        - glass_pane_exists: bool，flt-glass-pane 元素是否存在
+        - canvas_count: int，canvas 元素数量
+        - semantics_children: int，语义树节点数量
+        - js_errors: list，收集到的 JavaScrip t错误
+        - flutter_ready_state: str，document.readyState
+        - canvas_kit_loaded: bool，window.flutterCanvasKit 是否可用
+    """
+    result = driver.execute_script("""
+        (function() {
+            var info = {};
+
+            info.flutter_view_exists = !!document.querySelector('flutter-view');
+
+            var gp = document.querySelector('flt-glass-pane');
+            info.glass_pane_exists = !!gp;
+            info.canvas_count = gp && gp.shadowRoot
+                ? gp.shadowRoot.querySelectorAll('canvas').length
+                : 0;
+
+            var host = document.querySelector('flt-semantics-host');
+            info.semantics_children = host ? host.children.length : 0;
+
+            info.js_errors = window.__selenium_errors || [];
+
+            info.ready_state = document.readyState;
+
+            info.canvas_kit_loaded = !!(window.flutterCanvasKit);
+
+            // 检查 flutterCanvasKitLoaded promise 状态
+            if (window.flutterCanvasKitLoaded) {
+                window.flutterCanvasKitLoaded.then(function(ck) {
+                    window.__ck_ok = true;
+                }).catch(function(e) {
+                    window.__ck_error = e ? (e.message || String(e)) : 'unknown';
+                });
+            }
+            info.ck_load_ok = window.__ck_ok || false;
+            info.ck_load_error = window.__ck_error || null;
+
+            return info;
+        })();
+    """)
+    return result
 
 
 def _get_chrome_version() -> tuple[str, str] | None:
@@ -252,6 +323,10 @@ def _create_chrome_driver(base_url: str = ""):
     options.add_argument("--ignore-certificate-errors")
     options.add_argument("--incognito")
     options.add_argument("--enable-unsafe-swiftshader")
+    options.add_argument("--use-gl=angle")
+    options.add_argument("--use-angle=swiftshader")
+    options.add_argument("--ignore-gpu-blocklist")
+    options.add_argument("--enable-webgl")
     options.add_argument("--window-size=1920,1080")
 
     service = None

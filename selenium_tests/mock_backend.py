@@ -10,9 +10,30 @@
 """
 
 import json
+import mimetypes
 import os
 import sys
 from http.server import HTTPServer, SimpleHTTPRequestHandler
+
+# 显式注册关键 MIME 类型，确保在 slim Docker 镜像中也正确识别
+_mime_overrides = {
+    '.wasm': 'application/wasm',
+    '.js': 'application/javascript',
+    '.mjs': 'application/javascript',
+    '.dart': 'application/dart',
+    '.json': 'application/json',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.svg': 'image/svg+xml',
+    '.ico': 'image/vnd.microsoft.icon',
+    '.woff': 'font/woff',
+    '.woff2': 'font/woff2',
+    '.ttf': 'font/ttf',
+    '.otf': 'font/otf',
+}
+for ext, mime in _mime_overrides.items():
+    mimetypes.add_type(mime, ext)
 
 MOCK_API_KEY = "mock-api-key-for-testing"
 FLUTTER_BUILD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "build", "web")
@@ -108,14 +129,54 @@ class MockHandler(SimpleHTTPRequestHandler):
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Access-Control-Allow-Origin", "*")
+        self._send_security_headers()
         self.end_headers()
         self.wfile.write(body)
+
+    def _send_security_headers(self):
+        """添加跨域隔离头，使 SharedArrayBuffer 可用（CanvasKit/Skwasm 需要）。"""
+        self.send_header("Cross-Origin-Opener-Policy", "same-origin")
+        self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
 
     def _read_body(self):
         length = int(self.headers.get("Content-Length", 0))
         if length > 0:
             return self.rfile.read(length)
         return b""
+
+    def _serve_static_file(self):
+        """手动处理静态文件请求，确保 MIME 类型和跨域隔离头正确设置。"""
+        path = self.translate_path(self.path)
+        path = path.split("?")[0]
+
+        # 安全检查：确保请求路径在 FLUTTER_BUILD_DIR 内
+        real_path = os.path.realpath(path)
+        real_root = os.path.realpath(FLUTTER_BUILD_DIR)
+        if not real_path.startswith(real_root + os.sep) and real_path != real_root:
+            self.send_error(404, "File not found")
+            return
+
+        if not os.path.exists(path) or os.path.isdir(path):
+            # 如果是目录或文件不存在，回退到 index.html（SPA 路由）
+            if os.path.isdir(path) or not os.path.exists(path):
+                path = os.path.join(FLUTTER_BUILD_DIR, "index.html")
+                if not os.path.exists(path):
+                    self.send_error(404, "File not found")
+                    return
+
+        try:
+            ctype = mimetypes.guess_type(path)[0] or "application/octet-stream"
+            with open(path, "rb") as f:
+                content = f.read()
+                self.send_response(200)
+                self.send_header("Content-Type", ctype)
+                self.send_header("Content-Length", str(len(content)))
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self._send_security_headers()
+                self.end_headers()
+                self.wfile.write(content)
+        except OSError:
+            self.send_error(404, "File not found")
 
     def do_POST(self):
         if self.path == "/admin/login":
@@ -166,8 +227,7 @@ class MockHandler(SimpleHTTPRequestHandler):
         elif path == "/admin/keys":
             self._send_json([])
         else:
-            # 回退到静态文件服务
-            super().do_GET()
+            self._serve_static_file()
 
     def do_DELETE(self):
         self._send_json({}, 204)
@@ -175,8 +235,9 @@ class MockHandler(SimpleHTTPRequestHandler):
     def do_OPTIONS(self):
         self.send_response(200)
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS, HEAD")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-API-Key, X-Admin-User, X-Admin-Pass")
+        self._send_security_headers()
         self.end_headers()
 
 

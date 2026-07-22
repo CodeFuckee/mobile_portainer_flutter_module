@@ -28,6 +28,8 @@ RUN sed -i 's|http://deb.debian.org|http://mirrors.tuna.tsinghua.edu.cn|g' /etc/
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     chromium chromium-driver \
+    libegl1-mesa libgles2-mesa libgl1-mesa-glx libgl1-mesa-dri \
+    libgbm1 libdrm2 libxkbcommon0 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY selenium_tests/ ./

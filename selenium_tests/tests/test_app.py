@@ -27,11 +27,19 @@ class TestLogin:
             assert el.is_displayed(), "登录按钮应可见，说明页面已渲染完成"
         except Exception:
             # 回退：语义树不可用时，验证 canvas 已渲染
-            canvas_count = driver.execute_script(
-                'return document.querySelector("flt-glass-pane")?.shadowRoot'
-                '?.querySelectorAll("canvas").length || 0;'
+            from conftest import get_flutter_diagnostics
+            diag = get_flutter_diagnostics(driver)
+            canvas_count = diag.get("canvas_count", 0)
+            assert canvas_count > 0, (
+                f"Flutter 应用应已渲染（canvas 存在）。"
+                f" 诊断信息: flutter_view={diag.get('flutter_view_exists')}, "
+                f"glass_pane={diag.get('glass_pane_exists')}, "
+                f"canvas={canvas_count}, "
+                f"canvasKit_loaded={diag.get('canvas_kit_loaded')}, "
+                f"ck_ok={diag.get('ck_load_ok')}, "
+                f"ck_error={diag.get('ck_load_error')}, "
+                f"js_errors={diag.get('js_errors')}"
             )
-            assert canvas_count > 0, "Flutter 应用应已渲染（canvas 存在）"
 
     def test_login_button_visible(self, driver):
         page = LoginPage(driver)
