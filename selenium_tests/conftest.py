@@ -38,31 +38,82 @@ def _try_http(url: str, timeout: int = 5) -> bool:
 
 
 def enable_flutter_semantics(driver):
-    """启用 Flutter 无障碍语义树，使 CanvasKit 应用的 widget 可通过 DOM 访问。"""
-    # 先禁用 glass-pane 的鼠标拦截，否则无法点击语义占位符
+    """启用 Flutter 无障碍语义树，使 CanvasKit 应用的 widget 可通过 DOM 访问。
+
+    当 URL 中包含 ?enable_semantics=true 时，Flutter 应用会在加载时自动启用语义树，
+    此函数作为额外的安全网：如果程序化启用因任何原因未生效，
+    则通过点击 flt-semantics-placeholder 手动激活。
+    """
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+
+    # Step 1: 禁用 glass-pane 的鼠标拦截（使用 !important 防止被覆盖）
     driver.execute_script("""
-        const gp = document.querySelector('flt-glass-pane');
-        if (gp) {
-            gp.style.pointerEvents = 'none';
-            const canvas = gp.shadowRoot?.querySelector('canvas');
-            if (canvas) canvas.style.pointerEvents = 'none';
-        }
+        (function() {
+            const gp = document.querySelector('flt-glass-pane');
+            if (gp) {
+                gp.style.setProperty('pointer-events', 'none', 'important');
+                const canvas = gp.shadowRoot?.querySelector('canvas');
+                if (canvas) {
+                    canvas.style.setProperty('pointer-events', 'none', 'important');
+                }
+            }
+        })();
     """)
-    time.sleep(0.5)
 
-    # 点击语义占位符启用无障碍树
-    for _ in range(5):
-        driver.execute_script(
-            'document.querySelector("flt-semantics-placeholder")?.click();'
+    # Step 2: 等待 placeholder 出现在 DOM 中（最多 20 秒，适应 CI 慢速渲染）
+    try:
+        WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, "flt-semantics-placeholder")
+            )
         )
-        time.sleep(1)
-        children = driver.execute_script(
-            'return document.querySelector("flt-semantics-host")?.children.length || 0;'
-        )
-        if children > 0:
+    except Exception:
+        pass  # 即使超时也继续，placeholder 可能不需要点击（URL 参数已激活语义树）
+
+    # Step 3: 点击 placeholder 直到语义树有内容（最多 30 次 × 0.5 秒 = 15 秒）
+    for _ in range(30):
+        count = driver.execute_script("""
+            (function() {
+                const placeholder = document.querySelector('flt-semantics-placeholder');
+                if (placeholder) {
+                    // 确保 placeholder 完全可见和可点击
+                    placeholder.style.cssText = [
+                        'display:block !important',
+                        'opacity:1 !important',
+                        'visibility:visible !important',
+                        'pointer-events:auto !important',
+                        'position:fixed',
+                        'top:0',
+                        'left:0',
+                        'width:100%',
+                        'height:100%',
+                        'z-index:99999',
+                    ].join(';');
+
+                    // Flutter CanvasKit 监听 pointer 事件（非 click），同时发送多种事件确保兼容
+                    placeholder.dispatchEvent(new PointerEvent('pointerdown', {
+                        bubbles: true, cancelable: true
+                    }));
+                    placeholder.dispatchEvent(new PointerEvent('pointerup', {
+                        bubbles: true, cancelable: true
+                    }));
+                    placeholder.dispatchEvent(new MouseEvent('click', {
+                        bubbles: true, cancelable: true
+                    }));
+                    placeholder.click();
+                }
+                const host = document.querySelector('flt-semantics-host');
+                return host ? host.children.length : 0;
+            })();
+        """)
+        if count > 0:
             break
+        time.sleep(0.5)
 
-    time.sleep(1)
+    # Step 4: 等待语义树稳定
+    time.sleep(2)
 
 
 def _wait_flutter_ready(driver, timeout: int = 60):
@@ -262,11 +313,19 @@ def driver(base_url, server_reachable):
         d = _create_chrome_driver(base_url)
     d.implicitly_wait(IMPLICIT_WAIT)
     d.set_page_load_timeout(PAGE_LOAD_TIMEOUT)
+
+    # 追加 URL 参数启用 Flutter 语义树，使得 flt-semantics 元素在页面加载时就生成，
+    # 无需依赖点击 flt-semantics-placeholder 的竞态条件。
+    url = base_url
+    if 'enable_semantics=true' not in url:
+        sep = '&' if '?' in url else '?'
+        url = f'{url}{sep}enable_semantics=true'
+
     try:
-        d.get(base_url)
+        d.get(url)
     except Exception as e:
         d.quit()
-        pytest.skip(f"无法打开页面 {base_url}: {e}")
+        pytest.skip(f"无法打开页面 {url}: {e}")
 
     _wait_flutter_ready(d)
     enable_flutter_semantics(d)

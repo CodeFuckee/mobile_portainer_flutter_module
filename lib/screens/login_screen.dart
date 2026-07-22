@@ -92,106 +92,123 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
                     const SizedBox(height: 24),
-                    TextFormField(
-                      controller: _usernameController,
-                      decoration: InputDecoration(
-                        labelText: t.labelUsername,
-                        hintText: t.hintUsername,
-                        prefixIcon: const Icon(RemixIcon.userLine),
-                        border: const OutlineInputBorder(),
+                    Semantics(
+                      textField: true,
+                      label: t.labelUsername,
+                      child: TextFormField(
+                        controller: _usernameController,
+                        decoration: InputDecoration(
+                          labelText: t.labelUsername,
+                          hintText: t.hintUsername,
+                          prefixIcon: const Icon(RemixIcon.userLine),
+                          border: const OutlineInputBorder(),
+                        ),
+                        textInputAction: TextInputAction.next,
+                        autofocus: true,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return t.hintUsername;
+                          }
+                          return null;
+                        },
                       ),
-                      textInputAction: TextInputAction.next,
-                      autofocus: true,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return t.hintUsername;
-                        }
-                        return null;
-                      },
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: _obscurePassword,
-                      decoration: InputDecoration(
-                        labelText: t.labelPassword,
-                        hintText: t.hintPassword,
-                        prefixIcon: const Icon(RemixIcon.lockLine),
-                        suffixIcon: IconButton(
-                          icon: Icon(_obscurePassword
-                              ? RemixIcon.eyeOffLine
-                              : RemixIcon.eyeLine),
-                          onPressed: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
-                          },
+                    Semantics(
+                      textField: true,
+                      label: t.labelPassword,
+                      child: TextFormField(
+                        controller: _passwordController,
+                        obscureText: _obscurePassword,
+                        decoration: InputDecoration(
+                          labelText: t.labelPassword,
+                          hintText: t.hintPassword,
+                          prefixIcon: const Icon(RemixIcon.lockLine),
+                          suffixIcon: IconButton(
+                            icon: Icon(_obscurePassword
+                                ? RemixIcon.eyeOffLine
+                                : RemixIcon.eyeLine),
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
+                          ),
+                          border: const OutlineInputBorder(),
                         ),
-                        border: const OutlineInputBorder(),
+                        textInputAction: TextInputAction.done,
+                        onFieldSubmitted: (_) => _login(),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return t.hintPassword;
+                          }
+                          return null;
+                        },
                       ),
-                      textInputAction: TextInputAction.done,
-                      onFieldSubmitted: (_) => _login(),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return t.hintPassword;
-                        }
-                        return null;
-                      },
                     ),
                     if (_error != null) ...[
                       const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .errorContainer,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(RemixIcon.errorWarningLine,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onErrorContainer,
-                                size: 20),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                _error!,
-                                style: TextStyle(
+                      Semantics(
+                        liveRegion: true,
+                        label: _error,
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .errorContainer,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(RemixIcon.errorWarningLine,
                                   color: Theme.of(context)
                                       .colorScheme
                                       .onErrorContainer,
+                                  size: 20),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  _error!,
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onErrorContainer,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ],
                     const SizedBox(height: 24),
-                    SizedBox(
-                      height: 48,
-                      child: FilledButton(
-                        onPressed: _isLoading ? null : _login,
-                        child: _isLoading
-                            ? Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Color(0xFFFFFFFF),
+                    Semantics(
+                      button: true,
+                      label: t.btnLogin,
+                      enabled: !_isLoading,
+                      child: SizedBox(
+                        height: 48,
+                        child: FilledButton(
+                          onPressed: _isLoading ? null : _login,
+                          child: _isLoading
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Color(0xFFFFFFFF),
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(t.msgConnecting),
-                                ],
-                              )
-                            : Text(t.btnLogin),
+                                    const SizedBox(width: 12),
+                                    Text(t.msgConnecting),
+                                  ],
+                                )
+                              : Text(t.btnLogin),
+                        ),
                       ),
                     ),
                   ],

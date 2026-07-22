@@ -1,6 +1,8 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/main_tab_screen.dart';
 import 'screens/login_screen.dart';
@@ -15,6 +17,17 @@ import 'theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 通过 URL 参数启用语义树，供 Selenium 测试使用。
+  // Flutter Web CanvasKit 模式下，显式激活语义树可确保
+  // flt-semantics DOM 元素在页面加载时立即生成，
+  // 无需通过点击 flt-semantics-placeholder 触发。
+  if (kIsWeb) {
+    final uri = Uri.base;
+    if (uri.queryParameters['enable_semantics'] == 'true') {
+      SemanticsBinding.instance.ensureSemantics();
+    }
+  }
 
   // Workaround for Flutter framework bug: on macOS, synthesized Caps Lock
   // KeyUpEvents can arrive without corresponding KeyDownEvents in
