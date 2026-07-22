@@ -134,9 +134,16 @@ class MockHandler(SimpleHTTPRequestHandler):
         self.wfile.write(body)
 
     def _send_security_headers(self):
-        """添加跨域隔离头，使 SharedArrayBuffer 可用（CanvasKit/Skwasm 需要）。"""
+        """添加跨域隔离头，使 SharedArrayBuffer 可用（CanvasKit/Skwasm 需要）。
+
+        使用 credentialless 而非 require-corp：
+        - credentialless 仍然启用跨域隔离和 SharedArrayBuffer
+        - 但不要求跨域资源显式发送 Cross-Origin-Resource-Policy 头
+        - 跨域资源会以无凭证模式加载，兼容性更好
+        - Chrome 96+ 和 Chromium 120+ 均支持
+        """
         self.send_header("Cross-Origin-Opener-Policy", "same-origin")
-        self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
+        self.send_header("Cross-Origin-Embedder-Policy", "credentialless")
 
     def _read_body(self):
         length = int(self.headers.get("Content-Length", 0))
