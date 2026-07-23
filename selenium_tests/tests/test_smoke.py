@@ -62,6 +62,8 @@ def chrome_driver(chromedriver_path):
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--ignore-certificate-errors")
     options.add_argument("--test-type")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--enable-unsafe-swiftshader")
     d = webdriver.Chrome(service=ChromeService(chromedriver_path), options=options)
     yield d
     d.quit()

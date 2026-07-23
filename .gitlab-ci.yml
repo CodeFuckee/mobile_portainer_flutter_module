@@ -115,7 +115,7 @@ selenium_tests:
     - for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30; do curl -sf http://localhost:9000/info > /dev/null 2>&1 && echo "app ready" && break; echo "wait $i"; sleep 1; done
     - echo "step7 run tests"
     - mkdir -p selenium_tests/reports
-    - docker run --rm --network container:selenium_app -v $CI_PROJECT_DIR/selenium_tests/reports:/app/reports -e TEST_BASE_URL=http://localhost:9000 -e MOCK_BACKEND_URL=http://localhost:9000 -e TEST_BROWSER=chrome -e TEST_HEADLESS=true -e CHROMIUM_BINARY=/usr/bin/chromium -e CHROMEDRIVER_PATH=/usr/bin/chromedriver selenium_tests sh -c "pytest tests/ -v --html=reports/report.html --self-contained-html"
+    - docker run --rm --shm-size=2g --network container:selenium_app -v $CI_PROJECT_DIR/selenium_tests/reports:/app/reports -e TEST_BASE_URL=http://localhost:9000 -e MOCK_BACKEND_URL=http://localhost:9000 -e TEST_BROWSER=chrome -e TEST_HEADLESS=true -e CHROMIUM_BINARY=/usr/bin/chromium -e CHROMEDRIVER_PATH=/usr/bin/chromedriver selenium_tests sh -c "pytest tests/ -v --html=reports/report.html --self-contained-html"
     - echo "step8 cleanup"
     - docker stop selenium_app && docker rm selenium_app
     - echo "step9 done"
