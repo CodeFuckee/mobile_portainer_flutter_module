@@ -113,6 +113,7 @@ selenium_tests:
     - echo "step2 cleanup"
     - docker rm -f selenium_app 2>/dev/null || true
     - echo "step3 build app image (docker commit 方案)"
+    - docker rm -f tmp_app tmp_test 2>/dev/null || true
     - |
       echo "  -> 创建临时容器..."
       docker run --name tmp_app -d docker.1ms.run/python:3.11-slim sleep 3600
