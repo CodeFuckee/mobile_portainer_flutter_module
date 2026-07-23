@@ -104,9 +104,9 @@ selenium_tests:
     - ls -la build/web/index.html
     - |
       echo "step2 pull python image"
-      if ! docker pull docker.1ms.run/python:3.11-slim; then
+      if ! docker pull -q docker.1ms.run/python:3.11-slim; then
         echo "WARNING: 中国镜像拉取失败，回退到 Docker Hub 官方镜像..."
-        docker pull python:3.11-slim && docker tag python:3.11-slim docker.1ms.run/python:3.11-slim || {
+        docker pull -q python:3.11-slim && docker tag python:3.11-slim docker.1ms.run/python:3.11-slim || {
           echo "ERROR: 所有镜像源均不可用"
           exit 1
         }
