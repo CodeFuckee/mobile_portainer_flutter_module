@@ -104,10 +104,10 @@ selenium_tests:
     - docker info --format '{{.ServerVersion}} containers={{.Containers}} images={{.Images}}' 2>/dev/null || true
     - echo "step1 verify web build"
     - ls -la build/web/index.html
-    - echo "step2 build app image (base image pull by docker build)"
-    - timeout 300 docker build -f Dockerfile.selenium.cn --target app-server -t selenium_app .
+    - echo "step2 build app image"
+    - DOCKER_BUILDKIT=0 timeout 300 docker build -f Dockerfile.selenium.cn --target app-server -t selenium_app .
     - echo "step3 build test image"
-    - timeout 300 docker build -f Dockerfile.selenium.cn --target test-runner -t selenium_tests .
+    - DOCKER_BUILDKIT=0 timeout 300 docker build -f Dockerfile.selenium.cn --target test-runner -t selenium_tests .
     - echo "step4 up app"
     - docker rm -f selenium_app 2>/dev/null || true
     - docker run -d --name selenium_app -p 9000:9000 selenium_app
