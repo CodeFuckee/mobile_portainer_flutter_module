@@ -101,29 +101,29 @@ selenium_tests:
   script:
     - echo "step0 start"
     - docker --version
-    - docker info --format '{{.ServerVersion}} containers={{.Containers}} images={{.Images}}' 2>/dev/null || true
     - echo "step1 verify web build"
     - ls -la build/web/index.html
-    - echo "step2 setup docker compose alias"
-    - DCOMPOSE="docker compose"; $DCOMPOSE version 2>/dev/null || DCOMPOSE="docker-compose"; echo "using: $DCOMPOSE"
-    - echo "step3 cleanup"
+    - echo "step2 pull python image"
+    - docker pull docker.1ms.run/python:3.11-slim
+    - echo "step3 build app image"
+    - docker build -f Dockerfile.selenium.cn --target app-server -t selenium_app .
+    - echo "step4 build test image"
+    - docker build -f Dockerfile.selenium.cn --target test-runner -t selenium_tests .
+    - echo "step5 up app"
     - docker rm -f selenium_app 2>/dev/null || true
-    - $DCOMPOSE -f docker-compose.test.yml down -v 2>/dev/null || true
-    - echo "step4 build"
-    - $DCOMPOSE -f docker-compose.test.yml build
-    - echo "step5 run tests"
+    - docker run -d --name selenium_app -p 9000:9000 selenium_app
+    - echo "step6 wait"
+    - for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30; do curl -sf http://localhost:9000/info > /dev/null 2>&1 && echo "app ready" && break; echo "wait $i"; sleep 1; done
+    - echo "step7 run tests"
     - mkdir -p selenium_tests/reports
-    - $DCOMPOSE -f docker-compose.test.yml up --exit-code-from selenium-tests selenium-tests
-    - echo "step6 show test log"
-    - cat selenium_tests/reports/console.log 2>/dev/null || echo "no console.log"
-    - echo "step7 cleanup"
-    - $DCOMPOSE -f docker-compose.test.yml down -v
-    - echo "step8 done"
+    - docker run --rm --shm-size=2g --network container:selenium_app -v $CI_PROJECT_DIR/selenium_tests/reports:/app/reports -e TEST_BASE_URL=http://localhost:9000 -e MOCK_BACKEND_URL=http://localhost:9000 -e TEST_BROWSER=chrome -e TEST_HEADLESS=true -e CHROMIUM_BINARY=/usr/bin/chromium -e CHROMEDRIVER_PATH=/usr/bin/chromedriver selenium_tests sh -c "pytest tests/ -v --tb=long --html=reports/report.html --self-contained-html"
+    - echo "step8 cleanup"
+    - docker stop selenium_app && docker rm selenium_app
+    - echo "step9 done"
   artifacts:
     when: always
     paths:
       - selenium_tests/reports/report.html
-      - selenium_tests/reports/console.log
     expire_in: 7 days
 
 # ================================================================
