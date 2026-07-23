@@ -102,8 +102,15 @@ selenium_tests:
     - docker --version
     - echo "step1 verify web build"
     - ls -la build/web/index.html
-    - echo "step2 pull python image"
-    - docker pull docker.1ms.run/python:3.11-slim
+    - |
+      echo "step2 pull python image"
+      if ! docker pull docker.1ms.run/python:3.11-slim; then
+        echo "WARNING: 中国镜像拉取失败，回退到 Docker Hub 官方镜像..."
+        docker pull python:3.11-slim && docker tag python:3.11-slim docker.1ms.run/python:3.11-slim || {
+          echo "ERROR: 所有镜像源均不可用"
+          exit 1
+        }
+      fi
     - echo "step3 build app image"
     - docker build -f Dockerfile.selenium.cn --target app-server -t selenium_app .
     - echo "step4 build test image"
