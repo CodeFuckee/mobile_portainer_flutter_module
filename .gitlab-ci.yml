@@ -109,39 +109,20 @@ selenium_tests:
     - ls -la build/web/index.html
     - echo "step2 cleanup"
     - docker rm -f selenium_app 2>/dev/null || true
-    - echo "step3 build app (output in /tmp/build-app.log)"
-    - |
-      (while true; do sleep 3; echo -n "."; done) &
-      HB=$!
-      docker build --pull=false -f Dockerfile.selenium.cn --target app-server -t selenium_app . > /tmp/build-app.log 2>&1; RC=$?
-      kill $HB 2>/dev/null; wait $HB 2>/dev/null
-      echo ""
-      if [ $RC -ne 0 ]; then tail -50 /tmp/build-app.log; echo "BUILD FAILED"; exit $RC; fi
+    - echo "step3 build app"
+    - docker build -q --pull=false -f Dockerfile.selenium.cn --target app-server -t selenium_app .
     - echo "step3 done"
-    - echo "step4 build test (output in /tmp/build-test.log)"
-    - |
-      (while true; do sleep 3; echo -n "."; done) &
-      HB=$!
-      docker build --pull=false -f Dockerfile.selenium.cn --target test-runner -t selenium_tests . > /tmp/build-test.log 2>&1; RC=$?
-      kill $HB 2>/dev/null; wait $HB 2>/dev/null
-      echo ""
-      if [ $RC -ne 0 ]; then tail -50 /tmp/build-test.log; echo "BUILD FAILED"; exit $RC; fi
+    - echo "step4 build test"
+    - docker build -q --pull=false -f Dockerfile.selenium.cn --target test-runner -t selenium_tests .
     - echo "step4 done"
     - echo "step5 up app"
+    - docker rm -f selenium_app 2>/dev/null || true
     - docker run -d --name selenium_app -p 9000:9000 selenium_app
     - echo "step6 wait (up to 30s)"
     - for i in $(seq 1 30); do curl -sf http://localhost:9000/info > /dev/null 2>&1 && echo "app ready at ${i}s" && break; test $i -eq 30 && echo "TIMEOUT" && exit 1; sleep 1; done
-    - echo "step7 run tests (output in /tmp/run-test.log)"
+    - echo "step7 run tests"
     - mkdir -p selenium_tests/reports
-    - |
-      (while true; do sleep 5; echo -n "."; done) &
-      HB=$!
-      docker run --rm --shm-size=2g --network container:selenium_app -v $CI_PROJECT_DIR/selenium_tests/reports:/app/reports -e TEST_BASE_URL=http://localhost:9000 -e MOCK_BACKEND_URL=http://localhost:9000 -e TEST_BROWSER=chrome -e TEST_HEADLESS=true -e CHROMIUM_BINARY=/usr/bin/chromium -e CHROMEDRIVER_PATH=/usr/bin/chromedriver selenium_tests sh -c "pytest tests/ -v --tb=long --html=reports/report.html --self-contained-html" > /tmp/run-test.log 2>&1; RC=$?
-      kill $HB 2>/dev/null; wait $HB 2>/dev/null
-      echo ""
-      tail -100 /tmp/run-test.log
-      exit $RC
-    - echo "step7 done"
+    - docker run --rm --shm-size=2g --network container:selenium_app -v $CI_PROJECT_DIR/selenium_tests/reports:/app/reports -e TEST_BASE_URL=http://localhost:9000 -e MOCK_BACKEND_URL=http://localhost:9000 -e TEST_BROWSER=chrome -e TEST_HEADLESS=true -e CHROMIUM_BINARY=/usr/bin/chromium -e CHROMEDRIVER_PATH=/usr/bin/chromedriver selenium_tests sh -c "pytest tests/ -v --tb=long --html=reports/report.html --self-contained-html"
     - echo "step8 cleanup"
     - docker stop selenium_app 2>/dev/null || true
     - docker rm selenium_app 2>/dev/null || true
