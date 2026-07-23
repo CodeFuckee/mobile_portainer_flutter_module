@@ -208,6 +208,18 @@ def get_flutter_diagnostics(driver) -> dict:
             return info;
         })();
     """)
+    if result is None:
+        return {
+            "flutter_view_exists": False,
+            "glass_pane_exists": False,
+            "canvas_count": 0,
+            "semantics_children": 0,
+            "js_errors": ["execute_script returned None"],
+            "ready_state": "unknown",
+            "canvas_kit_loaded": False,
+            "ck_load_ok": False,
+            "ck_load_error": "execute_script failed",
+        }
     return result
 
 
