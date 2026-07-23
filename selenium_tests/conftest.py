@@ -322,14 +322,12 @@ def _create_chrome_driver(base_url: str = ""):
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--ignore-certificate-errors")
     options.add_argument("--incognito")
-    # Docker 无 GPU 环境下显式使用 ANGLE + SwiftShader 软件 WebGL。
-    # --disable-gpu 会完全禁用 GPU 进程，在 Chromium 120+ 中可能阻止
-    # SwiftShader 的加载，导致 CanvasKit WebGL 初始化失败。
-    # 正确做法：保持 GPU 进程运行，但强制 WebGL 使用软件渲染路径。
+    # Docker 无 GPU 环境下通过 --enable-unsafe-swiftshader 允许 SwiftShader
+    # 作为 WebGL 软件渲染后备方案。不强制指定 GPU 路径（--use-gl），
+    # 让 Chromium 自动选择最佳渲染后端，保持回退能力。
+    # 注意：不添加 --disable-gpu，因为该标志在 Chromium 120+ 中会完全禁用
+    # GPU 进程，阻止 SwiftShader 加载，反而导致 CanvasKit/WebGL 初始化失败。
     options.add_argument("--enable-unsafe-swiftshader")
-    options.add_argument("--use-gl=angle")
-    options.add_argument("--use-angle=swiftshader")
-    options.add_argument("--ignore-gpu-blocklist")
     options.add_argument("--window-size=1920,1080")
 
     service = None
