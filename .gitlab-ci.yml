@@ -104,19 +104,21 @@ selenium_tests:
     - docker info --format '{{.ServerVersion}} containers={{.Containers}} images={{.Images}}' 2>/dev/null || true
     - echo "step1 verify web build"
     - ls -la build/web/index.html
-    - echo "step2 cleanup"
+    - echo "step2 setup docker compose alias"
+    - DCOMPOSE="docker compose"; $DCOMPOSE version 2>/dev/null || DCOMPOSE="docker-compose"; echo "using: $DCOMPOSE"
+    - echo "step3 cleanup"
     - docker rm -f selenium_app 2>/dev/null || true
-    - docker compose -f docker-compose.test.yml down -v 2>/dev/null || true
-    - echo "step3 docker compose build"
-    - docker compose -f docker-compose.test.yml build
-    - echo "step4 docker compose up (test)"
+    - $DCOMPOSE -f docker-compose.test.yml down -v 2>/dev/null || true
+    - echo "step4 build"
+    - $DCOMPOSE -f docker-compose.test.yml build
+    - echo "step5 run tests"
     - mkdir -p selenium_tests/reports
-    - docker compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from selenium-tests selenium-tests
-    - echo "step5 show test log"
+    - $DCOMPOSE -f docker-compose.test.yml up --exit-code-from selenium-tests selenium-tests
+    - echo "step6 show test log"
     - cat selenium_tests/reports/console.log 2>/dev/null || echo "no console.log"
-    - echo "step6 cleanup"
-    - docker compose -f docker-compose.test.yml down -v
-    - echo "step7 done"
+    - echo "step7 cleanup"
+    - $DCOMPOSE -f docker-compose.test.yml down -v
+    - echo "step8 done"
   artifacts:
     when: always
     paths:
