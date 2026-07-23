@@ -105,6 +105,9 @@ selenium_tests:
     # 仅保留 echo 里程碑输出给 trace 查看进度。
     - echo "step0 start"
     - docker --version
+    - echo "step0.1 docker diagnostics"
+    - docker images --format '{{.Repository}}:{{.Tag}}' 2>/dev/null | sort
+    - df -h /var/lib/docker 2>/dev/null || df -h / 2>/dev/null || true
     - echo "step1 verify"
     - ls -la build/web/index.html
     - echo "step2 cleanup"
