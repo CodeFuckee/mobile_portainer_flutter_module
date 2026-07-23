@@ -14,6 +14,17 @@ import mimetypes
 import os
 import sys
 from http.server import HTTPServer, SimpleHTTPRequestHandler
+from socketserver import ThreadingMixIn
+
+
+class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
+    """多线程 HTTP 服务器，支持并发请求处理。
+
+    Flutter Web 应用在加载时需要并发请求多个资源（CanvasKit WASM、
+    dart.js、字体、素材等），单线程服务器串行处理会导致资源加载阻塞、
+    超时，可能触发 Chromium 渲染进程崩溃（"There is an unknown failure"）。
+    """
+    daemon_threads = True  # 守护线程，主线程退出时自动清理
 
 # 显式注册关键 MIME 类型，确保在 slim Docker 镜像中也正确识别
 _mime_overrides = {
@@ -253,8 +264,8 @@ def main():
         print(f"[mock_backend] WARNING: Flutter build dir not found: {FLUTTER_BUILD_DIR}")
         print("[mock_backend] Run 'flutter build web' first, or set MOCK_BACKEND_PORT and serve separately.")
 
-    server = HTTPServer(("0.0.0.0", PORT), MockHandler)
-    print(f"[mock_backend] Listening on http://0.0.0.0:{PORT}")
+    server = ThreadingHTTPServer(("0.0.0.0", PORT), MockHandler)
+    print(f"[mock_backend] Listening on http://0.0.0.0:{PORT} (threaded)")
     print(f"[mock_backend] Serving static files from: {FLUTTER_BUILD_DIR}")
     try:
         server.serve_forever()
