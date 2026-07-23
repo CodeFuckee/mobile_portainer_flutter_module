@@ -112,25 +112,31 @@ selenium_tests:
     - ls -la build/web/index.html
     - echo "step2 cleanup"
     - docker rm -f selenium_app 2>/dev/null || true
-    - echo "step3 build via DinD (docker run wrapping docker build)"
+    - echo "step3 build app image (docker commit 方案)"
     - |
-      docker run --rm \
-        -v /var/run/docker.sock:/var/run/docker.sock \
-        -v $CI_PROJECT_DIR:$CI_PROJECT_DIR \
-        -w $CI_PROJECT_DIR \
-        -e DOCKER_HOST=unix:///var/run/docker.sock \
-        docker.1ms.run/docker:cli \
-        docker build -q --pull=false -f Dockerfile.selenium.cn --target app-server -t selenium_app .
+      echo "  -> 创建临时容器..."
+      docker run --name tmp_app -d docker.1ms.run/python:3.11-slim sleep 3600
+      echo "  -> 复制构建产物..."
+      docker cp build/web tmp_app:/app/build/
+      docker exec tmp_app mkdir -p /app/selenium_tests
+      docker cp selenium_tests/mock_backend.py tmp_app:/app/selenium_tests/
+      echo "  -> 提交为 selenium_app 镜像..."
+      docker commit --change='WORKDIR /app' --change='EXPOSE 9000' --change='CMD ["python", "selenium_tests/mock_backend.py"]' tmp_app selenium_app:latest
+      docker rm -f tmp_app
     - echo "step3 done"
-    - echo "step4 build test via DinD"
+    - echo "step4 build test image (docker commit 方案)"
     - |
-      docker run --rm \
-        -v /var/run/docker.sock:/var/run/docker.sock \
-        -v $CI_PROJECT_DIR:$CI_PROJECT_DIR \
-        -w $CI_PROJECT_DIR \
-        -e DOCKER_HOST=unix:///var/run/docker.sock \
-        docker.1ms.run/docker:cli \
-        docker build -q --pull=false -f Dockerfile.selenium.cn --target test-runner -t selenium_tests .
+      echo "  -> 创建临时容器并安装依赖..."
+      docker run --name tmp_test -d docker.1ms.run/python:3.11-slim sleep 3600
+      docker exec tmp_test sh -c "sed -i 's|http://deb.debian.org|http://mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/debian.sources"
+      docker exec tmp_test sh -c "apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends chromium chromium-driver libegl1-mesa libgles2-mesa libgl1-mesa-glx libgl1-mesa-dri libgbm1 libdrm2 libxkbcommon0 libnss3 libnspr4 libatk-bridge2.0-0 libatk1.0-0 libatspi2.0-0 libcups2 libpango-1.0-0 libasound2 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 fonts-liberation libvulkan1 mesa-vulkan-drivers && rm -rf /var/lib/apt/lists/*"
+      echo "  -> 复制测试代码..."
+      docker cp selenium_tests/. tmp_test:/app/
+      echo "  -> 安装 Python 依赖..."
+      docker exec tmp_test sh -c "PIP_PROGRESS_BAR=off pip install --quiet --no-cache-dir -i https://pypi.tuna.tsinghua.edu.cn/simple selenium pytest webdriver-manager pytest-html"
+      echo "  -> 提交为 selenium_tests 镜像..."
+      docker commit --change='WORKDIR /app' --change='ENV WDM_PROGRESS_BAR=0' tmp_test selenium_tests:latest
+      docker rm -f tmp_test
     - echo "step4 done"
     - echo "step5 up app"
     - docker rm -f selenium_app 2>/dev/null || true
