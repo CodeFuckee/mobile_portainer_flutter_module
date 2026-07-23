@@ -107,16 +107,30 @@ selenium_tests:
     - docker --version
     - echo "step0.1 docker diagnostics"
     - docker images --format '{{.Repository}}:{{.Tag}}' 2>/dev/null | sort
-    - df -h /var/lib/docker 2>/dev/null || df -h / 2>/dev/null || true
+    - echo "DOCKER_HOST=$DOCKER_HOST"
     - echo "step1 verify"
     - ls -la build/web/index.html
     - echo "step2 cleanup"
     - docker rm -f selenium_app 2>/dev/null || true
-    - echo "step3 build app (DOCKER_BUILDKIT=0 classic builder)"
-    - DOCKER_BUILDKIT=0 docker build -q --pull=false -f Dockerfile.selenium.cn --target app-server -t selenium_app .
+    - echo "step3 build via DinD (docker run wrapping docker build)"
+    - |
+      docker run --rm \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        -v $CI_PROJECT_DIR:$CI_PROJECT_DIR \
+        -w $CI_PROJECT_DIR \
+        -e DOCKER_HOST=unix:///var/run/docker.sock \
+        docker.1ms.run/docker:cli \
+        docker build -q --pull=false -f Dockerfile.selenium.cn --target app-server -t selenium_app .
     - echo "step3 done"
-    - echo "step4 build test (DOCKER_BUILDKIT=0 classic builder)"
-    - DOCKER_BUILDKIT=0 docker build -q --pull=false -f Dockerfile.selenium.cn --target test-runner -t selenium_tests .
+    - echo "step4 build test via DinD"
+    - |
+      docker run --rm \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        -v $CI_PROJECT_DIR:$CI_PROJECT_DIR \
+        -w $CI_PROJECT_DIR \
+        -e DOCKER_HOST=unix:///var/run/docker.sock \
+        docker.1ms.run/docker:cli \
+        docker build -q --pull=false -f Dockerfile.selenium.cn --target test-runner -t selenium_tests .
     - echo "step4 done"
     - echo "step5 up app"
     - docker rm -f selenium_app 2>/dev/null || true
