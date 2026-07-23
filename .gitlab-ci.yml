@@ -106,9 +106,9 @@ selenium_tests:
     - echo "step2 cleanup old containers"
     - docker rm -f selenium_app 2>/dev/null || true
     - echo "step3 build app image"
-    - docker build -f Dockerfile.selenium.cn --target app-server -t selenium_app .
+    - docker build --pull=false -f Dockerfile.selenium.cn --target app-server -t selenium_app .
     - echo "step4 build test image"
-    - docker build -f Dockerfile.selenium.cn --target test-runner -t selenium_tests .
+    - docker build --pull=false -f Dockerfile.selenium.cn --target test-runner -t selenium_tests .
     - echo "step5 up app"
     - docker run -d --name selenium_app -p 9000:9000 selenium_app
     - echo "step6 wait"
