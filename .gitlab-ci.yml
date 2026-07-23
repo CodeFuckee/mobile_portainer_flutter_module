@@ -89,7 +89,7 @@ flutter_build_web:
 # ================================================================
 selenium_tests:
   stage: test
-  timeout: 10m
+  timeout: 30m
   tags:
     - linux
     - docker
@@ -112,13 +112,18 @@ selenium_tests:
     - ls -la build/web/index.html
     - echo "step2 cleanup"
     - docker rm -f selenium_app 2>/dev/null || true
-    - echo "step3 skip build (using cached images)"
-    - echo "step4 up app"
+    - echo "step3 build app (DOCKER_BUILDKIT=0 classic builder)"
+    - DOCKER_BUILDKIT=0 docker build -q --pull=false -f Dockerfile.selenium.cn --target app-server -t selenium_app .
+    - echo "step3 done"
+    - echo "step4 build test (DOCKER_BUILDKIT=0 classic builder)"
+    - DOCKER_BUILDKIT=0 docker build -q --pull=false -f Dockerfile.selenium.cn --target test-runner -t selenium_tests .
+    - echo "step4 done"
+    - echo "step5 up app"
     - docker rm -f selenium_app 2>/dev/null || true
     - docker run -d --name selenium_app -p 9000:9000 selenium_app
-    - echo "step5 wait (up to 30s)"
+    - echo "step6 wait (up to 30s)"
     - for i in $(seq 1 30); do curl -sf http://localhost:9000/info > /dev/null 2>&1 && echo "app ready at ${i}s" && break; test $i -eq 30 && echo "TIMEOUT" && exit 1; sleep 1; done
-    - echo "step6 run tests"
+    - echo "step7 run tests"
     - mkdir -p selenium_tests/reports
     - docker run --rm --shm-size=2g --network container:selenium_app -v $CI_PROJECT_DIR/selenium_tests/reports:/app/reports -e TEST_BASE_URL=http://localhost:9000 -e MOCK_BACKEND_URL=http://localhost:9000 -e TEST_BROWSER=chrome -e TEST_HEADLESS=true -e CHROMIUM_BINARY=/usr/bin/chromium -e CHROMEDRIVER_PATH=/usr/bin/chromedriver selenium_tests sh -c "pytest tests/ -v --tb=long --html=reports/report.html --self-contained-html"
     - echo "step7 cleanup"
