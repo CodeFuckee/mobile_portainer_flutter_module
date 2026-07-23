@@ -130,7 +130,7 @@ selenium_tests:
       echo "  -> 创建临时容器..."
       docker run --name tmp_test -d docker.1ms.run/python:3.11-slim sleep 3600
       echo "  -> 安装 Chromium 及依赖库（约 2-3 分钟）..."
-      docker exec tmp_test sh -c "sed -i 's|http://deb.debian.org|http://mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/debian.sources && apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends chromium chromium-driver libegl1-mesa libgles2-mesa libgl1-mesa-glx libgl1-mesa-dri libgbm1 libdrm2 libxkbcommon0 libnss3 libnspr4 libatk-bridge2.0-0 libatk1.0-0 libatspi2.0-0 libcups2 libpango-1.0-0 libasound2 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 fonts-liberation libvulkan1 mesa-vulkan-drivers && rm -rf /var/lib/apt/lists/*"
+      docker exec tmp_test sh -c "apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends chromium chromium-driver libegl1 libgles2 libgl1 libgl1-mesa-dri libgbm1 libdrm2 libxkbcommon0 libnss3 libnspr4 libatk-bridge2.0-0 libatk1.0-0 libatspi2.0-0 libcups2 libpango-1.0-0 libasound2 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 fonts-liberation libvulkan1 mesa-vulkan-drivers && rm -rf /var/lib/apt/lists/*"
       echo "  -> 复制测试代码..."
       docker exec tmp_test mkdir -p /app
       docker cp selenium_tests/. tmp_test:/app/
