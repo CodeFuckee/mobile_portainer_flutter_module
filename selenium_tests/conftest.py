@@ -335,13 +335,15 @@ def _create_chrome_driver(base_url: str = ""):
     options.add_argument("--ignore-certificate-errors")
     options.add_argument("--incognito")
     # Docker 无 GPU 环境下的 WebGL 软件渲染策略：
-    # 1. --use-gl=egl: 使用 EGL 接口，Mesa llvmpipe 提供软件 OpenGL/WebGL
-    # 2. --enable-unsafe-swiftshader: 允许 SwiftShader 作为后备 WebGL 方案
-    # 3. --ignore-gpu-blocklist: 防止 Chromium 将软件渲染器列入黑名单
-    # 不添加 --disable-gpu，因为该标志在 Chromium 120+ 中会完全禁用
-    # GPU 进程，阻止 EGL/SwiftShader 的加载。
-    options.add_argument("--use-gl=egl")
-    options.add_argument("--enable-unsafe-swiftshader")
+    # --use-gl=angle + --use-angle=swiftshader：使用 Chromium 内置的
+    # SwiftShader CPU 软件渲染器，通过 ANGLE 层提供 WebGL 支持。
+    # SwiftShader 是 Chromium 自带的，无需外部 Mesa/EGL 系统库，
+    # 在无 GPU 的 Docker 容器中比 --use-gl=egl（依赖 Mesa llvmpipe）
+    # 更可靠。
+    # --ignore-gpu-blocklist: 防止 Chromium 将软件渲染器列入黑名单。
+    # 不添加 --disable-gpu：该标志会完全禁用 GPU 进程，阻止 SwiftShader 加载。
+    options.add_argument("--use-gl=angle")
+    options.add_argument("--use-angle=swiftshader")
     options.add_argument("--ignore-gpu-blocklist")
     options.add_argument("--window-size=1920,1080")
 

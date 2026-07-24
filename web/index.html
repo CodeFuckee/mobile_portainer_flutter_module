@@ -21,12 +21,6 @@
   <script>
     // 修复国内无法访问 gstatic.com 的问题：强制使用本地 CanvasKit
     // 通过拦截 _flutter.loader 实现对 load() 调用的 canvasKitBaseUrl 注入
-    //
-    // 额外处理：过滤掉 CanvasKit 构建，强制使用 HTML 渲染器。
-    // 原因：CanvasKit 需要 WebGL 支持，在 headless Chromium（Docker CI、
-    // 无 GPU 环境）中 WebGL 上下文创建失败，导致 CanvasKit WASM 初始化失败
-    // 且 Flutter 不会自动回退到 HTML 渲染器，最终 flutter-view 不存在、
-    // canvas 数量为 0，应用完全无法渲染。
     (() => {
       const _flutterObj = {};
       let _realLoader = null;
@@ -43,17 +37,6 @@
               opts.config = opts.config || {};
               // 强制使用本地 canvaskit 目录，避免从 gstatic.com CDN 加载
               opts.config.canvasKitBaseUrl = opts.config.canvasKitBaseUrl || 'canvaskit';
-
-              // 过滤掉 CanvasKit 构建，保留 HTML 渲染器回退构建 {}。
-              // CanvasKit 在 headless/Docker/无 GPU 环境中无法初始化 WebGL，
-              // Flutter 不会在运行时从 CanvasKit 回退到 HTML，应用直接白屏。
-              // 详见 CI 诊断：flutter_view=False, canvas=0, canvasKit_loaded=False
-              if (_flutter.buildConfig && _flutter.buildConfig.builds) {
-                _flutter.buildConfig.builds = _flutter.buildConfig.builds.filter(
-                  b => !b.renderer || b.renderer !== 'canvaskit'
-                );
-              }
-
               return _origLoad.call(this, opts);
             };
           }
