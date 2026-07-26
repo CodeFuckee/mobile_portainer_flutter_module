@@ -179,28 +179,43 @@ deploy_to_synology:
       docker --version || { echo "错误：Docker CLI 不可用"; exit 1; }
 
       # ----------------------------------------------------------
-      # 自动选择可用的 Docker 命令（docker / sudo docker）
-      # 群晖 NAS 上 gitlab-runner 用户默认无权访问 docker.sock
+      # 诊断：当前用户、socket 权限
       # ----------------------------------------------------------
+      echo "当前用户: $(whoami), uid=$(id -u), groups=$(id -Gn)"
+      echo "docker.sock 状态:"
+      ls -la /var/run/docker.sock 2>/dev/null || echo "  /var/run/docker.sock 不存在"
+
+      # ----------------------------------------------------------
+      # 按优先级尝试 Docker 连接方式：
+      #   1. docker（直接访问 socket）
+      #   2. sudo chmod 修复 socket 权限
+      #   3. sudo docker（免密 sudo）
+      # ----------------------------------------------------------
+      DOCKER="docker"
       if docker info >/dev/null 2>&1; then
-        DOCKER="docker"
-        echo "Docker daemon 连接正常（直接访问）"
+        echo "✓ Docker daemon 连接正常（直接访问）"
+      elif sudo -n chmod 666 /var/run/docker.sock 2>/dev/null && docker info >/dev/null 2>&1; then
+        echo "✓ 通过 sudo 修复 socket 权限后连接正常"
       elif sudo -n docker info >/dev/null 2>&1; then
         DOCKER="sudo docker"
-        echo "Docker daemon 通过 sudo 连接正常"
+        echo "✓ Docker daemon 通过 sudo docker 连接正常"
       else
+        echo ""
         echo "================================================"
         echo "错误：无法连接 Docker daemon！"
         echo ""
-        echo "请在 NAS 上以 root 身份执行以下命令修复："
-        echo "  sudo synogroup --add docker"
+        echo "请在 NAS 上以 root 身份 SSH 执行以下命令："
+        echo ""
+        echo "  # 将 gitlab-runner 加入 docker 组（推荐方案）"
+        echo "  sudo synogroup --add docker 2>/dev/null || true"
         echo "  sudo synogroup --member docker gitlab-runner"
         echo "  sudo chown root:docker /var/run/docker.sock"
         echo "  sudo chmod 660 /var/run/docker.sock"
         echo "  sudo systemctl restart gitlab-runner"
         echo ""
-        echo "或者为 gitlab-runner 配置 sudo 免密："
-        echo "  echo 'gitlab-runner ALL=(ALL) NOPASSWD: /usr/local/bin/docker' >> /etc/sudoers.d/gitlab-runner"
+        echo "  # 备选方案：配置免密 sudo"
+        echo "  echo 'gitlab-runner ALL=(ALL) NOPASSWD:/usr/local/bin/docker' > /etc/sudoers.d/gitlab-runner"
+        echo "  chmod 440 /etc/sudoers.d/gitlab-runner"
         echo "================================================"
         exit 1
       fi
