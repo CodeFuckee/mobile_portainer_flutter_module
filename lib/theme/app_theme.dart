@@ -90,6 +90,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
+      fontFamily: 'Roboto',
 
       scaffoldBackgroundColor: colorScheme.surface,
 

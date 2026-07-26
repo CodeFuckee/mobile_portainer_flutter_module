@@ -436,7 +436,7 @@ class AuthService {
       throw Exception('未登录');
     }
 
-    final url = Uri.parse('${_cleanUrl(serverUrl)}/admin/email/test');
+    final url = Uri.parse('${_cleanUrl(serverUrl)}/admin/email/send');
     final client = http.Client();
 
     try {
@@ -448,7 +448,9 @@ class AuthService {
           'x-api-key': token,
         },
         body: json.encode({
-          'to_email': toEmail,
+          'recipients': [toEmail],
+          'subject': '测试邮件',
+          'text_body': '这是一封测试邮件',
         }),
       );
 

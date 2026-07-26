@@ -59,6 +59,13 @@ flutter:
   uses-material-design: true
   generate: true
 
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto.ttf
+        - asset: assets/fonts/Roboto-Italic.ttf
+          style: italic
+
   # To add Flutter specific assets to your application, add an assets section,
   # like this:
   # assets:
