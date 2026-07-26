@@ -1,6 +1,10 @@
 import 'dart:async';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:remix_icons_flutter/remixicon_ids.dart';
+
+import '../theme/theme_extensions.dart';
 
 enum ToastType { success, error, warning, info }
 
@@ -91,59 +95,59 @@ class AppToast {
       show(context, message, ToastType.info);
 }
 
-class _ToastStyle {
+/// Theme-aware color resolver for each toast type.
+///
+/// Colors are derived from the app's [ColorScheme] and [DockerColors]
+/// extension so they automatically adapt to light / dark mode and stay
+/// consistent with the Arco Design palette used throughout the app.
+class _ToastAppearance {
+  final Color border;
+  final Color background;
   final IconData icon;
-  final Color borderLight;
-  final Color borderDark;
-  final Color bgLight;
-  final Color bgDark;
 
-  const _ToastStyle({
+  const _ToastAppearance({
+    required this.border,
+    required this.background,
     required this.icon,
-    required this.borderLight,
-    required this.borderDark,
-    required this.bgLight,
-    required this.bgDark,
   });
 
-  Color borderColor(Brightness b) =>
-      b == Brightness.light ? borderLight : borderDark;
+  /// Arco Design functional green — same value as [DockerColors.statusRunning].
+  static const _successGreen = Color(0xFF00B42A);
+  static const _successGreenDark = Color(0xFF52CC6D);
 
-  Color backgroundColor(Brightness b) =>
-      b == Brightness.light ? bgLight : bgDark;
-
-  static const _styles = {
-    ToastType.success: _ToastStyle(
-      icon: RemixIcon.checkboxCircleFill,
-      borderLight: Color(0xFF2E7D32),
-      borderDark: Color(0xFF66BB6A),
-      bgLight: Color(0xFFE8F5E9),
-      bgDark: Color(0xFF1B5E20),
-    ),
-    ToastType.error: _ToastStyle(
-      icon: RemixIcon.errorWarningFill,
-      borderLight: Color(0xFFC62828),
-      borderDark: Color(0xFFFF8A80),
-      bgLight: Color(0xFFFFEBEE),
-      bgDark: Color(0x50B71C1C),
-    ),
-    ToastType.warning: _ToastStyle(
-      icon: RemixIcon.alertFill,
-      borderLight: Color(0xFFEF6C00),
-      borderDark: Color(0xFFFFB74D),
-      bgLight: Color(0xFFFFF3E0),
-      bgDark: Color(0x50E65100),
-    ),
-    ToastType.info: _ToastStyle(
-      icon: RemixIcon.informationFill,
-      borderLight: Color(0xFF0A84FF),
-      borderDark: Color(0xFF4DA3FF),
-      bgLight: Color(0xFFE3F2FD),
-      bgDark: Color(0x500D47A1),
-    ),
-  };
-
-  static _ToastStyle of(ToastType type) => _styles[type]!;
+  static _ToastAppearance of(ColorScheme cs, DockerColors? dc, ToastType type) {
+    final isDark = cs.brightness == Brightness.dark;
+    switch (type) {
+      case ToastType.success:
+        // Arco Design success green — prefer DockerColors extension when
+        // available, otherwise fall back to the hard-coded Arco green value.
+        final green = dc?.statusRunning ??
+            (isDark ? _successGreenDark : _successGreen);
+        return _ToastAppearance(
+          border: green,
+          background: green.withAlpha(isDark ? 25 : 18),
+          icon: RemixIcon.checkboxCircleFill,
+        );
+      case ToastType.error:
+        return _ToastAppearance(
+          border: cs.error,
+          background: cs.error.withAlpha(isDark ? 30 : 18),
+          icon: RemixIcon.errorWarningFill,
+        );
+      case ToastType.warning:
+        return _ToastAppearance(
+          border: cs.tertiary,
+          background: cs.tertiary.withAlpha(isDark ? 30 : 20),
+          icon: RemixIcon.alertFill,
+        );
+      case ToastType.info:
+        return _ToastAppearance(
+          border: cs.primary,
+          background: cs.primary.withAlpha(isDark ? 25 : 18),
+          icon: RemixIcon.informationFill,
+        );
+    }
+  }
 }
 
 class _ToastWidget extends StatefulWidget {
@@ -173,7 +177,7 @@ class _ToastWidgetState extends State<_ToastWidget>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 350),
       vsync: this,
     );
     _slideAnimation = Tween<Offset>(
@@ -181,15 +185,18 @@ class _ToastWidgetState extends State<_ToastWidget>
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeOut,
-      reverseCurve: Curves.easeIn,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
     ));
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0, 0.6, curve: Curves.easeOut),
+      ),
     );
 
     _controller.forward();
-    _dismissTimer = Timer(const Duration(milliseconds: 2500), _dismiss);
+    _dismissTimer = Timer(const Duration(milliseconds: 3000), _dismiss);
   }
 
   void _dismiss() async {
@@ -207,17 +214,19 @@ class _ToastWidgetState extends State<_ToastWidget>
     super.dispose();
   }
 
-  IconData _icon() => _ToastStyle.of(widget.type).icon;
-
-  Color _borderColor(ColorScheme cs) =>
-      _ToastStyle.of(widget.type).borderColor(cs.brightness);
-
-  Color _backgroundColor(ColorScheme cs) =>
-      _ToastStyle.of(widget.type).backgroundColor(cs.brightness);
-
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final dc = theme.extension<DockerColors>();
+    final appearance = _ToastAppearance.of(cs, dc, widget.type);
+    final isDark = cs.brightness == Brightness.dark;
+
+    // Frosted-glass base — surface container with the accent tint overlaid.
+    final baseBg = Color.alphaBlend(
+      appearance.background,
+      cs.surfaceContainerLowest,
+    );
 
     return FadeTransition(
       opacity: _fadeAnimation,
@@ -236,50 +245,78 @@ class _ToastWidgetState extends State<_ToastWidget>
               constraints: BoxConstraints(
                 maxWidth: MediaQuery.of(context).size.width - 32,
               ),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: _backgroundColor(cs),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border(
-                    left: BorderSide(color: _borderColor(cs), width: 4),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: cs.shadow.withAlpha(
-                          cs.brightness == Brightness.light ? 30 : 50),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(_icon(), color: _borderColor(cs), size: 22),
-                    const SizedBox(width: 12),
-                    Flexible(
-                      child: Text(
-                        widget.message,
-                        style: TextStyle(
-                          color: cs.onSurface,
-                          fontSize: 14,
-                          height: 1.3,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 11),
+                    decoration: BoxDecoration(
+                      color: Color.alphaBlend(
+                        cs.surfaceContainerLowest.withAlpha(isDark ? 180 : 160),
+                        baseBg,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: cs.outlineVariant.withAlpha(isDark ? 80 : 120),
+                        width: 0.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: cs.shadow.withAlpha(isDark ? 60 : 25),
+                          blurRadius: 16,
+                          offset: const Offset(0, 6),
+                          spreadRadius: -2,
                         ),
+                      ],
+                    ),
+                    child: IntrinsicWidth(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Left accent stripe + icon
+                          Container(
+                            width: 3,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              color: appearance.border,
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Icon(appearance.icon,
+                              color: appearance.border, size: 20),
+                          const SizedBox(width: 10),
+                          Flexible(
+                            child: Text(
+                              widget.message,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: cs.onSurface,
+                                fontSize: 13.5,
+                                height: 1.35,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: _dismiss,
+                            child: Padding(
+                              padding: const EdgeInsets.all(2),
+                              child: Icon(
+                                RemixIcon.closeFill,
+                                color: cs.onSurfaceVariant
+                                    .withAlpha(isDark ? 120 : 80),
+                                size: 16,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  GestureDetector(
-                    onTap: _dismiss,
-                    child: Icon(
-                      RemixIcon.closeFill,
-                      color: cs.onSurface.withAlpha(100),
-                      size: 18,
-                    ),
                   ),
-                ],
+                ),
               ),
-            ),
             ),
           ),
         ),
