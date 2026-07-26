@@ -160,7 +160,7 @@ selenium_tests:
 
 # ================================================================
 # deploy_to_synology —— 测试通过后部署到群晖 Docker
-# 前提：Runner 需挂载 /var/run/docker.sock（Docker-out-of-Docker）
+# 自动检测 Docker 命令（docker 或 sudo docker），兼容不同 Runner 权限配置
 # ================================================================
 deploy_to_synology:
   stage: deploy
@@ -177,51 +177,77 @@ deploy_to_synology:
       set +e
       echo "=== Docker 环境检查 ==="
       docker --version || { echo "错误：Docker CLI 不可用"; exit 1; }
-      echo "Docker 信息："
-      docker info --format '{{.ServerVersion}}' 2>/dev/null || echo "警告：无法连接 Docker daemon，请检查 /var/run/docker.sock"
+
+      # ----------------------------------------------------------
+      # 自动选择可用的 Docker 命令（docker / sudo docker）
+      # 群晖 NAS 上 gitlab-runner 用户默认无权访问 docker.sock
+      # ----------------------------------------------------------
+      if docker info >/dev/null 2>&1; then
+        DOCKER="docker"
+        echo "Docker daemon 连接正常（直接访问）"
+      elif sudo -n docker info >/dev/null 2>&1; then
+        DOCKER="sudo docker"
+        echo "Docker daemon 通过 sudo 连接正常"
+      else
+        echo "================================================"
+        echo "错误：无法连接 Docker daemon！"
+        echo ""
+        echo "请在 NAS 上以 root 身份执行以下命令修复："
+        echo "  sudo synogroup --add docker"
+        echo "  sudo synogroup --member docker gitlab-runner"
+        echo "  sudo chown root:docker /var/run/docker.sock"
+        echo "  sudo chmod 660 /var/run/docker.sock"
+        echo "  sudo systemctl restart gitlab-runner"
+        echo ""
+        echo "或者为 gitlab-runner 配置 sudo 免密："
+        echo "  echo 'gitlab-runner ALL=(ALL) NOPASSWD: /usr/local/bin/docker' >> /etc/sudoers.d/gitlab-runner"
+        echo "================================================"
+        exit 1
+      fi
+
       echo "工作目录：$CI_PROJECT_DIR"
       echo "构建产物检查："
       ls -la build/web/index.html || { echo "错误：缺少 build/web 构建产物"; exit 1; }
   script:
     - |
       echo "=== 1. 清理旧容器 ==="
-      docker stop ${DEPLOY_CONTAINER_NAME} 2>/dev/null || true
-      docker rm ${DEPLOY_CONTAINER_NAME} 2>/dev/null || true
-      docker stop ${DEPLOY_API_CONTAINER_NAME} 2>/dev/null || true
-      docker rm ${DEPLOY_API_CONTAINER_NAME} 2>/dev/null || true
+      $DOCKER stop ${DEPLOY_CONTAINER_NAME} 2>/dev/null || true
+      $DOCKER rm ${DEPLOY_CONTAINER_NAME} 2>/dev/null || true
+      $DOCKER stop ${DEPLOY_API_CONTAINER_NAME} 2>/dev/null || true
+      $DOCKER rm ${DEPLOY_API_CONTAINER_NAME} 2>/dev/null || true
 
       echo "=== 2. 检查端口 $DEPLOY_PORT 占用 ==="
-      PORT_PID=$(docker ps --filter "publish=$DEPLOY_PORT" --format '{{.ID}}' 2>/dev/null || true)
+      PORT_PID=$($DOCKER ps --filter "publish=$DEPLOY_PORT" --format '{{.ID}}' 2>/dev/null || true)
       if [ -n "$PORT_PID" ]; then
         echo "端口 $DEPLOY_PORT 被容器 $PORT_PID 占用，正在清理..."
-        docker stop $PORT_PID 2>/dev/null || true
-        docker rm $PORT_PID 2>/dev/null || true
+        $DOCKER stop $PORT_PID 2>/dev/null || true
+        $DOCKER rm $PORT_PID 2>/dev/null || true
       else
         echo "端口 $DEPLOY_PORT 未被占用"
       fi
 
       echo "=== 3. 确保网络 $DEPLOY_NETWORK 存在 ==="
-      if ! docker network inspect $DEPLOY_NETWORK >/dev/null 2>&1; then
+      if ! $DOCKER network inspect $DEPLOY_NETWORK >/dev/null 2>&1; then
         echo "创建网络 $DEPLOY_NETWORK ..."
-        docker network create $DEPLOY_NETWORK || { echo "错误：无法创建 Docker 网络"; exit 1; }
+        $DOCKER network create $DEPLOY_NETWORK || { echo "错误：无法创建 Docker 网络"; exit 1; }
       else
         echo "网络 $DEPLOY_NETWORK 已存在"
       fi
 
       echo "=== 4. 清理旧镜像 ==="
-      OLD_WEB_IMAGE=$(docker images -q ${DEPLOY_CONTAINER_NAME}:latest 2>/dev/null || true)
+      OLD_WEB_IMAGE=$($DOCKER images -q ${DEPLOY_CONTAINER_NAME}:latest 2>/dev/null || true)
       if [ -n "$OLD_WEB_IMAGE" ]; then
         echo "删除旧镜像 ${DEPLOY_CONTAINER_NAME}:latest ($OLD_WEB_IMAGE) ..."
-        docker rmi -f $OLD_WEB_IMAGE 2>/dev/null || true
+        $DOCKER rmi -f $OLD_WEB_IMAGE 2>/dev/null || true
       fi
 
       echo "=== 5. 构建 Web 镜像 ==="
-      docker build -f Dockerfile.web.cn -t ${DEPLOY_CONTAINER_NAME}:latest . || { echo "错误：Docker 镜像构建失败"; exit 1; }
+      $DOCKER build -f Dockerfile.web.cn -t ${DEPLOY_CONTAINER_NAME}:latest . || { echo "错误：Docker 镜像构建失败"; exit 1; }
 
       echo "=== 6. 启动 API 容器 ==="
-      if docker images -q ${DEPLOY_API_IMAGE} >/dev/null 2>&1; then
+      if $DOCKER images -q ${DEPLOY_API_IMAGE} >/dev/null 2>&1; then
         echo "API 镜像存在，启动容器..."
-        docker run -d \
+        $DOCKER run -d \
           --name ${DEPLOY_API_CONTAINER_NAME} \
           --restart unless-stopped \
           --network $DEPLOY_NETWORK \
@@ -240,7 +266,7 @@ deploy_to_synology:
       fi
 
       echo "=== 7. 启动 Web 容器 ==="
-      docker run -d \
+      $DOCKER run -d \
         --name ${DEPLOY_CONTAINER_NAME} \
         --restart unless-stopped \
         --network $DEPLOY_NETWORK \
