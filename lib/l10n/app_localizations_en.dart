@@ -713,6 +713,55 @@ class AppLocalizationsEn extends AppLocalizations {
   String get msgNoSmtpConfig => 'SMTP is not configured, please configure it in System Settings first';
 
   @override
+  String get sectionMcpServers => 'MCP Servers';
+
+  @override
+  String get buttonAddMcpServer => 'Add MCP Server';
+
+  @override
+  String get hintAddMcpServer => 'Tap to configure an MCP server';
+
+  @override
+  String get labelMcpServerName => 'Server Name';
+
+  @override
+  String get labelMcpServerUrl => 'MCP Endpoint URL';
+
+  @override
+  String get labelMcpServerType => 'Type';
+
+  @override
+  String get hintMcpUrl => 'e.g., http://server:8000/mcp';
+
+  @override
+  String get msgMcpServerAdded => 'MCP server added';
+
+  @override
+  String get msgMcpServerUpdated => 'MCP server updated';
+
+  @override
+  String get msgMcpServerDeleted => 'MCP server deleted';
+
+  @override
+  String msgMcpServerSwitched(Object name) {
+    return 'Switched to MCP server: $name';
+  }
+
+  @override
+  String get titleMcpTools => 'MCP Tools';
+
+  @override
+  String get msgNoMcpTools => 'No MCP tools found';
+
+  @override
+  String labelMcpToolsCount(Object count) {
+    return '$count tools';
+  }
+
+  @override
+  String get labelInputSchema => 'Input Schema';
+
+  @override
   String get labelApiDocs => 'API Documentation (Swagger)';
 
   @override

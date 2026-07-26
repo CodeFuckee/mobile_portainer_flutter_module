@@ -1463,6 +1463,96 @@ abstract class AppLocalizations {
   /// **'SMTP is not configured, please configure it in System Settings first'**
   String get msgNoSmtpConfig;
 
+  /// No description provided for @sectionMcpServers.
+  ///
+  /// In en, this message translates to:
+  /// **'MCP Servers'**
+  String get sectionMcpServers;
+
+  /// No description provided for @buttonAddMcpServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Add MCP Server'**
+  String get buttonAddMcpServer;
+
+  /// No description provided for @hintAddMcpServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to configure an MCP server'**
+  String get hintAddMcpServer;
+
+  /// No description provided for @labelMcpServerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Server Name'**
+  String get labelMcpServerName;
+
+  /// No description provided for @labelMcpServerUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'MCP Endpoint URL'**
+  String get labelMcpServerUrl;
+
+  /// No description provided for @labelMcpServerType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get labelMcpServerType;
+
+  /// No description provided for @hintMcpUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., http://server:8000/mcp'**
+  String get hintMcpUrl;
+
+  /// No description provided for @msgMcpServerAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'MCP server added'**
+  String get msgMcpServerAdded;
+
+  /// No description provided for @msgMcpServerUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'MCP server updated'**
+  String get msgMcpServerUpdated;
+
+  /// No description provided for @msgMcpServerDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'MCP server deleted'**
+  String get msgMcpServerDeleted;
+
+  /// No description provided for @msgMcpServerSwitched.
+  ///
+  /// In en, this message translates to:
+  /// **'Switched to MCP server: {name}'**
+  String msgMcpServerSwitched(Object name);
+
+  /// No description provided for @titleMcpTools.
+  ///
+  /// In en, this message translates to:
+  /// **'MCP Tools'**
+  String get titleMcpTools;
+
+  /// No description provided for @msgNoMcpTools.
+  ///
+  /// In en, this message translates to:
+  /// **'No MCP tools found'**
+  String get msgNoMcpTools;
+
+  /// No description provided for @labelMcpToolsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} tools'**
+  String labelMcpToolsCount(Object count);
+
+  /// No description provided for @labelInputSchema.
+  ///
+  /// In en, this message translates to:
+  /// **'Input Schema'**
+  String get labelInputSchema;
+
   /// No description provided for @labelApiDocs.
   ///
   /// In en, this message translates to:

@@ -713,6 +713,55 @@ class AppLocalizationsZh extends AppLocalizations {
   String get msgNoSmtpConfig => 'SMTP 未配置，请先在系统设置中配置邮件服务';
 
   @override
+  String get sectionMcpServers => 'MCP 服务器';
+
+  @override
+  String get buttonAddMcpServer => '添加 MCP 服务器';
+
+  @override
+  String get hintAddMcpServer => '点击配置 MCP 服务器';
+
+  @override
+  String get labelMcpServerName => '服务器名称';
+
+  @override
+  String get labelMcpServerUrl => 'MCP 端点地址';
+
+  @override
+  String get labelMcpServerType => '类型';
+
+  @override
+  String get hintMcpUrl => '例如 http://server:8000/mcp';
+
+  @override
+  String get msgMcpServerAdded => 'MCP 服务器已添加';
+
+  @override
+  String get msgMcpServerUpdated => 'MCP 服务器已更新';
+
+  @override
+  String get msgMcpServerDeleted => 'MCP 服务器已删除';
+
+  @override
+  String msgMcpServerSwitched(Object name) {
+    return '已切换到 MCP 服务器：$name';
+  }
+
+  @override
+  String get titleMcpTools => 'MCP 工具';
+
+  @override
+  String get msgNoMcpTools => '暂无 MCP 工具';
+
+  @override
+  String labelMcpToolsCount(Object count) {
+    return '$count 个工具';
+  }
+
+  @override
+  String get labelInputSchema => '输入参数';
+
+  @override
   String get labelApiDocs => 'API 文档 (Swagger)';
 
   @override
