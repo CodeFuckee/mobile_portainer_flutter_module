@@ -711,4 +711,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get msgNoSmtpConfig => 'SMTP 未配置，请先在系统设置中配置邮件服务';
+
+  @override
+  String get labelApiDocs => 'API 文档 (Swagger)';
+
+  @override
+  String get labelRedoc => 'API 文档 (ReDoc)';
+
+  @override
+  String get msgNoActiveServer => '未配置活跃服务器';
 }

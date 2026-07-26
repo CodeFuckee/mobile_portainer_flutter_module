@@ -78,7 +78,7 @@ flutter_build_web:
     - flutter
   script:
     - flutter pub get
-    - flutter build web --no-tree-shake-icons
+    - flutter build web --no-tree-shake-icons --no-wasm-dry-run
   artifacts:
     paths:
       - build/web

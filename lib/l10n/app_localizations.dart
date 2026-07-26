@@ -1462,6 +1462,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'SMTP is not configured, please configure it in System Settings first'**
   String get msgNoSmtpConfig;
+
+  /// No description provided for @labelApiDocs.
+  ///
+  /// In en, this message translates to:
+  /// **'API Documentation (Swagger)'**
+  String get labelApiDocs;
+
+  /// No description provided for @labelRedoc.
+  ///
+  /// In en, this message translates to:
+  /// **'API Documentation (ReDoc)'**
+  String get labelRedoc;
+
+  /// No description provided for @msgNoActiveServer.
+  ///
+  /// In en, this message translates to:
+  /// **'No active server configured'**
+  String get msgNoActiveServer;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

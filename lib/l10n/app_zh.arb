@@ -226,5 +226,8 @@
   "msgTestEmailFailed": "测试邮件发送失败",
   "msgSendingTestEmail": "正在发送测试邮件...",
   "msgNoEmailBound": "请先绑定邮箱地址",
-  "msgNoSmtpConfig": "SMTP 未配置，请先在系统设置中配置邮件服务"
+  "msgNoSmtpConfig": "SMTP 未配置，请先在系统设置中配置邮件服务",
+  "labelApiDocs": "API 文档 (Swagger)",
+  "labelRedoc": "API 文档 (ReDoc)",
+  "msgNoActiveServer": "未配置活跃服务器"
 }

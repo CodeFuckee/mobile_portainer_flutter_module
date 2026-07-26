@@ -711,4 +711,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get msgNoSmtpConfig => 'SMTP is not configured, please configure it in System Settings first';
+
+  @override
+  String get labelApiDocs => 'API Documentation (Swagger)';
+
+  @override
+  String get labelRedoc => 'API Documentation (ReDoc)';
+
+  @override
+  String get msgNoActiveServer => 'No active server configured';
 }

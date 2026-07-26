@@ -151,6 +151,60 @@ class SettingsScreenState extends State<SettingsScreen> {
     await UpdateService.checkUpdate(context, showNoUpdateToast: true);
   }
 
+  Future<void> _openApiDocs() async {
+    if (_activeApiUrl == null || _activeApiUrl!.isEmpty) {
+      if (mounted) {
+        NotifyUtils.showNotify(context, AppLocalizations.of(context)!.msgNoActiveServer);
+      }
+      return;
+    }
+    final apiUri = Uri.parse(_activeApiUrl!);
+    final docsUrl = Uri(
+      scheme: apiUri.scheme,
+      host: apiUri.host,
+      port: apiUri.port,
+      path: '/docs',
+    );
+    bool launched;
+    if (PlatformDetector.isOhos) {
+      launched = await HarmonyosPlatform.launchUrl(docsUrl.toString());
+    } else {
+      launched = await launchUrl(docsUrl, mode: LaunchMode.externalApplication);
+    }
+    if (!launched) {
+      if (mounted) {
+        NotifyUtils.showNotify(context, 'Could not launch API Docs');
+      }
+    }
+  }
+
+  Future<void> _openRedoc() async {
+    if (_activeApiUrl == null || _activeApiUrl!.isEmpty) {
+      if (mounted) {
+        NotifyUtils.showNotify(context, AppLocalizations.of(context)!.msgNoActiveServer);
+      }
+      return;
+    }
+    final apiUri = Uri.parse(_activeApiUrl!);
+    final docsUrl = Uri(
+      scheme: apiUri.scheme,
+      host: apiUri.host,
+      port: apiUri.port,
+      path: '/redoc',
+    );
+    bool launched;
+    if (PlatformDetector.isOhos) {
+      launched = await HarmonyosPlatform.launchUrl(docsUrl.toString());
+    } else {
+      launched = await launchUrl(docsUrl, mode: LaunchMode.externalApplication);
+    }
+    if (!launched) {
+      if (mounted) {
+        NotifyUtils.showNotify(context, 'Could not launch ReDoc');
+      }
+    }
+  }
+
   Future<void> _openGithub() async {
     final Uri url = Uri.parse('https://github.com/CodeFuckee/mobile_portainer_flutter_module');
     bool launched;
@@ -1289,6 +1343,22 @@ class SettingsScreenState extends State<SettingsScreen> {
                     trailing: Icon(RemixIcon.arrowRightSLine, color: colorScheme.onSurfaceVariant),
                   ),
                 ],
+                _buildSettingDivider(dividerColor),
+                _buildSettingTile(
+                  icon: RemixIcon.bookOpenLine,
+                  title: t.labelApiDocs,
+                  onTap: _openApiDocs,
+                  colorScheme: colorScheme,
+                  trailing: Icon(RemixIcon.externalLinkLine, size: 18, color: colorScheme.onSurfaceVariant),
+                ),
+                _buildSettingDivider(dividerColor),
+                _buildSettingTile(
+                  icon: RemixIcon.bookReadLine,
+                  title: t.labelRedoc,
+                  onTap: _openRedoc,
+                  colorScheme: colorScheme,
+                  trailing: Icon(RemixIcon.externalLinkLine, size: 18, color: colorScheme.onSurfaceVariant),
+                ),
                 _buildSettingDivider(dividerColor),
                 _buildSettingTile(
                   icon: RemixIcon.terminalLine,

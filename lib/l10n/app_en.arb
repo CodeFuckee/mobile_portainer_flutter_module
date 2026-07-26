@@ -226,5 +226,8 @@
   "msgTestEmailFailed": "Failed to send test email",
   "msgSendingTestEmail": "Sending test email...",
   "msgNoEmailBound": "Please bind an email address first",
-  "msgNoSmtpConfig": "SMTP is not configured, please configure it in System Settings first"
+  "msgNoSmtpConfig": "SMTP is not configured, please configure it in System Settings first",
+  "labelApiDocs": "API Documentation (Swagger)",
+  "labelRedoc": "API Documentation (ReDoc)",
+  "msgNoActiveServer": "No active server configured"
 }
