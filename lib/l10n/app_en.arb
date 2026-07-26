@@ -220,5 +220,11 @@
   "msgEmailUpdated": "Email updated successfully",
   "msgEmailRequired": "Please enter an email address",
   "msgEmailInvalid": "Please enter a valid email address",
-  "labelNotBound": "Not bound"
+  "labelNotBound": "Not bound",
+  "actionSendTestEmail": "Send Test Email",
+  "msgTestEmailSent": "Test email sent successfully",
+  "msgTestEmailFailed": "Failed to send test email",
+  "msgSendingTestEmail": "Sending test email...",
+  "msgNoEmailBound": "Please bind an email address first",
+  "msgNoSmtpConfig": "SMTP is not configured, please configure it in System Settings first"
 }

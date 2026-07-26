@@ -16,6 +16,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
   final _emailController = TextEditingController();
   bool _isLoading = true;
   bool _isSubmitting = false;
+  bool _isSendingTest = false;
   String? _loadError;
   String? _username;
   String? _boundEmail;
@@ -49,6 +50,39 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
         _loadError = e.toString();
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _sendTestEmail() async {
+    if (_isSendingTest) return;
+
+    final email = _boundEmail;
+    if (email == null || email.isEmpty) {
+      if (mounted) {
+        NotifyUtils.showNotify(
+          context,
+          AppLocalizations.of(context)!.msgNoEmailBound,
+        );
+      }
+      return;
+    }
+
+    setState(() => _isSendingTest = true);
+    try {
+      await AuthService.sendTestEmail(toEmail: email);
+      if (!mounted) return;
+      NotifyUtils.showNotify(
+        context,
+        AppLocalizations.of(context)!.msgTestEmailSent,
+      );
+    } catch (e) {
+      if (mounted) {
+        NotifyUtils.showNotify(context, e.toString());
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSendingTest = false);
+      }
     }
   }
 
@@ -213,6 +247,27 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
               ),
             ),
           ),
+
+          // 发送测试邮件按钮（仅在已绑定邮箱时显示）
+          if (hasEmail) ...[
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 44,
+              child: OutlinedButton.icon(
+                onPressed: _isSendingTest ? null : _sendTestEmail,
+                icon: _isSendingTest
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(RemixIcon.mailSendLine),
+                label: Text(
+                  _isSendingTest ? t.msgSendingTestEmail : t.actionSendTestEmail,
+                ),
+              ),
+            ),
+          ],
 
           const SizedBox(height: 32),
           SizedBox(

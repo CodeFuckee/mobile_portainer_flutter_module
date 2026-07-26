@@ -1426,6 +1426,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not bound'**
   String get labelNotBound;
+
+  /// No description provided for @actionSendTestEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Test Email'**
+  String get actionSendTestEmail;
+
+  /// No description provided for @msgTestEmailSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Test email sent successfully'**
+  String get msgTestEmailSent;
+
+  /// No description provided for @msgTestEmailFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send test email'**
+  String get msgTestEmailFailed;
+
+  /// No description provided for @msgSendingTestEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending test email...'**
+  String get msgSendingTestEmail;
+
+  /// No description provided for @msgNoEmailBound.
+  ///
+  /// In en, this message translates to:
+  /// **'Please bind an email address first'**
+  String get msgNoEmailBound;
+
+  /// No description provided for @msgNoSmtpConfig.
+  ///
+  /// In en, this message translates to:
+  /// **'SMTP is not configured, please configure it in System Settings first'**
+  String get msgNoSmtpConfig;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

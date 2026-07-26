@@ -693,4 +693,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get labelNotBound => '未绑定';
+
+  @override
+  String get actionSendTestEmail => '发送测试邮件';
+
+  @override
+  String get msgTestEmailSent => '测试邮件发送成功';
+
+  @override
+  String get msgTestEmailFailed => '测试邮件发送失败';
+
+  @override
+  String get msgSendingTestEmail => '正在发送测试邮件...';
+
+  @override
+  String get msgNoEmailBound => '请先绑定邮箱地址';
+
+  @override
+  String get msgNoSmtpConfig => 'SMTP 未配置，请先在系统设置中配置邮件服务';
 }

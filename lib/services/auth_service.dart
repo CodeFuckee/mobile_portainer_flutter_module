@@ -424,6 +424,51 @@ class AuthService {
     }
   }
 
+  /// 发送测试邮件到指定邮箱。
+  static Future<void> sendTestEmail({
+    required String toEmail,
+  }) async {
+    final prefs = await PreferencesService.getInstance();
+    final serverUrl = prefs.getString(_serverUrlKey);
+    final token = prefs.getString(_tokenKey);
+
+    if (serverUrl == null || token == null) {
+      throw Exception('未登录');
+    }
+
+    final url = Uri.parse('${_cleanUrl(serverUrl)}/admin/email/test');
+    final client = http.Client();
+
+    try {
+      final response = await client.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'x-api-key': token,
+        },
+        body: json.encode({
+          'to_email': toEmail,
+        }),
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 204) {
+        String detail = '发送测试邮件失败 (${response.statusCode})';
+        try {
+          final data = json.decode(response.body);
+          if (data is Map && data['message'] != null) {
+            detail = data['message'].toString();
+          } else if (data is Map && data['detail'] != null) {
+            detail = data['detail'].toString();
+          }
+        } catch (_) {}
+        throw Exception(detail);
+      }
+    } finally {
+      client.close();
+    }
+  }
+
   /// 获取当前用户个人信息。
   static Future<Map<String, dynamic>> getProfile() async {
     final prefs = await PreferencesService.getInstance();

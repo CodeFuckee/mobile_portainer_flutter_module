@@ -693,4 +693,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get labelNotBound => 'Not bound';
+
+  @override
+  String get actionSendTestEmail => 'Send Test Email';
+
+  @override
+  String get msgTestEmailSent => 'Test email sent successfully';
+
+  @override
+  String get msgTestEmailFailed => 'Failed to send test email';
+
+  @override
+  String get msgSendingTestEmail => 'Sending test email...';
+
+  @override
+  String get msgNoEmailBound => 'Please bind an email address first';
+
+  @override
+  String get msgNoSmtpConfig => 'SMTP is not configured, please configure it in System Settings first';
 }

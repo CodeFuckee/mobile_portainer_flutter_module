@@ -220,5 +220,11 @@
   "msgEmailUpdated": "邮箱更新成功",
   "msgEmailRequired": "请输入邮箱地址",
   "msgEmailInvalid": "请输入有效的邮箱地址",
-  "labelNotBound": "未绑定"
+  "labelNotBound": "未绑定",
+  "actionSendTestEmail": "发送测试邮件",
+  "msgTestEmailSent": "测试邮件发送成功",
+  "msgTestEmailFailed": "测试邮件发送失败",
+  "msgSendingTestEmail": "正在发送测试邮件...",
+  "msgNoEmailBound": "请先绑定邮箱地址",
+  "msgNoSmtpConfig": "SMTP 未配置，请先在系统设置中配置邮件服务"
 }
