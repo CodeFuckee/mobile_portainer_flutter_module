@@ -7,6 +7,7 @@ import 'dashboard_screen.dart';
 import 'home_screen.dart';
 import 'images_screen.dart';
 import 'resources_screen.dart';
+import 'projects_screen.dart';
 import 'settings_screen.dart';
 import '../theme/app_theme.dart';
 import 'package:mobile_portainer_flutter_module/l10n/app_localizations.dart';
@@ -33,6 +34,8 @@ class _MainTabScreenState extends State<MainTabScreen> {
   final GlobalKey<ImagesScreenState> _imagesKey =
       GlobalKey<ImagesScreenState>();
   // Keys for other screens are no longer needed as they are navigated to from Resources
+  final GlobalKey<ProjectListScreenState> _projectsKey =
+      GlobalKey<ProjectListScreenState>();
   final GlobalKey<SettingsScreenState> _settingsKey =
       GlobalKey<SettingsScreenState>();
 
@@ -80,11 +83,12 @@ class _MainTabScreenState extends State<MainTabScreen> {
       _dashboardKey.currentState?.refresh();
       _containersKey.currentState?.refreshAfterSettings();
       _imagesKey.currentState?.refreshAfterSettings();
+      _projectsKey.currentState?.refresh();
       // Other screens will refresh when opened as they are pushed new
       _settingsChanged = false;
     }
     // Also refresh settings if we switch to it, to ensure it shows correct active server
-    if (index == 3) {
+    if (index == 4) {
       _settingsKey.currentState?.refresh();
     }
   }
@@ -98,6 +102,8 @@ class _MainTabScreenState extends State<MainTabScreen> {
       case 2:
         return t.titleResources;
       case 3:
+        return t.titleProjects;
+      case 4:
         return t.titleSettings;
       default:
         return '';
@@ -136,6 +142,9 @@ class _MainTabScreenState extends State<MainTabScreen> {
         ),
         ResourcesScreen(
           bottomNavBar: bottomNavBar,
+        ),
+        ProjectListScreen(
+          key: _projectsKey,
         ),
         SettingsScreen(
           key: _settingsKey,
@@ -191,6 +200,7 @@ class _MainTabScreenState extends State<MainTabScreen> {
       (RemixIcon.dashboardLine, RemixIcon.dashboardFill, t.titleDashboard),
       (RemixIcon.serverLine, RemixIcon.serverLine, t.titleContainers),
       (RemixIcon.apps2Line, RemixIcon.apps2Fill, t.titleResources),
+      (RemixIcon.folderLine, RemixIcon.folderFill, t.titleProjects),
       (RemixIcon.settings3Line, RemixIcon.settings3Line, t.titleSettings),
     ];
 
@@ -267,7 +277,7 @@ class _MainTabScreenState extends State<MainTabScreen> {
           onPressed: _toggleLayoutMode,
           tooltip: 'Switch Layout',
         ),
-      if (_selectedIndex < 2)
+      if (_selectedIndex == 0 || _selectedIndex == 1 || _selectedIndex == 3)
         IconButton(
           icon: const Icon(RemixIcon.refreshLine),
           onPressed: () {
@@ -276,6 +286,10 @@ class _MainTabScreenState extends State<MainTabScreen> {
             } else if (_selectedIndex == 1) {
               if (_containersKey.currentState?.isLoading != true) {
                 _containersKey.currentState?.manualRefresh();
+              }
+            } else if (_selectedIndex == 3) {
+              if (_projectsKey.currentState?.isLoading != true) {
+                _projectsKey.currentState?.manualRefresh();
               }
             }
           },

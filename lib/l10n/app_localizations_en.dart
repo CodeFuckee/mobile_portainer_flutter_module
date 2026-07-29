@@ -713,55 +713,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get msgNoSmtpConfig => 'SMTP is not configured, please configure it in System Settings first';
 
   @override
-  String get sectionMcpServers => 'MCP Servers';
-
-  @override
-  String get buttonAddMcpServer => 'Add MCP Server';
-
-  @override
-  String get hintAddMcpServer => 'Tap to configure an MCP server';
-
-  @override
-  String get labelMcpServerName => 'Server Name';
-
-  @override
-  String get labelMcpServerUrl => 'MCP Endpoint URL';
-
-  @override
-  String get labelMcpServerType => 'Type';
-
-  @override
-  String get hintMcpUrl => 'e.g., http://server:8000/mcp';
-
-  @override
-  String get msgMcpServerAdded => 'MCP server added';
-
-  @override
-  String get msgMcpServerUpdated => 'MCP server updated';
-
-  @override
-  String get msgMcpServerDeleted => 'MCP server deleted';
-
-  @override
-  String msgMcpServerSwitched(Object name) {
-    return 'Switched to MCP server: $name';
-  }
-
-  @override
-  String get titleMcpTools => 'MCP Tools';
-
-  @override
-  String get msgNoMcpTools => 'No MCP tools found';
-
-  @override
-  String labelMcpToolsCount(Object count) {
-    return '$count tools';
-  }
-
-  @override
-  String get labelInputSchema => 'Input Schema';
-
-  @override
   String get labelApiDocs => 'API Documentation (Swagger)';
 
   @override
@@ -769,4 +720,88 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get msgNoActiveServer => 'No active server configured';
+
+  @override
+  String get titleProjects => 'Projects';
+
+  @override
+  String get hintSearchProjects => 'Search projects...';
+
+  @override
+  String get msgNoProjects => 'No projects found';
+
+  @override
+  String get labelProjectName => 'Project Name';
+
+  @override
+  String get labelProjectDescription => 'Description';
+
+  @override
+  String get hintProjectName => 'Enter project name';
+
+  @override
+  String get hintProjectDescription => 'Optional description';
+
+  @override
+  String get actionCreateProject => 'Create Project';
+
+  @override
+  String get actionSaveFile => 'Save';
+
+  @override
+  String get actionBuildImage => 'Build Image';
+
+  @override
+  String get actionComposeUp => 'Up';
+
+  @override
+  String get actionComposeDown => 'Down';
+
+  @override
+  String get msgBuildStarted => 'Build started';
+
+  @override
+  String get msgBuildSuccess => 'Build completed successfully';
+
+  @override
+  String get msgBuildFailed => 'Build failed';
+
+  @override
+  String get msgBuildLogEmpty => 'No build logs yet';
+
+  @override
+  String get msgComposeUpSuccess => 'Containers started successfully';
+
+  @override
+  String get msgComposeDownSuccess => 'Containers stopped successfully';
+
+  @override
+  String get titleBuildLogs => 'Build Logs';
+
+  @override
+  String get labelFileDockerfile => 'Dockerfile';
+
+  @override
+  String get labelFileCompose => 'docker-compose.yaml';
+
+  @override
+  String get msgProjectCreated => 'Project created successfully';
+
+  @override
+  String get msgProjectDeleted => 'Project deleted';
+
+  @override
+  String get msgConfirmDeleteProject => 'Are you sure you want to delete this project? All associated files will also be deleted.';
+
+  @override
+  String get msgSaveBeforeBuild => 'Please save your files before building';
+
+  @override
+  String get labelBuildId => 'Build ID';
+
+  @override
+  String get labelImageId => 'Image ID';
+
+  @override
+  String get msgSaveAll => 'All files saved';
 }

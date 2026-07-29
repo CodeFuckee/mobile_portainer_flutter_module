@@ -1463,96 +1463,6 @@ abstract class AppLocalizations {
   /// **'SMTP is not configured, please configure it in System Settings first'**
   String get msgNoSmtpConfig;
 
-  /// No description provided for @sectionMcpServers.
-  ///
-  /// In en, this message translates to:
-  /// **'MCP Servers'**
-  String get sectionMcpServers;
-
-  /// No description provided for @buttonAddMcpServer.
-  ///
-  /// In en, this message translates to:
-  /// **'Add MCP Server'**
-  String get buttonAddMcpServer;
-
-  /// No description provided for @hintAddMcpServer.
-  ///
-  /// In en, this message translates to:
-  /// **'Tap to configure an MCP server'**
-  String get hintAddMcpServer;
-
-  /// No description provided for @labelMcpServerName.
-  ///
-  /// In en, this message translates to:
-  /// **'Server Name'**
-  String get labelMcpServerName;
-
-  /// No description provided for @labelMcpServerUrl.
-  ///
-  /// In en, this message translates to:
-  /// **'MCP Endpoint URL'**
-  String get labelMcpServerUrl;
-
-  /// No description provided for @labelMcpServerType.
-  ///
-  /// In en, this message translates to:
-  /// **'Type'**
-  String get labelMcpServerType;
-
-  /// No description provided for @hintMcpUrl.
-  ///
-  /// In en, this message translates to:
-  /// **'e.g., http://server:8000/mcp'**
-  String get hintMcpUrl;
-
-  /// No description provided for @msgMcpServerAdded.
-  ///
-  /// In en, this message translates to:
-  /// **'MCP server added'**
-  String get msgMcpServerAdded;
-
-  /// No description provided for @msgMcpServerUpdated.
-  ///
-  /// In en, this message translates to:
-  /// **'MCP server updated'**
-  String get msgMcpServerUpdated;
-
-  /// No description provided for @msgMcpServerDeleted.
-  ///
-  /// In en, this message translates to:
-  /// **'MCP server deleted'**
-  String get msgMcpServerDeleted;
-
-  /// No description provided for @msgMcpServerSwitched.
-  ///
-  /// In en, this message translates to:
-  /// **'Switched to MCP server: {name}'**
-  String msgMcpServerSwitched(Object name);
-
-  /// No description provided for @titleMcpTools.
-  ///
-  /// In en, this message translates to:
-  /// **'MCP Tools'**
-  String get titleMcpTools;
-
-  /// No description provided for @msgNoMcpTools.
-  ///
-  /// In en, this message translates to:
-  /// **'No MCP tools found'**
-  String get msgNoMcpTools;
-
-  /// No description provided for @labelMcpToolsCount.
-  ///
-  /// In en, this message translates to:
-  /// **'{count} tools'**
-  String labelMcpToolsCount(Object count);
-
-  /// No description provided for @labelInputSchema.
-  ///
-  /// In en, this message translates to:
-  /// **'Input Schema'**
-  String get labelInputSchema;
-
   /// No description provided for @labelApiDocs.
   ///
   /// In en, this message translates to:
@@ -1570,6 +1480,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No active server configured'**
   String get msgNoActiveServer;
+
+  /// No description provided for @titleProjects.
+  ///
+  /// In en, this message translates to:
+  /// **'Projects'**
+  String get titleProjects;
+
+  /// No description provided for @hintSearchProjects.
+  ///
+  /// In en, this message translates to:
+  /// **'Search projects...'**
+  String get hintSearchProjects;
+
+  /// No description provided for @msgNoProjects.
+  ///
+  /// In en, this message translates to:
+  /// **'No projects found'**
+  String get msgNoProjects;
+
+  /// No description provided for @labelProjectName.
+  ///
+  /// In en, this message translates to:
+  /// **'Project Name'**
+  String get labelProjectName;
+
+  /// No description provided for @labelProjectDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get labelProjectDescription;
+
+  /// No description provided for @hintProjectName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter project name'**
+  String get hintProjectName;
+
+  /// No description provided for @hintProjectDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional description'**
+  String get hintProjectDescription;
+
+  /// No description provided for @actionCreateProject.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Project'**
+  String get actionCreateProject;
+
+  /// No description provided for @actionSaveFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get actionSaveFile;
+
+  /// No description provided for @actionBuildImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Build Image'**
+  String get actionBuildImage;
+
+  /// No description provided for @actionComposeUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Up'**
+  String get actionComposeUp;
+
+  /// No description provided for @actionComposeDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Down'**
+  String get actionComposeDown;
+
+  /// No description provided for @msgBuildStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Build started'**
+  String get msgBuildStarted;
+
+  /// No description provided for @msgBuildSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Build completed successfully'**
+  String get msgBuildSuccess;
+
+  /// No description provided for @msgBuildFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Build failed'**
+  String get msgBuildFailed;
+
+  /// No description provided for @msgBuildLogEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No build logs yet'**
+  String get msgBuildLogEmpty;
+
+  /// No description provided for @msgComposeUpSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Containers started successfully'**
+  String get msgComposeUpSuccess;
+
+  /// No description provided for @msgComposeDownSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Containers stopped successfully'**
+  String get msgComposeDownSuccess;
+
+  /// No description provided for @titleBuildLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Build Logs'**
+  String get titleBuildLogs;
+
+  /// No description provided for @labelFileDockerfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Dockerfile'**
+  String get labelFileDockerfile;
+
+  /// No description provided for @labelFileCompose.
+  ///
+  /// In en, this message translates to:
+  /// **'docker-compose.yaml'**
+  String get labelFileCompose;
+
+  /// No description provided for @msgProjectCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Project created successfully'**
+  String get msgProjectCreated;
+
+  /// No description provided for @msgProjectDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Project deleted'**
+  String get msgProjectDeleted;
+
+  /// No description provided for @msgConfirmDeleteProject.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this project? All associated files will also be deleted.'**
+  String get msgConfirmDeleteProject;
+
+  /// No description provided for @msgSaveBeforeBuild.
+  ///
+  /// In en, this message translates to:
+  /// **'Please save your files before building'**
+  String get msgSaveBeforeBuild;
+
+  /// No description provided for @labelBuildId.
+  ///
+  /// In en, this message translates to:
+  /// **'Build ID'**
+  String get labelBuildId;
+
+  /// No description provided for @labelImageId.
+  ///
+  /// In en, this message translates to:
+  /// **'Image ID'**
+  String get labelImageId;
+
+  /// No description provided for @msgSaveAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All files saved'**
+  String get msgSaveAll;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

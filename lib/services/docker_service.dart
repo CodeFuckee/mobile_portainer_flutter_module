@@ -10,6 +10,8 @@ import '../models/docker_network.dart';
 import '../models/docker_volume.dart';
 import '../models/server_usage.dart';
 import '../models/container_file.dart';
+import '../models/project.dart';
+import '../models/build_log.dart';
 
 class DockerService {
   final String baseUrl;
@@ -793,10 +795,10 @@ class DockerService {
   }
 
   Future<Map<String, dynamic>> getAvailablePorts() async {
-    final cleanBaseUrl = baseUrl.endsWith('/') 
-        ? baseUrl.substring(0, baseUrl.length - 1) 
+    final cleanBaseUrl = baseUrl.endsWith('/')
+        ? baseUrl.substring(0, baseUrl.length - 1)
         : baseUrl;
-        
+
     final url = Uri.parse('$cleanBaseUrl/ports/available');
 
     final headers = _authHeaders();
@@ -809,6 +811,260 @@ class DockerService {
       } else {
         final msg = _extractErrorMessage(response.body, 'Failed to load containers', response.statusCode);
                 throw Exception(msg);
+      }
+    } catch (e) {
+      throw e is Exception ? e : Exception('Network error');
+    }
+  }
+
+  // -------------------- Projects --------------------
+
+  Future<List<Project>> getProjects() async {
+    final cleanBaseUrl = baseUrl.endsWith('/')
+        ? baseUrl.substring(0, baseUrl.length - 1)
+        : baseUrl;
+    final url = Uri.parse('$cleanBaseUrl/projects');
+
+    final headers = _authHeaders();
+
+    try {
+      final response = await _client.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonList = json.decode(response.body);
+        return jsonList.map((json) => Project.fromJson(json)).toList();
+      } else {
+        final msg = _extractErrorMessage(response.body, 'Failed to load projects', response.statusCode);
+        throw Exception(msg);
+      }
+    } catch (e) {
+      throw e is Exception ? e : Exception('Network error');
+    }
+  }
+
+  Future<Project> createProject(String name, String description) async {
+    final cleanBaseUrl = baseUrl.endsWith('/')
+        ? baseUrl.substring(0, baseUrl.length - 1)
+        : baseUrl;
+    final url = Uri.parse('$cleanBaseUrl/projects');
+
+    final headers = _authHeaders({'Content-Type': 'application/json'});
+
+    final body = json.encode({
+      'name': name,
+      'description': description,
+    });
+
+    try {
+      final response = await _client.post(url, headers: headers, body: body);
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return Project.fromJson(json.decode(response.body));
+      } else {
+        final msg = _extractErrorMessage(response.body, 'Failed to create project', response.statusCode);
+        throw Exception(msg);
+      }
+    } catch (e) {
+      throw e is Exception ? e : Exception('Network error');
+    }
+  }
+
+  Future<Project> getProject(String id) async {
+    final cleanBaseUrl = baseUrl.endsWith('/')
+        ? baseUrl.substring(0, baseUrl.length - 1)
+        : baseUrl;
+    final url = Uri.parse('$cleanBaseUrl/projects/$id');
+
+    final headers = _authHeaders();
+
+    try {
+      final response = await _client.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        return Project.fromJson(json.decode(response.body));
+      } else {
+        final msg = _extractErrorMessage(response.body, 'Failed to load project', response.statusCode);
+        throw Exception(msg);
+      }
+    } catch (e) {
+      throw e is Exception ? e : Exception('Network error');
+    }
+  }
+
+  Future<void> deleteProject(String id) async {
+    final cleanBaseUrl = baseUrl.endsWith('/')
+        ? baseUrl.substring(0, baseUrl.length - 1)
+        : baseUrl;
+    final url = Uri.parse('$cleanBaseUrl/projects/$id');
+
+    final headers = _authHeaders();
+
+    try {
+      final response = await _client.delete(url, headers: headers);
+
+      if (response.statusCode != 204 && response.statusCode != 200) {
+        final msg = _extractErrorMessage(response.body, 'Failed to delete project', response.statusCode);
+        throw Exception(msg);
+      }
+    } catch (e) {
+      throw e is Exception ? e : Exception('Network error');
+    }
+  }
+
+  // -------------------- Project Files --------------------
+
+  Future<String> getProjectFile(String projectId, String filename) async {
+    final cleanBaseUrl = baseUrl.endsWith('/')
+        ? baseUrl.substring(0, baseUrl.length - 1)
+        : baseUrl;
+    final url = Uri.parse('$cleanBaseUrl/projects/$projectId/files/$filename');
+
+    final headers = _authHeaders();
+
+    try {
+      final response = await _client.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonMap = json.decode(response.body);
+        return jsonMap['content']?.toString() ?? '';
+      } else {
+        final msg = _extractErrorMessage(response.body, 'Failed to load project file', response.statusCode);
+        throw Exception(msg);
+      }
+    } catch (e) {
+      throw e is Exception ? e : Exception('Network error');
+    }
+  }
+
+  Future<void> updateProjectFile(String projectId, String filename, String content) async {
+    final cleanBaseUrl = baseUrl.endsWith('/')
+        ? baseUrl.substring(0, baseUrl.length - 1)
+        : baseUrl;
+    final url = Uri.parse('$cleanBaseUrl/projects/$projectId/files/$filename');
+
+    final headers = _authHeaders({'Content-Type': 'application/json'});
+
+    final body = json.encode({'content': content});
+
+    try {
+      final response = await _client.put(url, headers: headers, body: body);
+
+      if (response.statusCode != 200 && response.statusCode != 204) {
+        final msg = _extractErrorMessage(response.body, 'Failed to save project file', response.statusCode);
+        throw Exception(msg);
+      }
+    } catch (e) {
+      throw e is Exception ? e : Exception('Network error');
+    }
+  }
+
+  // -------------------- Project Build --------------------
+
+  Future<Map<String, dynamic>> triggerBuild(String projectId) async {
+    final cleanBaseUrl = baseUrl.endsWith('/')
+        ? baseUrl.substring(0, baseUrl.length - 1)
+        : baseUrl;
+    final url = Uri.parse('$cleanBaseUrl/projects/$projectId/build');
+
+    final headers = _authHeaders({'Content-Type': 'application/json'});
+
+    try {
+      final response = await _client.post(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        final msg = _extractErrorMessage(response.body, 'Failed to trigger build', response.statusCode);
+        throw Exception(msg);
+      }
+    } catch (e) {
+      throw e is Exception ? e : Exception('Network error');
+    }
+  }
+
+  Stream<BuildLog> getBuildLogs(String projectId) async* {
+    final cleanBaseUrl = baseUrl.endsWith('/')
+        ? baseUrl.substring(0, baseUrl.length - 1)
+        : baseUrl;
+
+    String wsUrl = cleanBaseUrl.replaceFirst('http', 'ws');
+    if (cleanBaseUrl.startsWith('https')) {
+      wsUrl = cleanBaseUrl.replaceFirst('https', 'wss');
+    } else if (!cleanBaseUrl.startsWith('http')) {
+      wsUrl = 'ws://$cleanBaseUrl';
+    } else {
+      wsUrl = cleanBaseUrl.replaceFirst('http', 'ws');
+    }
+
+    wsUrl = '$wsUrl/ws/projects/$projectId/build/logs?api_key=$apiKey';
+
+    final headers = _authHeaders();
+
+    final channel = await WsHelper.connectDirect(
+      Uri.parse(wsUrl),
+      headers: headers,
+      ignoreSsl: ignoreSsl,
+    );
+
+    try {
+      await for (final message in channel.stream) {
+        if (message is String) {
+          try {
+            yield BuildLog.fromJson(json.decode(message));
+          } catch (_) {
+            yield BuildLog(rawMessage: message, isDone: false);
+          }
+        } else {
+          yield BuildLog(rawMessage: message.toString(), isDone: false);
+        }
+      }
+    } catch (e) {
+      yield BuildLog(error: e.toString(), isDone: true);
+    } finally {
+      channel.sink.close();
+    }
+  }
+
+  // -------------------- Project Up / Down --------------------
+
+  Future<Map<String, dynamic>> triggerProjectUp(String projectId) async {
+    final cleanBaseUrl = baseUrl.endsWith('/')
+        ? baseUrl.substring(0, baseUrl.length - 1)
+        : baseUrl;
+    final url = Uri.parse('$cleanBaseUrl/projects/$projectId/up');
+
+    final headers = _authHeaders({'Content-Type': 'application/json'});
+
+    try {
+      final response = await _client.post(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        final msg = _extractErrorMessage(response.body, 'Failed to start project', response.statusCode);
+        throw Exception(msg);
+      }
+    } catch (e) {
+      throw e is Exception ? e : Exception('Network error');
+    }
+  }
+
+  Future<Map<String, dynamic>> triggerProjectDown(String projectId) async {
+    final cleanBaseUrl = baseUrl.endsWith('/')
+        ? baseUrl.substring(0, baseUrl.length - 1)
+        : baseUrl;
+    final url = Uri.parse('$cleanBaseUrl/projects/$projectId/down');
+
+    final headers = _authHeaders({'Content-Type': 'application/json'});
+
+    try {
+      final response = await _client.post(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        final msg = _extractErrorMessage(response.body, 'Failed to stop project', response.statusCode);
+        throw Exception(msg);
       }
     } catch (e) {
       throw e is Exception ? e : Exception('Network error');

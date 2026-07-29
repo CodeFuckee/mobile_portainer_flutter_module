@@ -713,55 +713,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get msgNoSmtpConfig => 'SMTP 未配置，请先在系统设置中配置邮件服务';
 
   @override
-  String get sectionMcpServers => 'MCP 服务器';
-
-  @override
-  String get buttonAddMcpServer => '添加 MCP 服务器';
-
-  @override
-  String get hintAddMcpServer => '点击配置 MCP 服务器';
-
-  @override
-  String get labelMcpServerName => '服务器名称';
-
-  @override
-  String get labelMcpServerUrl => 'MCP 端点地址';
-
-  @override
-  String get labelMcpServerType => '类型';
-
-  @override
-  String get hintMcpUrl => '例如 http://server:8000/mcp';
-
-  @override
-  String get msgMcpServerAdded => 'MCP 服务器已添加';
-
-  @override
-  String get msgMcpServerUpdated => 'MCP 服务器已更新';
-
-  @override
-  String get msgMcpServerDeleted => 'MCP 服务器已删除';
-
-  @override
-  String msgMcpServerSwitched(Object name) {
-    return '已切换到 MCP 服务器：$name';
-  }
-
-  @override
-  String get titleMcpTools => 'MCP 工具';
-
-  @override
-  String get msgNoMcpTools => '暂无 MCP 工具';
-
-  @override
-  String labelMcpToolsCount(Object count) {
-    return '$count 个工具';
-  }
-
-  @override
-  String get labelInputSchema => '输入参数';
-
-  @override
   String get labelApiDocs => 'API 文档 (Swagger)';
 
   @override
@@ -769,4 +720,88 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get msgNoActiveServer => '未配置活跃服务器';
+
+  @override
+  String get titleProjects => '项目';
+
+  @override
+  String get hintSearchProjects => '搜索项目...';
+
+  @override
+  String get msgNoProjects => '暂无项目';
+
+  @override
+  String get labelProjectName => '项目名称';
+
+  @override
+  String get labelProjectDescription => '描述';
+
+  @override
+  String get hintProjectName => '输入项目名称';
+
+  @override
+  String get hintProjectDescription => '可选描述';
+
+  @override
+  String get actionCreateProject => '创建项目';
+
+  @override
+  String get actionSaveFile => '保存';
+
+  @override
+  String get actionBuildImage => '构建镜像';
+
+  @override
+  String get actionComposeUp => '启动';
+
+  @override
+  String get actionComposeDown => '停止';
+
+  @override
+  String get msgBuildStarted => '构建已开始';
+
+  @override
+  String get msgBuildSuccess => '构建成功';
+
+  @override
+  String get msgBuildFailed => '构建失败';
+
+  @override
+  String get msgBuildLogEmpty => '暂无构建日志';
+
+  @override
+  String get msgComposeUpSuccess => '容器启动成功';
+
+  @override
+  String get msgComposeDownSuccess => '容器已停止';
+
+  @override
+  String get titleBuildLogs => '构建日志';
+
+  @override
+  String get labelFileDockerfile => 'Dockerfile';
+
+  @override
+  String get labelFileCompose => 'docker-compose.yaml';
+
+  @override
+  String get msgProjectCreated => '项目创建成功';
+
+  @override
+  String get msgProjectDeleted => '项目已删除';
+
+  @override
+  String get msgConfirmDeleteProject => '确定要删除此项目吗？此操作将同时删除所有关联文件。';
+
+  @override
+  String get msgSaveBeforeBuild => '请先保存文件再构建';
+
+  @override
+  String get labelBuildId => '构建 ID';
+
+  @override
+  String get labelImageId => '镜像 ID';
+
+  @override
+  String get msgSaveAll => '全部保存已保存';
 }
