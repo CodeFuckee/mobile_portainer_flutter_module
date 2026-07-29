@@ -108,6 +108,43 @@ selenium_tests:
     - echo "step0.1 docker diagnostics"
     - docker images --format '{{.Repository}}:{{.Tag}}' 2>/dev/null | sort
     - echo "DOCKER_HOST=$DOCKER_HOST"
+    - echo "step0.2 find free port"
+    - |
+      # 动态分配端口，避免宿主机端口被占用导致 stage 失败
+      get_free_port() {
+        # 优先用 python3 的 socket 绑定获取空闲端口（原子操作，无竞态）
+        local port
+        port=$(python3 -c "
+      import socket, random
+      s = socket.socket()
+      # 在 10000-60000 范围随机尝试，避免常见服务端口
+      for offset in random.sample(range(50001), 100):
+          try:
+              s.bind(('', 10000 + offset))
+              print(s.getsockname()[1])
+              s.close()
+              return
+          except OSError:
+              continue
+      # 回退：让内核分配
+      s.bind(('', 0))
+      print(s.getsockname()[1])
+      s.close()
+      " 2>/dev/null)
+        if [ -n "$port" ]; then
+          echo "$port"
+          return 0
+        fi
+        # 回退：用 bash /dev/tcp 检查
+        local p=9000
+        while [ $p -le 9999 ]; do
+          (echo >/dev/tcp/127.0.0.1/$p) 2>/dev/null || { echo "$p"; return 0; }
+          p=$((p + 1))
+        done
+        echo "9000"
+      }
+      SELENIUM_PORT=$(get_free_port)
+      echo "SELENIUM_PORT = $SELENIUM_PORT"
     - echo "step1 verify"
     - ls -la build/web/index.html
     - echo "step2 cleanup"
@@ -140,11 +177,11 @@ selenium_tests:
       docker commit --change='WORKDIR /app' --change='ENV WDM_PROGRESS_BAR=0' tmp_test selenium_tests:latest
       docker rm -f tmp_test
     - echo "step4 done"
-    - echo "step5 up app"
+    - echo "step5 up app (port=$SELENIUM_PORT)"
     - docker rm -f selenium_app 2>/dev/null || true
-    - docker run -d --name selenium_app -p 9000:9000 selenium_app
+    - docker run -d --name selenium_app -p ${SELENIUM_PORT}:9000 selenium_app
     - echo "step6 wait (up to 30s)"
-    - for i in $(seq 1 30); do curl -sf http://localhost:9000/info > /dev/null 2>&1 && echo "app ready at ${i}s" && break; test $i -eq 30 && echo "TIMEOUT" && exit 1; sleep 1; done
+    - for i in $(seq 1 30); do curl -sf http://localhost:${SELENIUM_PORT}/info > /dev/null 2>&1 && echo "app ready at ${i}s" && break; test $i -eq 30 && echo "TIMEOUT" && exit 1; sleep 1; done
     - echo "step7 run tests"
     - mkdir -p selenium_tests/reports
     - docker run --rm --shm-size=2g --network container:selenium_app -v $CI_PROJECT_DIR/selenium_tests/reports:/app/reports -e TEST_BASE_URL=http://localhost:9000 -e MOCK_BACKEND_URL=http://localhost:9000 -e TEST_BROWSER=chrome -e TEST_HEADLESS=true -e CHROMIUM_BINARY=/usr/bin/chromium -e CHROMEDRIVER_PATH=/usr/bin/chromedriver selenium_tests sh -c "pytest tests/ -v --tb=long --html=reports/report.html --self-contained-html"
