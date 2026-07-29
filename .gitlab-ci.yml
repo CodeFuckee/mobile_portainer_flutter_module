@@ -283,13 +283,23 @@ selenium_tests:
 
       set -e
     - echo "step7 run tests"
-    - mkdir -p "$CI_PROJECT_DIR/selenium_tests/reports"
     - |
+      # 在同一 shell 块中创建 reports 目录并运行测试
+      # 确保 Docker bind mount 时路径一定存在
+      REPORT_DIR="$CI_PROJECT_DIR/selenium_tests/reports"
+      mkdir -p "$REPORT_DIR"
+      if [ ! -d "$REPORT_DIR" ]; then
+        echo "FATAL: cannot create report dir: $REPORT_DIR"
+        exit 1
+      fi
+      echo "report dir: $REPORT_DIR"
+      ls -la "$REPORT_DIR"
+
       # 测试容器通过 --network container:selenium_app 共享网络命名空间，
       # 因此内部 localhost:9000 始终可达，不受宿主机端口映射影响。
       docker run --rm --shm-size=2g \
         --network container:selenium_app \
-        -v $CI_PROJECT_DIR/selenium_tests/reports:/app/reports \
+        -v "$REPORT_DIR:/app/reports" \
         -e TEST_BASE_URL=http://localhost:9000 \
         -e MOCK_BACKEND_URL=http://localhost:9000 \
         -e TEST_BROWSER=chrome \
