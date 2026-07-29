@@ -284,33 +284,71 @@ selenium_tests:
       set -e
     - echo "step7 run tests"
     - |
-      # 在同一 shell 块中创建 reports 目录并运行测试
-      # 确保 Docker bind mount 时路径一定存在
-      REPORT_DIR="$CI_PROJECT_DIR/selenium_tests/reports"
-      mkdir -p "$REPORT_DIR"
-      if [ ! -d "$REPORT_DIR" ]; then
-        echo "FATAL: cannot create report dir: $REPORT_DIR"
-        exit 1
-      fi
-      echo "report dir: $REPORT_DIR"
-      ls -la "$REPORT_DIR"
+      # ================================================================
+      # 不使用 Docker bind mount（-v）！
+      #
+      # 原因：当 Docker daemon 运行在容器中或不同挂载命名空间时
+      # （如 Docker-in-Docker、远程 Docker socket、Synology Docker），
+      # bind mount 的源路径需要在 Docker daemon 宿主机上存在，
+      # 而非 GitLab Runner 的文件系统上。
+      #
+      # 解决方案：pytest 报告写入容器内部 /tmp/reports/，
+      # 测试完成后通过 docker cp 提取到 Runner 文件系统。
+      # docker cp 通过 Docker API 流式传输，不依赖宿主文件系统路径。
+      # ================================================================
 
-      # 测试容器通过 --network container:selenium_app 共享网络命名空间，
+      set +e  # 禁用 exit-on-error，确保测试失败时也能提取报告
+
+      REPORT_DIR="$CI_PROJECT_DIR/selenium_tests/reports"
+      rm -rf "$REPORT_DIR" 2>/dev/null || true
+      mkdir -p "$REPORT_DIR"
+
+      TEST_CONTAINER="selenium_test_runner"
+      docker rm -f "$TEST_CONTAINER" 2>/dev/null || true
+
+      # 运行测试（不使用 --rm，以便测试后通过 docker cp 提取报告）
+      # --network container:selenium_app 共享网络命名空间，
       # 因此内部 localhost:9000 始终可达，不受宿主机端口映射影响。
-      docker run --rm --shm-size=2g \
+      docker run --shm-size=2g \
+        --name "$TEST_CONTAINER" \
         --network container:selenium_app \
-        -v "$REPORT_DIR:/app/reports" \
         -e TEST_BASE_URL=http://localhost:9000 \
         -e MOCK_BACKEND_URL=http://localhost:9000 \
         -e TEST_BROWSER=chrome \
         -e TEST_HEADLESS=true \
         -e CHROMIUM_BINARY=/usr/bin/chromium \
         -e CHROMEDRIVER_PATH=/usr/bin/chromedriver \
-        selenium_tests sh -c "pytest tests/ -v --tb=long --html=reports/report.html --self-contained-html"
-    - echo "step8 cleanup"
+        selenium_tests sh -c '
+          mkdir -p /tmp/reports && \
+          pytest tests/ -v --tb=long --html=/tmp/reports/report.html --self-contained-html
+        '
+      TEST_EXIT=$?
+
+      # 无论测试成功与否，都提取报告
+      echo "Extracting test reports from container..."
+      docker cp "$TEST_CONTAINER:/tmp/reports/." "$REPORT_DIR/" 2>/dev/null || {
+        echo "Warning: Could not copy reports from container"
+        echo "Container logs (last 20 lines):"
+        docker logs "$TEST_CONTAINER" 2>/dev/null | tail -20 || true
+      }
+
+      # 清理测试容器
+      docker rm -f "$TEST_CONTAINER" 2>/dev/null || true
+
+      echo "Reports directory contents:"
+      ls -la "$REPORT_DIR/" 2>/dev/null || echo "  (empty)"
+
+      # 恢复原始测试退出码
+      if [ $TEST_EXIT -ne 0 ]; then
+        echo "Tests FAILED with exit code $TEST_EXIT"
+        exit $TEST_EXIT
+      fi
+      echo "Tests PASSED"
+    - echo "step8 done"
+  after_script:
+    - docker rm -f selenium_test_runner 2>/dev/null || true
     - docker stop selenium_app 2>/dev/null || true
-    - docker rm selenium_app 2>/dev/null || true
-    - echo "done"
+    - docker rm -f selenium_app 2>/dev/null || true
   artifacts:
     when: always
     paths:
