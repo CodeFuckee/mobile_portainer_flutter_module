@@ -283,7 +283,7 @@ selenium_tests:
 
       set -e
     - echo "step7 run tests"
-    - mkdir -p selenium_tests/reports
+    - mkdir -p "$CI_PROJECT_DIR/selenium_tests/reports"
     - |
       # 测试容器通过 --network container:selenium_app 共享网络命名空间，
       # 因此内部 localhost:9000 始终可达，不受宿主机端口映射影响。
