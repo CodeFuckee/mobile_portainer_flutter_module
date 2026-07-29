@@ -108,43 +108,49 @@ selenium_tests:
     - echo "step0.1 docker diagnostics"
     - docker images --format '{{.Repository}}:{{.Tag}}' 2>/dev/null | sort
     - echo "DOCKER_HOST=$DOCKER_HOST"
-    - echo "step0.2 find free port"
+    - echo "step0.2 find free host port"
     - |
-      # 动态分配端口，避免宿主机端口被占用导致 stage 失败
-      get_free_port() {
-        # 优先用 python3 的 socket 绑定获取空闲端口（原子操作，无竞态）
-        local port
-        port=$(python3 -c "
-      import socket, random
-      s = socket.socket()
-      # 在 10000-60000 范围随机尝试，避免常见服务端口
-      for offset in random.sample(range(50001), 100):
-          try:
-              s.bind(('', 10000 + offset))
-              print(s.getsockname()[1])
-              s.close()
-              return
-          except OSError:
-              continue
-      # 回退：让内核分配
-      s.bind(('', 0))
-      print(s.getsockname()[1])
-      s.close()
+      # ================================================================
+      # 动态分配宿主机端口
+      #
+      # 关键：CI 运行在 Docker 容器内，但通过 docker.sock 操作的是宿主机。
+      # socket.bind() 只能检测 CI 容器内的端口，看不到宿主机的端口占用。
+      # 因此必须通过 Docker daemon 查询/验证宿主机端口。
+      # ================================================================
+
+      # 1. 通过 docker ps 收集宿主机上已被容器映射占用的端口（快速初筛）
+      HOST_USED_PORTS=$(docker ps --format '{{.Ports}}' 2>/dev/null \
+        | tr ',' '\n' \
+        | grep -oP ':\K[0-9]+(?=->)' \
+        | sort -u)
+      echo "宿主机已占用端口: $(echo $HOST_USED_PORTS | tr '\n' ' ')"
+
+      # 2. 生成候选端口（避开已知占用的端口）
+      get_candidate_port() {
+        # python3 生成随机端口，或纯 shell 回退
+        local p
+        p=$(python3 -c "
+      import random
+      # 在 10000-60000 范围内随机生成，避开常见服务端口
+      print(random.randint(10000, 60000))
       " 2>/dev/null)
-        if [ -n "$port" ]; then
-          echo "$port"
-          return 0
+        if [ -z "$p" ]; then
+          p=$((10000 + RANDOM % 50000))
         fi
-        # 回退：用 bash /dev/tcp 检查
-        local p=9000
-        while [ $p -le 9999 ]; do
-          (echo >/dev/tcp/127.0.0.1/$p) 2>/dev/null || { echo "$p"; return 0; }
-          p=$((p + 1))
-        done
-        echo "9000"
+        echo "$p"
       }
-      SELENIUM_PORT=$(get_free_port)
-      echo "SELENIUM_PORT = $SELENIUM_PORT"
+
+      SELENIUM_PORT=9000
+      for _ in $(seq 1 20); do
+        candidate=$(get_candidate_port)
+        # 跳过 docker ps 中已知占用的端口
+        if echo "$HOST_USED_PORTS" | grep -qxF "$candidate"; then
+          continue
+        fi
+        SELENIUM_PORT=$candidate
+        break
+      done
+      echo "SELENIUM_PORT 初始值 = $SELENIUM_PORT"
     - echo "step1 verify"
     - ls -la build/web/index.html
     - echo "step2 cleanup"
@@ -177,9 +183,42 @@ selenium_tests:
       docker commit --change='WORKDIR /app' --change='ENV WDM_PROGRESS_BAR=0' tmp_test selenium_tests:latest
       docker rm -f tmp_test
     - echo "step4 done"
-    - echo "step5 up app (port=$SELENIUM_PORT)"
-    - docker rm -f selenium_app 2>/dev/null || true
-    - docker run -d --name selenium_app selenium_app
+    - echo "step5 up app with retry (max 15 attempts)"
+    - |
+      # 通过 docker run 实际尝试绑定宿主机端口。
+      # 如果端口被宿主机的非 Docker 进程占用（docker ps 看不到），
+      # docker daemon 会返回 "port is already allocated" 错误，
+      # 此时自动换端口重试。这是唯一 100% 可靠的宿主机端口检测方式。
+      docker rm -f selenium_app 2>/dev/null || true
+      APP_STARTED=false
+      MAX_PORT_ATTEMPTS=15
+      attempt=1
+      while [ $attempt -le $MAX_PORT_ATTEMPTS ]; do
+        err_log=$(mktemp)
+        if docker run -d --name selenium_app -p ${SELENIUM_PORT}:9000 selenium_app 2>"$err_log"; then
+          echo "selenium_app started on host port $SELENIUM_PORT (attempt $attempt)"
+          APP_STARTED=true
+          rm -f "$err_log"
+          break
+        fi
+        if grep -qiE 'port.*already.*allocated|bind.*failed|address already in use' "$err_log"; then
+          echo "宿主机端口 $SELENIUM_PORT 已被占用，重新分配..."
+          docker rm -f selenium_app 2>/dev/null || true
+          # 重新分配端口（避免重复命中同一个占用端口）
+          SELENIUM_PORT=$(python3 -c "import random; print(random.randint(10000, 60000))" 2>/dev/null || echo $((SELENIUM_PORT + (RANDOM % 500) + 1)))
+          attempt=$((attempt + 1))
+        else
+          echo "Docker 启动失败（非端口原因）:"
+          cat "$err_log"
+          rm -f "$err_log"
+          exit 1
+        fi
+        rm -f "$err_log"
+      done
+      if [ "$APP_STARTED" = false ]; then
+        echo "错误：尝试 $MAX_PORT_ATTEMPTS 个端口后仍无法启动 selenium_app"
+        exit 1
+      fi
     - echo "step6 wait (up to 30s)"
     - for i in $(seq 1 30); do curl -sf http://localhost:${SELENIUM_PORT}/info > /dev/null 2>&1 && echo "app ready at ${i}s" && break; test $i -eq 30 && echo "TIMEOUT" && exit 1; sleep 1; done
     - echo "step7 run tests"
