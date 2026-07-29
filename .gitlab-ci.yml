@@ -179,7 +179,7 @@ selenium_tests:
     - echo "step4 done"
     - echo "step5 up app (port=$SELENIUM_PORT)"
     - docker rm -f selenium_app 2>/dev/null || true
-    - docker run -d --name selenium_app -p ${SELENIUM_PORT}:9000 selenium_app
+    - docker run -d --name selenium_app selenium_app
     - echo "step6 wait (up to 30s)"
     - for i in $(seq 1 30); do curl -sf http://localhost:${SELENIUM_PORT}/info > /dev/null 2>&1 && echo "app ready at ${i}s" && break; test $i -eq 30 && echo "TIMEOUT" && exit 1; sleep 1; done
     - echo "step7 run tests"
