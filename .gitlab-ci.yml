@@ -250,29 +250,38 @@ selenium_tests:
     - |
       # ================================================================
       # 外部健康检查：从 CI shell 通过端口映射访问 app
-      #
-      # 尝试顺序：localhost → docker gateway → host.docker.internal
-      # 如果 CI 本身在容器内运行（非 --network host），
-      # localhost 可能是 CI 容器自身而非宿主机，需要尝试其他地址。
+      # 注意：此步骤仅用于诊断，不影响后续测试！
+      # 测试容器通过 --network container: 共享网络命名空间，
+      # 内部 localhost:9000 始终可达。
       # ================================================================
 
-      # 尝试 1: localhost（CI 直接运行在宿主机上时有效）
+      set +e  # 此步骤的任何失败都不应中断 job
+
+      # 尝试 1: localhost
       if curl -sf "http://localhost:${SELENIUM_PORT}/info" > /dev/null 2>&1; then
         echo "app reachable via localhost:${SELENIUM_PORT}"
       else
-        echo "localhost:${SELENIUM_PORT} not reachable, trying alternatives..."
+        echo "localhost:${SELENIUM_PORT} not reachable"
 
-        # 尝试 2: Docker 网桥网关（CI 容器通过 docker.sock 访问宿主机时）
-        GATEWAY=$(ip route 2>/dev/null | awk '/default/ {print $3; exit}')
+        # 尝试 2: Docker 网桥网关（兼容 busybox/synology，优先试用 route 命令）
+        GATEWAY=""
+        if command -v ip >/dev/null 2>&1; then
+          GATEWAY=$(ip route 2>/dev/null | awk '/default/ {print $3; exit}')
+        elif command -v route >/dev/null 2>&1; then
+          GATEWAY=$(route -n 2>/dev/null | awk '$1=="0.0.0.0" {print $2; exit}')
+        fi
+
         if [ -n "$GATEWAY" ] && curl -sf "http://${GATEWAY}:${SELENIUM_PORT}/info" > /dev/null 2>&1; then
           echo "app reachable via gateway ${GATEWAY}:${SELENIUM_PORT}"
         else
-          echo "WARNING: external health check failed, but internal check passed"
-          echo "  container running: $(docker inspect -f '{{.State.Status}}' selenium_app)"
-          echo "  port mapping:      $(docker port selenium_app)"
-          echo "  Tests will use --network container: mode (shares network namespace)"
+          echo "WARNING: external health check skipped"
+          echo "  container status: $(docker inspect -f '{{.State.Status}}' selenium_app 2>/dev/null || echo unknown)"
+          echo "  container ports:  $(docker port selenium_app 2>/dev/null || echo unknown)"
+          echo "  Tests use --network container: mode (independent of host port mapping)"
         fi
       fi
+
+      set -e
     - echo "step7 run tests"
     - mkdir -p selenium_tests/reports
     - |
