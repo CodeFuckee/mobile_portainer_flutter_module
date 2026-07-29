@@ -108,49 +108,6 @@ selenium_tests:
     - echo "step0.1 docker diagnostics"
     - docker images --format '{{.Repository}}:{{.Tag}}' 2>/dev/null | sort
     - echo "DOCKER_HOST=$DOCKER_HOST"
-    - echo "step0.2 find free host port"
-    - |
-      # ================================================================
-      # 动态分配宿主机端口
-      #
-      # 关键：CI 运行在 Docker 容器内，但通过 docker.sock 操作的是宿主机。
-      # socket.bind() 只能检测 CI 容器内的端口，看不到宿主机的端口占用。
-      # 因此必须通过 Docker daemon 查询/验证宿主机端口。
-      # ================================================================
-
-      # 1. 通过 docker ps 收集宿主机上已被容器映射占用的端口（快速初筛）
-      HOST_USED_PORTS=$(docker ps --format '{{.Ports}}' 2>/dev/null \
-        | tr ',' '\n' \
-        | grep -oP ':\K[0-9]+(?=->)' \
-        | sort -u)
-      echo "宿主机已占用端口: $(echo $HOST_USED_PORTS | tr '\n' ' ')"
-
-      # 2. 生成候选端口（避开已知占用的端口）
-      get_candidate_port() {
-        # python3 生成随机端口，或纯 shell 回退
-        local p
-        p=$(python3 -c "
-      import random
-      # 在 10000-60000 范围内随机生成，避开常见服务端口
-      print(random.randint(10000, 60000))
-      " 2>/dev/null)
-        if [ -z "$p" ]; then
-          p=$((10000 + RANDOM % 50000))
-        fi
-        echo "$p"
-      }
-
-      SELENIUM_PORT=9000
-      for _ in $(seq 1 20); do
-        candidate=$(get_candidate_port)
-        # 跳过 docker ps 中已知占用的端口
-        if echo "$HOST_USED_PORTS" | grep -qxF "$candidate"; then
-          continue
-        fi
-        SELENIUM_PORT=$candidate
-        break
-      done
-      echo "SELENIUM_PORT 初始值 = $SELENIUM_PORT"
     - echo "step1 verify"
     - ls -la build/web/index.html
     - echo "step2 cleanup"
@@ -164,8 +121,11 @@ selenium_tests:
       docker exec tmp_app mkdir -p /app/build/web /app/selenium_tests
       docker cp build/web/. tmp_app:/app/build/web/
       docker cp selenium_tests/mock_backend.py tmp_app:/app/selenium_tests/
+      echo "  -> 验证容器内文件..."
+      docker exec tmp_app ls -la /app/build/web/index.html
+      docker exec tmp_app ls -la /app/selenium_tests/mock_backend.py
       echo "  -> 提交为 selenium_app 镜像..."
-      docker commit --change='WORKDIR /app' --change='EXPOSE 9000' --change='CMD ["python", "selenium_tests/mock_backend.py"]' tmp_app selenium_app:latest
+      docker commit --change='WORKDIR /app' --change='EXPOSE 9000' --change='CMD ["python3", "selenium_tests/mock_backend.py"]' tmp_app selenium_app:latest
       docker rm -f tmp_app
     - echo "step3 done"
     - echo "step4 build test image (docker commit 方案)"
@@ -183,51 +143,155 @@ selenium_tests:
       docker commit --change='WORKDIR /app' --change='ENV WDM_PROGRESS_BAR=0' tmp_test selenium_tests:latest
       docker rm -f tmp_test
     - echo "step4 done"
-    - echo "step5 up app with retry (max 15 attempts)"
+    - echo "step5 start app with dynamic port + internal health check"
     - |
-      # 通过 docker run 实际尝试绑定宿主机端口。
-      # 如果端口被宿主机的非 Docker 进程占用（docker ps 看不到），
-      # docker daemon 会返回 "port is already allocated" 错误，
-      # 此时自动换端口重试。这是唯一 100% 可靠的宿主机端口检测方式。
+      # ================================================================
+      # 端口分配 + 容器启动 + 内部健康检查
+      #
+      # 关键设计：
+      # 1. 通过 docker ps 收集宿主机已占用端口（docker daemon 视角）
+      # 2. docker run -p 绑定端口 — 既是端口分配也是实际使用，无竞态
+      # 3. docker exec 做内部健康检查 — 不依赖宿主机端口映射，100% 可靠
+      # 4. 外部 curl 作为辅助验证（后续 step6）
+      # ================================================================
+
       docker rm -f selenium_app 2>/dev/null || true
-      APP_STARTED=false
-      MAX_PORT_ATTEMPTS=15
+
+      # 收集宿主机 Docker 已占用的端口
+      HOST_USED=$(docker ps --format '{{.Ports}}' 2>/dev/null \
+        | tr ',' '\n' \
+        | grep -oP ':\K[0-9]+(?=->)' \
+        | sort -u)
+
+      MAX_ATTEMPTS=15
+      STARTED=false
       attempt=1
-      while [ $attempt -le $MAX_PORT_ATTEMPTS ]; do
-        err_log=$(mktemp)
-        if docker run -d --name selenium_app -p ${SELENIUM_PORT}:9000 selenium_app 2>"$err_log"; then
-          echo "selenium_app started on host port $SELENIUM_PORT (attempt $attempt)"
-          APP_STARTED=true
-          rm -f "$err_log"
-          break
-        fi
-        if grep -qiE 'port.*already.*allocated|bind.*failed|address already in use' "$err_log"; then
-          echo "宿主机端口 $SELENIUM_PORT 已被占用，重新分配..."
-          docker rm -f selenium_app 2>/dev/null || true
-          # 重新分配端口（避免重复命中同一个占用端口）
-          SELENIUM_PORT=$(python3 -c "import random; print(random.randint(10000, 60000))" 2>/dev/null || echo $((SELENIUM_PORT + (RANDOM % 500) + 1)))
+
+      while [ $attempt -le $MAX_ATTEMPTS ]; do
+        # ---- 生成候选端口，避开 docker ps 已知占用 ----
+        PORT=$(python3 -c "import random; print(random.randint(10000, 60000))" 2>/dev/null \
+          || echo $((10000 + RANDOM % 50000)))
+
+        # 跳过已知被 Docker 占用的端口
+        if echo "$HOST_USED" | grep -qxF "$PORT"; then
           attempt=$((attempt + 1))
-        else
-          echo "Docker 启动失败（非端口原因）:"
-          cat "$err_log"
-          rm -f "$err_log"
-          exit 1
+          continue
+        fi
+
+        echo "[attempt $attempt] trying host port $PORT"
+
+        # ---- 启动 app 容器 ----
+        err_log=$(mktemp)
+        if ! docker run -d --name selenium_app -p ${PORT}:9000 selenium_app 2>"$err_log"; then
+          if grep -qiE 'port.*already.*allocated|bind.*failed|address already in use' "$err_log"; then
+            echo "  -> port $PORT occupied on host, retrying..."
+            docker rm -f selenium_app 2>/dev/null || true
+            rm -f "$err_log"
+            attempt=$((attempt + 1))
+            continue
+          else
+            echo "FATAL: docker run failed (non-port error):"
+            cat "$err_log"
+            rm -f "$err_log"
+            exit 1
+          fi
         fi
         rm -f "$err_log"
+
+        # ---- 立即检查容器是否还活着 ----
+        sleep 2
+        STATUS=$(docker inspect -f '{{.State.Status}}' selenium_app 2>/dev/null)
+        if [ "$STATUS" != "running" ]; then
+          echo "  -> container exited (status=$STATUS), checking logs:"
+          docker logs selenium_app 2>&1 | tail -20
+          echo "  -> container exited unexpectedly, retrying..."
+          docker rm -f selenium_app 2>/dev/null || true
+          attempt=$((attempt + 1))
+          continue
+        fi
+
+        # ---- 内部健康检查：docker exec 不依赖端口映射 ----
+        INTERNAL_OK=false
+        for i in $(seq 1 15); do
+          if docker exec selenium_app python3 -c "
+      import urllib.request
+      try:
+          resp = urllib.request.urlopen('http://localhost:9000/info', timeout=3)
+          print(resp.status)
+      except Exception as e:
+          print(f'ERROR: {e}')
+      " 2>/dev/null | grep -q '200'; then
+            echo "  -> app healthy (internal check) at ${i}s"
+            INTERNAL_OK=true
+            break
+          fi
+          sleep 1
+        done
+
+        if [ "$INTERNAL_OK" = true ]; then
+          SELENIUM_PORT=$PORT
+          STARTED=true
+          echo "  -> app running on internal:9000, mapped to host:$SELENIUM_PORT"
+          break
+        fi
+
+        echo "  -> internal health check TIMEOUT, container logs:"
+        docker logs selenium_app 2>&1 | tail -20
+        docker rm -f selenium_app 2>/dev/null || true
+        attempt=$((attempt + 1))
       done
-      if [ "$APP_STARTED" = false ]; then
-        echo "错误：尝试 $MAX_PORT_ATTEMPTS 个端口后仍无法启动 selenium_app"
+
+      if [ "$STARTED" = false ]; then
+        echo "FATAL: failed to start selenium_app after $MAX_ATTEMPTS attempts"
         exit 1
       fi
-    - echo "step6 wait (up to 30s)"
-    - for i in $(seq 1 30); do curl -sf http://localhost:${SELENIUM_PORT}/info > /dev/null 2>&1 && echo "app ready at ${i}s" && break; test $i -eq 30 && echo "TIMEOUT" && exit 1; sleep 1; done
+      echo "SELENIUM_PORT=$SELENIUM_PORT"
+    - echo "step6 external health check"
+    - |
+      # ================================================================
+      # 外部健康检查：从 CI shell 通过端口映射访问 app
+      #
+      # 尝试顺序：localhost → docker gateway → host.docker.internal
+      # 如果 CI 本身在容器内运行（非 --network host），
+      # localhost 可能是 CI 容器自身而非宿主机，需要尝试其他地址。
+      # ================================================================
+
+      # 尝试 1: localhost（CI 直接运行在宿主机上时有效）
+      if curl -sf "http://localhost:${SELENIUM_PORT}/info" > /dev/null 2>&1; then
+        echo "app reachable via localhost:${SELENIUM_PORT}"
+      else
+        echo "localhost:${SELENIUM_PORT} not reachable, trying alternatives..."
+
+        # 尝试 2: Docker 网桥网关（CI 容器通过 docker.sock 访问宿主机时）
+        GATEWAY=$(ip route 2>/dev/null | awk '/default/ {print $3; exit}')
+        if [ -n "$GATEWAY" ] && curl -sf "http://${GATEWAY}:${SELENIUM_PORT}/info" > /dev/null 2>&1; then
+          echo "app reachable via gateway ${GATEWAY}:${SELENIUM_PORT}"
+        else
+          echo "WARNING: external health check failed, but internal check passed"
+          echo "  container running: $(docker inspect -f '{{.State.Status}}' selenium_app)"
+          echo "  port mapping:      $(docker port selenium_app)"
+          echo "  Tests will use --network container: mode (shares network namespace)"
+        fi
+      fi
     - echo "step7 run tests"
     - mkdir -p selenium_tests/reports
-    - docker run --rm --shm-size=2g --network container:selenium_app -v $CI_PROJECT_DIR/selenium_tests/reports:/app/reports -e TEST_BASE_URL=http://localhost:9000 -e MOCK_BACKEND_URL=http://localhost:9000 -e TEST_BROWSER=chrome -e TEST_HEADLESS=true -e CHROMIUM_BINARY=/usr/bin/chromium -e CHROMEDRIVER_PATH=/usr/bin/chromedriver selenium_tests sh -c "pytest tests/ -v --tb=long --html=reports/report.html --self-contained-html"
-    - echo "step7 cleanup"
+    - |
+      # 测试容器通过 --network container:selenium_app 共享网络命名空间，
+      # 因此内部 localhost:9000 始终可达，不受宿主机端口映射影响。
+      docker run --rm --shm-size=2g \
+        --network container:selenium_app \
+        -v $CI_PROJECT_DIR/selenium_tests/reports:/app/reports \
+        -e TEST_BASE_URL=http://localhost:9000 \
+        -e MOCK_BACKEND_URL=http://localhost:9000 \
+        -e TEST_BROWSER=chrome \
+        -e TEST_HEADLESS=true \
+        -e CHROMIUM_BINARY=/usr/bin/chromium \
+        -e CHROMEDRIVER_PATH=/usr/bin/chromedriver \
+        selenium_tests sh -c "pytest tests/ -v --tb=long --html=reports/report.html --self-contained-html"
+    - echo "step8 cleanup"
     - docker stop selenium_app 2>/dev/null || true
     - docker rm selenium_app 2>/dev/null || true
-    - echo "step8 done"
+    - echo "done"
   artifacts:
     when: always
     paths:
